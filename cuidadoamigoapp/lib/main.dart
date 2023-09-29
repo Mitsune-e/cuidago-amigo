@@ -1,6 +1,8 @@
 import 'package:cuidadoamigoapp/views/RecuperarSenha.dart';
 import 'package:cuidadoamigoapp/views/cadastro1.dart';
 import 'package:cuidadoamigoapp/views/login.dart';
+import 'package:cuidadoamigoapp/views/homeIdoso.dart';
+
 import 'package:flutter/material.dart';
 
 void main() {
@@ -20,6 +22,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => Login(),
         '/cadastro1': (context) => Cadastro1(),
         '/recuperarSenha': (context) => RecuperarSenha(),
+        '/homeIdoso': (context) => HomeIdoso(),
       },
     );
   }

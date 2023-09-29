@@ -46,7 +46,7 @@ class Login extends StatelessWidget {
                 
                 TextButton(onPressed: (){Navigator.of(context).pushNamed('/recuperarSenha');}, child: Text('Esqueci minha senha')),
                 
-                 ElevatedButton(onPressed:(){}, child: Text('Logar',style: TextStyle(color: Colors.white,)),
+                 ElevatedButton(onPressed:(){Navigator.of(context).pushReplacementNamed('/homeIdoso');}, child: Text('Logar',style: TextStyle(color: Colors.white,)),
                   style: ElevatedButton.styleFrom(
                     primary: Color.fromRGBO(92, 198, 186, 100),
                     shape:  StadiumBorder()

@@ -127,6 +127,6 @@ class Cadastro1 extends StatelessWidget {
           ],
       ),
     ),
-    );;
+    );
   }
 }
