@@ -6,6 +6,7 @@ import 'package:cuidadoamigoapp/views/SolicitarCuidador2.dart';
 import 'package:cuidadoamigoapp/views/agenda.dart';
 import 'package:cuidadoamigoapp/views/cadastro1.dart';
 import 'package:cuidadoamigoapp/views/cadastro2.dart';
+import 'package:cuidadoamigoapp/views/detalhamento.dart';
 import 'package:cuidadoamigoapp/views/homeCuidador.dart';
 import 'package:cuidadoamigoapp/views/login.dart';
 import 'package:cuidadoamigoapp/views/homeIdoso.dart';

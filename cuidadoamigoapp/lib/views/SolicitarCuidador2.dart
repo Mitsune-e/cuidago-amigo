@@ -38,7 +38,7 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
         actions: [
           IconButton(
             onPressed: () {
-              // Adicione ação para abrir o filtro
+              _mostrarFiltrosDialog(context);
             },
             icon: Icon(Icons.filter_alt),
           ),
@@ -136,6 +136,47 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
           ),
         ),
       ),
+    );
+  }
+
+  void _mostrarFiltrosDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Filtros'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Selecione os filtros desejados:'),
+              CheckboxListTile(
+                title: Text('Filtro 1'),
+                value: false, // Coloque o valor do filtro aqui
+                onChanged: (bool? value) {
+                  // Atualize o valor do filtro aqui
+                },
+              ),
+              CheckboxListTile(
+                title: Text('Filtro 2'),
+                value: false, // Coloque o valor do filtro aqui
+                onChanged: (bool? value) {
+                  // Atualize o valor do filtro aqui
+                },
+              ),
+              // Adicione mais filtros conforme necessário
+            ],
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Fechar o diálogo
+              },
+              child: Text('Aplicar'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

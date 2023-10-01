@@ -1,3 +1,4 @@
+import 'package:cuidadoamigoapp/views/detalhamento.dart';
 import 'package:flutter/material.dart';
 
 class Agenda extends StatelessWidget {
@@ -19,7 +20,17 @@ class Agenda extends StatelessWidget {
             'Descrição do Serviço 1',
             'Horário: 10:00 - 11:00',
             () {
-              // Adicione a lógica para navegar para a página de detalhamento aqui
+             Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => DetalhesServico(
+                      serviceName: 'Serviço 1',
+                      serviceDescription: 'Descrição do Serviço 1',
+                      serviceTime: '10:00 - 11:00',
+                      serviceAddress: '123 Rua Principal, Cidade',
+                      serviceDate: '01/01/2023',
+                    ),
+                  ),
+            );
             },
           ),
           _buildServiceButton(
@@ -27,7 +38,17 @@ class Agenda extends StatelessWidget {
             'Descrição do Serviço 2',
             'Horário: 14:00 - 15:00',
             () {
-              // Adicione a lógica para navegar para a página de detalhamento aqui
+             Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => DetalhesServico(
+                      serviceName: 'Serviço 1',
+                      serviceDescription: 'Descrição do Serviço 1',
+                      serviceTime: '10:00 - 11:00',
+                      serviceAddress: '123 Rua Principal, Cidade',
+                      serviceDate: '01/01/2023',
+                    ),
+                  ),
+            );
             },
           ),
           // Adicione mais serviços aqui, se necessário

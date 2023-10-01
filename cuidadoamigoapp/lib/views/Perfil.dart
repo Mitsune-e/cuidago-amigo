@@ -1,7 +1,23 @@
 import 'package:flutter/material.dart';
 
-class Perfil extends StatelessWidget {
+class Perfil extends StatefulWidget {
   const Perfil({Key? key});
+
+  @override
+  _PerfilState createState() => _PerfilState();
+}
+
+class _PerfilState extends State<Perfil> {
+  TextEditingController _nomeController = TextEditingController(text: 'João da Silva');
+  TextEditingController _cpfController = TextEditingController(text: '123.456.789-00');
+  TextEditingController _emailController = TextEditingController(text: 'joao.silva@example.com');
+  TextEditingController _telefoneController = TextEditingController(text: '(12) 3456-7890');
+  TextEditingController _cepController = TextEditingController(text: '12345-678');
+  TextEditingController _enderecoController = TextEditingController(text: 'Rua da Paz, 123');
+  TextEditingController _tipoSanguineoController = TextEditingController(text: 'A+');
+  TextEditingController _alergiasController = TextEditingController(text: 'Nenhuma');
+  TextEditingController _medicamentosController = TextEditingController(text: 'Nenhum');
+  TextEditingController _condicoesMedicasController = TextEditingController(text: 'Nenhuma');
 
   @override
   Widget build(BuildContext context) {
@@ -32,17 +48,42 @@ class Perfil extends StatelessWidget {
             ),
             SizedBox(height: 20),
             _buildInfoBox(
-              title: 'Informações Pessoais',
+              title: 'Dados Pessoais',
               buttonText: 'Editar',
               onButtonPressed: () {
-                // Adicione a lógica para editar as informações pessoais aqui
+                _mostrarEditarDialog(
+                  'Dados Pessoais',
+                  [
+                    _nomeController,
+                    _cpfController,
+                    _emailController,
+                    _telefoneController,
+                    _cepController,
+                  ],
+                );
               },
               children: [
-                _buildInfoRow('Nome', 'João da Silva'),
-                _buildInfoRow('CPF', '123.456.789-00'),
-                _buildInfoRow('E-mail', 'joao.silva@example.com'),
-                _buildInfoRow('Telefone', '(12) 3456-7890'),
-                _buildInfoRow('CEP', '12345-678'),
+                _buildInfoRow('Nome', _nomeController.text),
+                _buildInfoRow('CPF', _cpfController.text),
+                _buildInfoRow('E-mail', _emailController.text),
+                _buildInfoRow('Telefone', _telefoneController.text),
+                _buildInfoRow('CEP', _cepController.text),
+              ],
+            ),
+            SizedBox(height: 20),
+            _buildInfoBox(
+              title: 'Endereço',
+              buttonText: 'Editar',
+              onButtonPressed: () {
+                _mostrarEditarDialog(
+                  'Endereço',
+                  [
+                    _enderecoController,
+                  ],
+                );
+              },
+              children: [
+                _buildInfoRow('Endereço', _enderecoController.text),
               ],
             ),
             SizedBox(height: 20),
@@ -50,13 +91,21 @@ class Perfil extends StatelessWidget {
               title: 'Informações de Saúde',
               buttonText: 'Editar',
               onButtonPressed: () {
-                // Adicione a lógica para editar as informações de saúde aqui
+                _mostrarEditarDialog(
+                  'Informações de Saúde',
+                  [
+                    _tipoSanguineoController,
+                    _alergiasController,
+                    _medicamentosController,
+                    _condicoesMedicasController,
+                  ],
+                );
               },
               children: [
-                _buildInfoRow('Tipo Sanguíneo', 'A+'),
-                _buildInfoRow('Alergias', 'Nenhuma'),
-                _buildInfoRow('Medicamentos', 'Nenhum'),
-                _buildInfoRow('Condições Médicas', 'Nenhuma'),
+                _buildInfoRow('Tipo Sanguíneo', _tipoSanguineoController.text),
+                _buildInfoRow('Alergias', _alergiasController.text),
+                _buildInfoRow('Medicamentos', _medicamentosController.text),
+                _buildInfoRow('Condições Médicas', _condicoesMedicasController.text),
               ],
             ),
           ],
@@ -140,6 +189,39 @@ class Perfil extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _mostrarEditarDialog(String title, List<TextEditingController> controllers) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Editar $title'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (int i = 0; i < controllers.length; i++)
+                  TextFormField(
+                    controller: controllers[i],
+                    decoration: InputDecoration(
+                      labelText: controllers[i].text,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Fechar o diálogo
+              },
+              child: Text('Salvar'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
