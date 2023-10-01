@@ -12,7 +12,7 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
   bool _exibirCamposEndereco = false;
   TimeOfDay selectedTime = TimeOfDay.now();
   var HoraInicio = "Início";
-  var Horafim = "Fim";
+  var HoraFim = "Fim";
   TextEditingController dataController = TextEditingController();
 
   @override
@@ -92,7 +92,7 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Início',
+                              '${HoraInicio}',
                               style: TextStyle(color: Colors.white),
                             ),
                             SizedBox(width: 4.0),
@@ -120,7 +120,7 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                         );
                         if (timeOfDay != null) {
                           setState(() {
-                            Horafim = timeOfDay.format(context);
+                            HoraFim = timeOfDay.format(context);
                           });
                         }
                       },
@@ -136,7 +136,7 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Fim',
+                              '${HoraFim}',
                               style: TextStyle(color: Colors.white),
                             ),
                             SizedBox(width: 4.0),
