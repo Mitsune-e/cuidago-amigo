@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
-class Cadastro1 extends StatelessWidget {
-  const Cadastro1({Key? key});
+class CadastroPrestador extends StatelessWidget {
+  const CadastroPrestador({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -146,10 +146,10 @@ class Cadastro1 extends StatelessWidget {
   Widget _buildNextButton(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        Navigator.of(context).pushReplacementNamed('/cadastro2');
+        Navigator.of(context).pushReplacementNamed('/homePrestador');
       },
       child: Text(
-        'Prosseguir',
+        'Finalizar',
         style: TextStyle(color: Colors.white),
       ),
       style: ElevatedButton.styleFrom(

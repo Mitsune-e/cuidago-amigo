@@ -1,5 +1,12 @@
+import 'package:cuidadoamigoapp/views/CadastroCuidado.dart';
+import 'package:cuidadoamigoapp/views/Perfil.dart';
 import 'package:cuidadoamigoapp/views/RecuperarSenha.dart';
+import 'package:cuidadoamigoapp/views/SolicitarCuidado1.dart';
+import 'package:cuidadoamigoapp/views/SolicitarCuidador2.dart';
+import 'package:cuidadoamigoapp/views/agenda.dart';
 import 'package:cuidadoamigoapp/views/cadastro1.dart';
+import 'package:cuidadoamigoapp/views/cadastro2.dart';
+import 'package:cuidadoamigoapp/views/homeCuidador.dart';
 import 'package:cuidadoamigoapp/views/login.dart';
 import 'package:cuidadoamigoapp/views/homeIdoso.dart';
 
@@ -23,6 +30,13 @@ class MyApp extends StatelessWidget {
         '/cadastro1': (context) => Cadastro1(),
         '/recuperarSenha': (context) => RecuperarSenha(),
         '/homeIdoso': (context) => HomeIdoso(),
+        '/cadastro2' :(context) => Cadastro2(),
+        '/cadastroPrestador':(context) => CadastroPrestador(),
+        '/perfil':(context) => Perfil(),
+        '/agenda':(context) => Agenda(),
+        "/homePrestador":(context) => HomePrestador(),
+        '/solicitarCuidador1':(context) => SolicitarCuidado1(),
+        '/solicitarCuidador2':(context) => CuidadorInfoPage(),
       },
     );
   }

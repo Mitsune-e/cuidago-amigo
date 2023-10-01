@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:footer/footer.dart';
-import 'package:footer/footer_view.dart';
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class RecuperarSenha extends StatelessWidget {
   const RecuperarSenha({super.key});
@@ -9,42 +6,80 @@ class RecuperarSenha extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: 
-          SingleChildScrollView(
-            child: Padding(
-            padding: new EdgeInsets.only(top:150.0),
-            child: Column(
-              children:[
-                Row(children: [IconButton(onPressed: (){Navigator.of(context).pushReplacementNamed('/login');}, icon: Icon(Icons.arrow_back)),],),
-                Column(
-                
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pushReplacementNamed('/login');
+                    },
+                    icon: Icon(
+                      Icons.arrow_back,
+                      size: 30,
+                    ),
+                  ),
+                ],
+              ),
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  
-                  
                   SizedBox(
                     height: 200,
-                    width:400 ,
-                    child: Image.asset('Assets/imagens/LOGO.png',fit:BoxFit.cover,)),
-                  TextFormField( 
-                     
+                    width: 400,
+                    child: Image.asset(
+                      'Assets/imagens/LOGO.png',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    'Recuperar Senha',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  TextFormField(
                     keyboardType: TextInputType.emailAddress,
-                    decoration:InputDecoration(
-                      labelText:  'Email',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-                   )),
-                   ElevatedButton(onPressed:(){}, child: Text('Enviar Email',style: TextStyle(color: Colors.white,)),
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Lógica para enviar o email de recuperação de senha
+                    },
+                    child: Text(
+                      'Enviar Email',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.white,
+                      ),
+                    ),
                     style: ElevatedButton.styleFrom(
                       primary: Color.fromRGBO(92, 198, 186, 100),
-                      shape:  StadiumBorder()
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                     ),
-                    ),
-              
-               ],
-              ),
-            ]),
                   ),
+                ],
+              ),
+            ],
           ),
+        ),
+      ),
     );
   }
 }

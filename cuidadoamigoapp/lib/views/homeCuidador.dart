@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class HomeIdoso extends StatelessWidget {
-  const HomeIdoso({Key? key});
+class HomePrestador extends StatelessWidget {
+  const HomePrestador({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -12,20 +12,20 @@ class HomeIdoso extends StatelessWidget {
           onPressed: () {
             Navigator.of(context).pushReplacementNamed('/login');
           },
-          icon: Icon(Icons.exit_to_app), // Botão de Saída na esquerda
+          icon: Icon(Icons.exit_to_app),
         ),
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.of(context).pushNamed('/agenda');
+              // Adicione ação para visualizar solicitações pendentes
             },
-            icon: Icon(Icons.calendar_today), // Botão de Agenda à direita
+            icon: Icon(Icons.notifications), // Ícone de notificações à direita
           ),
           IconButton(
             onPressed: () {
-              Navigator.of(context).pushNamed('/perfil');
+              // Adicione ação para visualizar perfil do prestador
             },
-            icon: Icon(Icons.person), // Botão de Perfil à direita
+            icon: Icon(Icons.person), // Ícone de perfil à direita
           ),
         ],
       ),
@@ -36,12 +36,12 @@ class HomeIdoso extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CircleAvatar(
-                radius: 80, // Tamanho do ícone de pessoa
-                backgroundColor: Colors.white, // Fundo branco para o ícone
+                radius: 80,
+                backgroundColor: Colors.white,
               ),
               SizedBox(height: 20),
               Text(
-                'Bem-vindo(a), Nome do Idoso',
+                'Bem-vindo(a), Nome do Prestador',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -51,23 +51,23 @@ class HomeIdoso extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                 /* _buildSquare(
+                    context,
+                    'Iniciar Serviço',
+                    'Assets/imagens/iniciar_servico.png',
+                    () {
+                      // Adicione ação para iniciar serviço
+                    },
+                  ),*/
+                  /*SizedBox(width: 20),
                   _buildSquare(
                     context,
-                    'Enfermeira(o)',
-                    'Assets/imagens/enfermeira.png',
+                    'Solicitações',
+                    'Assets/imagens/solicitacoes.png',
                     () {
-                      //Navigator.of(context).pushNamed('/pedirEnfermeiro');
+                      // Adicione ação para visualizar solicitações
                     },
-                  ),
-                  SizedBox(width: 20),
-                  _buildSquare(
-                    context,
-                    'Cuidador ou Passeador',
-                    'Assets/imagens/cuidador.png',
-                    () {
-                      Navigator.of(context).pushNamed('/solicitarCuidador1');
-                    },
-                  ),
+                  ),*/
                 ],
               ),
             ],
