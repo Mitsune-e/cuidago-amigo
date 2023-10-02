@@ -8,29 +8,28 @@ class Agenda extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF73C9C9),
-        title: Text('Minha Agenda'),
-        
+        backgroundColor: const Color(0xFF73C9C9),
+        title: const Text('Minha Agenda'),
       ),
       body: ListView(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         children: [
           _buildServiceButton(
             'Serviço 1',
             'Descrição do Serviço 1',
             'Horário: 10:00 - 11:00',
             () {
-             Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => DetalhesServico(
-                      serviceName: 'Serviço 1',
-                      serviceDescription: 'Descrição do Serviço 1',
-                      serviceTime: '10:00 - 11:00',
-                      serviceAddress: '123 Rua Principal, Cidade',
-                      serviceDate: '01/01/2023',
-                    ),
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => DetalhesServico(
+                    serviceName: 'Serviço 1',
+                    serviceDescription: 'Descrição do Serviço 1',
+                    serviceTime: '10:00 - 11:00',
+                    serviceAddress: '123 Rua Principal, Cidade',
+                    serviceDate: '01/01/2023',
                   ),
-            );
+                ),
+              );
             },
           ),
           _buildServiceButton(
@@ -38,17 +37,17 @@ class Agenda extends StatelessWidget {
             'Descrição do Serviço 2',
             'Horário: 14:00 - 15:00',
             () {
-             Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => DetalhesServico(
-                      serviceName: 'Serviço 1',
-                      serviceDescription: 'Descrição do Serviço 1',
-                      serviceTime: '10:00 - 11:00',
-                      serviceAddress: '123 Rua Principal, Cidade',
-                      serviceDate: '01/01/2023',
-                    ),
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => DetalhesServico(
+                    serviceName: 'Serviço 1',
+                    serviceDescription: 'Descrição do Serviço 1',
+                    serviceTime: '10:00 - 11:00',
+                    serviceAddress: '123 Rua Principal, Cidade',
+                    serviceDate: '01/01/2023',
                   ),
-            );
+                ),
+              );
             },
           ),
           // Adicione mais serviços aqui, se necessário
@@ -66,7 +65,7 @@ class Agenda extends StatelessWidget {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
-        margin: EdgeInsets.symmetric(vertical: 8),
+        margin: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8),
@@ -75,14 +74,14 @@ class Agenda extends StatelessWidget {
               color: Colors.grey.withOpacity(0.3),
               spreadRadius: 2,
               blurRadius: 3,
-              offset: Offset(0, 2),
+              offset: const Offset(0, 2),
             ),
           ],
         ),
         child: ListTile(
           title: Text(
             serviceName,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: Color(0xFF73C9C9),
@@ -107,7 +106,7 @@ class Agenda extends StatelessWidget {
               ),
             ],
           ),
-          trailing: Icon(
+          trailing: const Icon(
             Icons.arrow_forward_ios,
             color: Color(0xFF73C9C9),
           ),

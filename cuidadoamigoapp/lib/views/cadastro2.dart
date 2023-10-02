@@ -16,7 +16,7 @@ class _Cadastro2State extends State<Cadastro2> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -24,21 +24,21 @@ class _Cadastro2State extends State<Cadastro2> {
               onPressed: () {
                 Navigator.of(context).pushReplacementNamed('/cadastro1');
               },
-              icon: Icon(Icons.arrow_back),
+              icon: const Icon(Icons.arrow_back),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Center(
               child: Image.asset('Assets/imagens/LOGO.png'),
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               "Como é sua Movimentação?",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             Column(
               children: [
                 RadioListTile<String>(
-                  title: Text("Não necessito de Ajuda"),
+                  title: const Text("Não necessito de Ajuda"),
                   value: "Não necessito de Ajuda",
                   groupValue: respostaPergunta1,
                   onChanged: (value) {
@@ -48,7 +48,7 @@ class _Cadastro2State extends State<Cadastro2> {
                   },
                 ),
                 RadioListTile<String>(
-                  title: Text("Necessito de Ajuda"),
+                  title: const Text("Necessito de Ajuda"),
                   value: "Necessito de Ajuda",
                   groupValue: respostaPergunta1,
                   onChanged: (value) {
@@ -58,7 +58,7 @@ class _Cadastro2State extends State<Cadastro2> {
                   },
                 ),
                 RadioListTile<String>(
-                  title: Text("Utilizo andador"),
+                  title: const Text("Utilizo andador"),
                   value: "Utilizo andador",
                   groupValue: respostaPergunta1,
                   onChanged: (value) {
@@ -68,7 +68,7 @@ class _Cadastro2State extends State<Cadastro2> {
                   },
                 ),
                 RadioListTile<String>(
-                  title: Text("Utilizo Cadeira de Rodas"),
+                  title: const Text("Utilizo Cadeira de Rodas"),
                   value: "Utilizo Cadeira de Rodas",
                   groupValue: respostaPergunta1,
                   onChanged: (value) {
@@ -78,7 +78,7 @@ class _Cadastro2State extends State<Cadastro2> {
                   },
                 ),
                 RadioListTile<String>(
-                  title: Text("Acamado"),
+                  title: const Text("Acamado"),
                   value: "Acamao",
                   groupValue: respostaPergunta1,
                   onChanged: (value) {
@@ -89,15 +89,15 @@ class _Cadastro2State extends State<Cadastro2> {
                 ),
               ],
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               "Como é sua Alimentação?",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             Column(
               children: [
                 RadioListTile<String>(
-                  title: Text("Via Oral"),
+                  title: const Text("Via Oral"),
                   value: "Via Oral",
                   groupValue: respostaPergunta2,
                   onChanged: (value) {
@@ -107,7 +107,7 @@ class _Cadastro2State extends State<Cadastro2> {
                   },
                 ),
                 RadioListTile<String>(
-                  title: Text("Via Sonda"),
+                  title: const Text("Via Sonda"),
                   value: "Via Sonda",
                   groupValue: respostaPergunta2,
                   onChanged: (value) {
@@ -118,15 +118,15 @@ class _Cadastro2State extends State<Cadastro2> {
                 ),
               ],
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               "Existe alguma doença crônica?",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             Column(
               children: [
                 RadioListTile<String>(
-                  title: Text("Sim"),
+                  title: const Text("Sim"),
                   value: "Sim",
                   groupValue: respostaPergunta3,
                   onChanged: (value) {
@@ -136,7 +136,7 @@ class _Cadastro2State extends State<Cadastro2> {
                   },
                 ),
                 RadioListTile<String>(
-                  title: Text("Não"),
+                  title: const Text("Não"),
                   value: "Não",
                   groupValue: respostaPergunta3,
                   onChanged: (value) {
@@ -146,18 +146,18 @@ class _Cadastro2State extends State<Cadastro2> {
                   },
                 ),
                 ElevatedButton(
-      onPressed: () {
-        Navigator.of(context).pushReplacementNamed('/homeIdoso');
-      },
-      child: Text(
-        'Finalizar',
-          style: TextStyle(color: Colors.white),
-      ),
-      style: ElevatedButton.styleFrom(
-        primary: Color.fromRGBO(92, 198, 186, 100),
-        shape: StadiumBorder(),
-      ),
-    ),
+                  onPressed: () {
+                    Navigator.of(context).pushReplacementNamed('/homeIdoso');
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromRGBO(92, 198, 186, 100),
+                    shape: const StadiumBorder(),
+                  ),
+                  child: const Text(
+                    'Finalizar',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
               ],
             ),
           ],

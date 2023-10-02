@@ -13,21 +13,29 @@ class Cadastro1 extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _buildHeader(context),
-            SizedBox(height: 20),
-            _buildTextField('Nome', TextInputType.text, 20, ),
-            SizedBox(height: 5),
+            const SizedBox(height: 20),
+            _buildTextField(
+              'Nome',
+              TextInputType.text,
+              20,
+            ),
+            const SizedBox(height: 5),
             _buildCPFTextField(),
-            SizedBox(height: 5),
-            _buildTextField('E-mail', TextInputType.emailAddress, null, ),
-            SizedBox(height: 5),
+            const SizedBox(height: 5),
+            _buildTextField(
+              'E-mail',
+              TextInputType.emailAddress,
+              null,
+            ),
+            const SizedBox(height: 5),
             _buildPhoneTextField(),
-            SizedBox(height: 5),
+            const SizedBox(height: 5),
             _buildCEPTextField(),
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
             _buildPasswordField('Senha', 'Senha'),
-            SizedBox(height: 5),
+            const SizedBox(height: 5),
             _buildPasswordField('Confirma Senha', 'Confirma Senha'),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             _buildNextButton(context),
           ],
         ),
@@ -42,9 +50,9 @@ class Cadastro1 extends StatelessWidget {
           onPressed: () {
             Navigator.of(context).pushReplacementNamed('/login');
           },
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
         ),
-        SizedBox(width: 48),
+        const SizedBox(width: 48),
         Image.asset('Assets/imagens/LOGO.png'),
       ],
     );
@@ -60,7 +68,9 @@ class Cadastro1 extends StatelessWidget {
       width: 250,
       child: TextFormField(
         initialValue: initialValue,
-        inputFormatters: maxLength != null ? [LengthLimitingTextInputFormatter(maxLength)] : [],
+        inputFormatters: maxLength != null
+            ? [LengthLimitingTextInputFormatter(maxLength)]
+            : [],
         keyboardType: keyboardType,
         decoration: InputDecoration(
           hintText: hintText,
@@ -148,13 +158,13 @@ class Cadastro1 extends StatelessWidget {
       onPressed: () {
         Navigator.of(context).pushReplacementNamed('/cadastro2');
       },
-      child: Text(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color.fromRGBO(92, 198, 186, 100),
+        shape: const StadiumBorder(),
+      ),
+      child: const Text(
         'Prosseguir',
         style: TextStyle(color: Colors.white),
-      ),
-      style: ElevatedButton.styleFrom(
-        primary: Color.fromRGBO(92, 198, 186, 100),
-        shape: StadiumBorder(),
       ),
     );
   }

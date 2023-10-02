@@ -33,14 +33,14 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Detalhes do Cuidador'),
-        backgroundColor: Color(0xFF73C9C9),
+        title: const Text('Detalhes do Cuidador'),
+        backgroundColor: const Color(0xFF73C9C9),
         actions: [
           IconButton(
             onPressed: () {
               _mostrarFiltrosDialog(context);
             },
-            icon: Icon(Icons.filter_alt),
+            icon: const Icon(Icons.filter_alt),
           ),
         ],
       ),
@@ -65,16 +65,16 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
           }
         },
         child: Container(
-          color: Color(0xFF73C9C9),
+          color: const Color(0xFF73C9C9),
           child: Center(
             child: Card(
               elevation: 5.0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0),
               ),
-              margin: EdgeInsets.symmetric(horizontal: 16.0),
+              margin: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16.0),
                 child: ListView(
                   shrinkWrap: true,
                   children: [
@@ -82,49 +82,49 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
                     Icon(
                       cuidadores[currentIndex]['foto'],
                       size: 80.0,
-                      color: Color(0xFF73C9C9),
+                      color: const Color(0xFF73C9C9),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Text(
                       cuidadores[currentIndex]['nome'],
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 20.0,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Text(
                       cuidadores[currentIndex]['descricao'],
                       textAlign: TextAlign.center,
                       maxLines: 5, // Limite o número de linhas para 5
                       overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(height: 20),
-                    Text(
+                    const SizedBox(height: 20),
+                    const Text(
                       'Informações do Cuidador:',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     // Lista de tópicos com informações do cuidador
                     for (String topico in cuidadores[currentIndex]['topicos'])
                       ListTile(
-                        leading: Icon(Icons.check),
+                        leading: const Icon(Icons.check),
                         title: Text(topico),
                       ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () {
                         // Adicione ação para finalizar o agendamento
                       },
                       style: ElevatedButton.styleFrom(
-                        primary: Color(0xFF73C9C9),
+                        backgroundColor: const Color(0xFF73C9C9),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.0),
                         ),
                       ),
-                      child: Text(
+                      child: const Text(
                         'Finalizar Agendamento',
                         style: TextStyle(color: Colors.white),
                       ),
@@ -144,21 +144,21 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Filtros'),
+          title: const Text('Filtros'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Selecione os filtros desejados:'),
+              const Text('Selecione os filtros desejados:'),
               CheckboxListTile(
-                title: Text('Filtro 1'),
+                title: const Text('Filtro 1'),
                 value: false, // Coloque o valor do filtro aqui
                 onChanged: (bool? value) {
                   // Atualize o valor do filtro aqui
                 },
               ),
               CheckboxListTile(
-                title: Text('Filtro 2'),
+                title: const Text('Filtro 2'),
                 value: false, // Coloque o valor do filtro aqui
                 onChanged: (bool? value) {
                   // Atualize o valor do filtro aqui
@@ -172,7 +172,7 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
               onPressed: () {
                 Navigator.of(context).pop(); // Fechar o diálogo
               },
-              child: Text('Aplicar'),
+              child: const Text('Aplicar'),
             ),
           ],
         );

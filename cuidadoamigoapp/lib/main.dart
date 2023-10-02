@@ -25,23 +25,20 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(primaryColor: Colors.red),
-      home: Login(),
+      home: const Login(),
       routes: {
-        '/login': (context) => Login(),
-        '/cadastro1': (context) => Cadastro1(),
-        '/recuperarSenha': (context) => RecuperarSenha(),
-        '/homeIdoso': (context) => HomeIdoso(),
-        '/cadastro2' :(context) => Cadastro2(),
-        '/cadastroPrestador':(context) => CadastroPrestador(),
-        '/perfil':(context) => Perfil(),
-        '/agenda':(context) => Agenda(),
-        "/homePrestador":(context) => HomePrestador(),
-        '/solicitarCuidador1':(context) => SolicitarCuidado1(),
-        '/solicitarCuidador2':(context) => CuidadorInfoPage(),
+        '/login': (context) => const Login(),
+        '/cadastro1': (context) => const Cadastro1(),
+        '/recuperarSenha': (context) => const RecuperarSenha(),
+        '/homeIdoso': (context) => const HomeIdoso(),
+        '/cadastro2': (context) => const Cadastro2(),
+        '/cadastroPrestador': (context) => const CadastroPrestador(),
+        '/perfil': (context) => const Perfil(),
+        '/agenda': (context) => const Agenda(),
+        "/homePrestador": (context) => const HomePrestador(),
+        '/solicitarCuidador1': (context) => const SolicitarCuidado1(),
+        '/solicitarCuidador2': (context) => const CuidadorInfoPage(),
       },
     );
   }
 }
-
-
-
