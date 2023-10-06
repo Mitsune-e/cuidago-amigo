@@ -1,15 +1,16 @@
-import 'package:cuidadoamigoapp/views/CadastroCuidado.dart';
-import 'package:cuidadoamigoapp/views/Perfil.dart';
+import 'package:cuidadoamigoapp/views/Cliente/cadastro2.dart';
+import 'package:cuidadoamigoapp/views/Prestador/CadastroCuidado.dart';
+import 'package:cuidadoamigoapp/views/Cliente/Perfil.dart';
 import 'package:cuidadoamigoapp/views/RecuperarSenha.dart';
-import 'package:cuidadoamigoapp/views/SolicitarCuidado1.dart';
-import 'package:cuidadoamigoapp/views/SolicitarCuidador2.dart';
-import 'package:cuidadoamigoapp/views/agenda.dart';
-import 'package:cuidadoamigoapp/views/cadastro1.dart';
-import 'package:cuidadoamigoapp/views/cadastro2.dart';
-import 'package:cuidadoamigoapp/views/detalhamento.dart';
-import 'package:cuidadoamigoapp/views/homeCuidador.dart';
+import 'package:cuidadoamigoapp/views/Cliente/SolicitarCuidado1.dart';
+import 'package:cuidadoamigoapp/views/Cliente/SolicitarCuidador2.dart';
+import 'package:cuidadoamigoapp/views/Cliente/agenda.dart';
+import 'package:cuidadoamigoapp/views/Cliente/cadastro1.dart';
+import 'package:cuidadoamigoapp/views/Cliente/cadastro3.dart';
+import 'package:cuidadoamigoapp/views/Cliente/detalhamento.dart';
+import 'package:cuidadoamigoapp/views/Prestador/homeCuidador.dart';
 import 'package:cuidadoamigoapp/views/login.dart';
-import 'package:cuidadoamigoapp/views/homeIdoso.dart';
+import 'package:cuidadoamigoapp/views/Cliente/homeIdoso.dart';
 
 import 'package:flutter/material.dart';
 
@@ -29,9 +30,10 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => Login(),
         '/cadastro1': (context) => Cadastro1(),
+        '/cadastro2':(context) => Cadastro2(),
+        '/cadastro3' :(context) => Cadastro3(),
         '/recuperarSenha': (context) => RecuperarSenha(),
         '/homeIdoso': (context) => HomeIdoso(),
-        '/cadastro2' :(context) => Cadastro2(),
         '/cadastroPrestador':(context) => CadastroPrestador(),
         '/perfil':(context) => Perfil(),
         '/agenda':(context) => Agenda(),

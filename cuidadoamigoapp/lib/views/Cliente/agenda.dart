@@ -1,4 +1,4 @@
-import 'package:cuidadoamigoapp/views/detalhamento.dart';
+import 'package:cuidadoamigoapp/views/Cliente/detalhamento.dart';
 import 'package:flutter/material.dart';
 
 class Agenda extends StatelessWidget {

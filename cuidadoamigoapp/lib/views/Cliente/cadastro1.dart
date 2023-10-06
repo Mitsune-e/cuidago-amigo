@@ -8,21 +8,42 @@ class Cadastro1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Color(0xFF73C9C9),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+              onPressed: () {
+                Navigator.of(context).pushReplacementNamed('/login');
+              },
+              icon: Icon(Icons.arrow_back),
+            ),
+            
+            Text('Informações Pessoais'),
+            IconButton(
+            onPressed: () {Navigator.of(context).pushReplacementNamed("/cadastro2");},
+            icon: Icon(Icons.arrow_forward), // Ícone vazio à direita
+          ),
+  
+          ],
+        ),
+      ),
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            SizedBox(height: 20),
             _buildHeader(context),
             SizedBox(height: 20),
-            _buildTextField('Nome', TextInputType.text, 20, ),
+            _buildTextField('Nome', TextInputType.text, 20),
             SizedBox(height: 5),
             _buildCPFTextField(),
             SizedBox(height: 5),
-            _buildTextField('E-mail', TextInputType.emailAddress, null, ),
+            _buildTextField('E-mail', TextInputType.emailAddress),
             SizedBox(height: 5),
             _buildPhoneTextField(),
-            SizedBox(height: 5),
-            _buildCEPTextField(),
             SizedBox(height: 40),
             _buildPasswordField('Senha', 'Senha'),
             SizedBox(height: 5),
@@ -37,14 +58,8 @@ class Cadastro1 extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        IconButton(
-          onPressed: () {
-            Navigator.of(context).pushReplacementNamed('/login');
-          },
-          icon: Icon(Icons.arrow_back),
-        ),
-        SizedBox(width: 48),
         Image.asset('Assets/imagens/LOGO.png'),
       ],
     );
@@ -104,26 +119,6 @@ class Cadastro1 extends StatelessWidget {
         keyboardType: TextInputType.phone,
         decoration: InputDecoration(
           hintText: 'Telefone',
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCEPTextField() {
-    return SizedBox(
-      width: 250,
-      child: TextFormField(
-        inputFormatters: [
-          MaskTextInputFormatter(
-            mask: '##.###.###',
-            filter: {"#": RegExp(r'[0-9]')},
-            type: MaskAutoCompletionType.lazy,
-          )
-        ],
-        keyboardType: TextInputType.number,
-        decoration: InputDecoration(
-          hintText: 'CEP',
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
         ),
       ),

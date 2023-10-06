@@ -8,23 +8,31 @@ class Perfil extends StatefulWidget {
 }
 
 class _PerfilState extends State<Perfil> {
+  // Controladores de texto para os campos existentes
   TextEditingController _nomeController = TextEditingController(text: 'João da Silva');
   TextEditingController _cpfController = TextEditingController(text: '123.456.789-00');
   TextEditingController _emailController = TextEditingController(text: 'joao.silva@example.com');
   TextEditingController _telefoneController = TextEditingController(text: '(12) 3456-7890');
+
+  // Controladores de texto para os novos campos
   TextEditingController _cepController = TextEditingController(text: '12345-678');
+  TextEditingController _estadoController = TextEditingController(text: 'SP');
+  TextEditingController _cidadeController = TextEditingController(text: 'São Paulo');
   TextEditingController _enderecoController = TextEditingController(text: 'Rua da Paz, 123');
-  TextEditingController _tipoSanguineoController = TextEditingController(text: 'A+');
-  TextEditingController _alergiasController = TextEditingController(text: 'Nenhuma');
-  TextEditingController _medicamentosController = TextEditingController(text: 'Nenhum');
-  TextEditingController _condicoesMedicasController = TextEditingController(text: 'Nenhuma');
+  TextEditingController _complementoController = TextEditingController(text: 'Apto 101');
+  TextEditingController _numeroController = TextEditingController(text: '123');
+  TextEditingController _pontoReferenciaController = TextEditingController(text: 'Próximo à escola');
+
+  TextEditingController _movimentacaoController = TextEditingController(text: 'Normal');
+  TextEditingController _alimentacaoController = TextEditingController(text: 'Sem restrições');
+  TextEditingController _doencaCronicaController = TextEditingController(text: 'Nenhuma');
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Minha Conta'),
-        backgroundColor: Color(0xFF73C9C9), // Cor principal
+        backgroundColor: Color(0xFF73C9C9),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
@@ -58,7 +66,6 @@ class _PerfilState extends State<Perfil> {
                     _cpfController,
                     _emailController,
                     _telefoneController,
-                    _cepController,
                   ],
                 );
               },
@@ -67,7 +74,6 @@ class _PerfilState extends State<Perfil> {
                 _buildInfoRow('CPF', _cpfController.text),
                 _buildInfoRow('E-mail', _emailController.text),
                 _buildInfoRow('Telefone', _telefoneController.text),
-                _buildInfoRow('CEP', _cepController.text),
               ],
             ),
             SizedBox(height: 20),
@@ -78,12 +84,24 @@ class _PerfilState extends State<Perfil> {
                 _mostrarEditarDialog(
                   'Endereço',
                   [
+                    _cepController,
+                    _estadoController,
+                    _cidadeController,
                     _enderecoController,
+                    _complementoController,
+                    _numeroController,
+                    _pontoReferenciaController,
                   ],
                 );
               },
               children: [
+                _buildInfoRow('CEP', _cepController.text),
+                _buildInfoRow('Estado', _estadoController.text),
+                _buildInfoRow('Cidade', _cidadeController.text),
                 _buildInfoRow('Endereço', _enderecoController.text),
+                _buildInfoRow('Complemento', _complementoController.text),
+                _buildInfoRow('Número', _numeroController.text),
+                _buildInfoRow('Ponto de Referência', _pontoReferenciaController.text),
               ],
             ),
             SizedBox(height: 20),
@@ -94,18 +112,16 @@ class _PerfilState extends State<Perfil> {
                 _mostrarEditarDialog(
                   'Informações de Saúde',
                   [
-                    _tipoSanguineoController,
-                    _alergiasController,
-                    _medicamentosController,
-                    _condicoesMedicasController,
+                    _movimentacaoController,
+                    _alimentacaoController,
+                    _doencaCronicaController,
                   ],
                 );
               },
               children: [
-                _buildInfoRow('Tipo Sanguíneo', _tipoSanguineoController.text),
-                _buildInfoRow('Alergias', _alergiasController.text),
-                _buildInfoRow('Medicamentos', _medicamentosController.text),
-                _buildInfoRow('Condições Médicas', _condicoesMedicasController.text),
+                _buildInfoRow('Movimentação', _movimentacaoController.text),
+                _buildInfoRow('Alimentação', _alimentacaoController.text),
+                _buildInfoRow('Doença Crônica', _doencaCronicaController.text),
               ],
             ),
           ],
@@ -146,7 +162,7 @@ class _PerfilState extends State<Perfil> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF73C9C9), // Cor principal
+                  color: Color(0xFF73C9C9),
                 ),
               ),
               TextButton(
@@ -155,7 +171,7 @@ class _PerfilState extends State<Perfil> {
                   buttonText,
                   style: TextStyle(
                     fontSize: 16,
-                    color: Color(0xFF73C9C9), // Cor principal
+                    color: Color(0xFF73C9C9),
                   ),
                 ),
               ),
@@ -168,29 +184,30 @@ class _PerfilState extends State<Perfil> {
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+        Widget _buildInfoRow(String label, String value) {
+        return Padding(
+          padding: EdgeInsets.symmetric(vertical: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 4), // Espaço entre o rótulo e o valor
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+            ],
           ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 18,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+        );
+      }
 
   void _mostrarEditarDialog(String title, List<TextEditingController> controllers) {
     showDialog(
@@ -215,7 +232,7 @@ class _PerfilState extends State<Perfil> {
           actions: [
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Fechar o diálogo
+                Navigator.of(context).pop();
               },
               child: Text('Salvar'),
             ),
