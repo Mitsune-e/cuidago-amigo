@@ -19,16 +19,16 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Solicitar Cuidado'),
-        backgroundColor: Color(0xFF73C9C9), // Cor principal da página
+        title: const Text('Solicitar Cuidado'),
+        backgroundColor: const Color(0xFF73C9C9), // Cor principal da página
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'Data',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -38,7 +38,7 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
               TextFormField(
                 controller: dataController,
                 keyboardType: TextInputType.datetime,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Selecione a data',
                   prefixIcon: Icon(Icons.date_range),
                 ),
@@ -57,8 +57,8 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                   }
                 },
               ),
-              SizedBox(height: 20),
-              Text(
+              const SizedBox(height: 20),
+              const Text(
                 'Horário',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -81,35 +81,35 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        primary: Color(0xFF73C9C9),
+                        backgroundColor: const Color(0xFF73C9C9),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.0),
                         ),
                       ),
                       child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 12.0),
+                        padding: const EdgeInsets.symmetric(vertical: 12.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
                               '${HoraInicio}',
-                              style: TextStyle(color: Colors.white),
+                              style: const TextStyle(color: Colors.white),
                             ),
-                            SizedBox(width: 4.0),
-                            Icon(Icons.access_time, color: Colors.white),
+                            const SizedBox(width: 4.0),
+                            const Icon(Icons.access_time, color: Colors.white),
                           ],
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(width: 10),
-                  Text(
+                  const SizedBox(width: 10),
+                  const Text(
                     'até',
                     style: TextStyle(
                       fontSize: 18.0,
                     ),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
@@ -125,22 +125,22 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        primary: Color(0xFF73C9C9),
+                        backgroundColor: const Color(0xFF73C9C9),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.0),
                         ),
                       ),
                       child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 12.0),
+                        padding: const EdgeInsets.symmetric(vertical: 12.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
                               '${HoraFim}',
-                              style: TextStyle(color: Colors.white),
+                              style: const TextStyle(color: Colors.white),
                             ),
-                            SizedBox(width: 4.0),
-                            Icon(Icons.access_time, color: Colors.white),
+                            const SizedBox(width: 4.0),
+                            const Icon(Icons.access_time, color: Colors.white),
                           ],
                         ),
                       ),
@@ -148,8 +148,8 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                   ),
                 ],
               ),
-              SizedBox(height: 20),
-              Text(
+              const SizedBox(height: 20),
+              const Text(
                 'Endereço',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -161,12 +161,12 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                     child: ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
-                        primary: Color(0xFF73C9C9),
+                        backgroundColor: const Color(0xFF73C9C9),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.0),
                         ),
                       ),
-                      child: Padding(
+                      child: const Padding(
                         padding: EdgeInsets.symmetric(vertical: 12.0),
                         child: Text(
                           'Salvo',
@@ -175,7 +175,7 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                       ),
                     ),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
@@ -184,12 +184,12 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                         });
                       },
                       style: ElevatedButton.styleFrom(
-                        primary: Color(0xFF73C9C9),
+                        backgroundColor: const Color(0xFF73C9C9),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.0),
                         ),
                       ),
-                      child: Padding(
+                      child: const Padding(
                         padding: EdgeInsets.symmetric(vertical: 12.0),
                         child: Text(
                           'Novo',
@@ -204,32 +204,32 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     TextFormField(
                       // Campo de CEP
                       keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: 'CEP',
                         prefixIcon: Icon(Icons.location_on),
                       ),
                     ),
                     TextFormField(
                       // Campo de Cidade
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: 'Cidade',
                         prefixIcon: Icon(Icons.location_city),
                       ),
                     ),
                     TextFormField(
                       // Campo de Endereço
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: 'Endereço',
                         prefixIcon: Icon(Icons.home),
                       ),
                     ),
                     TextFormField(
                       // Campo de Complemento
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: 'Complemento (opcional)',
                         prefixIcon: Icon(Icons.add),
                       ),
@@ -237,14 +237,14 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                     TextFormField(
                       // Campo de Número
                       keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: 'Número',
                         prefixIcon: Icon(Icons.format_list_numbered),
                       ),
                     ),
                   ],
                 ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Align(
                 alignment: Alignment.bottomCenter,
                 child: ElevatedButton(
@@ -252,13 +252,14 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                     Navigator.of(context).pushNamed('/solicitarCuidador2');
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Color(0xFF73C9C9),
+                    backgroundColor: const Color(0xFF73C9C9),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),
                   ),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 40.0),
+                  child: const Padding(
+                    padding:
+                        EdgeInsets.symmetric(vertical: 16.0, horizontal: 40.0),
                     child: Text(
                       'Prosseguir',
                       style: TextStyle(

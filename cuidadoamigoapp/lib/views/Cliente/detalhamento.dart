@@ -41,32 +41,32 @@ class _DetalhesServicoState extends State<DetalhesServico> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF73C9C9), // Cor principal da página
-        title: Text('Detalhes do Serviço'),
+        backgroundColor: const Color(0xFF73C9C9), // Cor principal da página
+        title: const Text('Detalhes do Serviço'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CircleAvatar(
+            const CircleAvatar(
               backgroundColor: Color(0xFF73C9C9),
+              radius: 60,
               child: Icon(
                 Icons.person,
                 size: 80,
                 color: Colors.white,
               ),
-              radius: 60,
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'Nome do Serviço',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
               'Descrição do Serviço',
               style: TextStyle(
@@ -74,26 +74,26 @@ class _DetalhesServicoState extends State<DetalhesServico> {
                 color: Colors.grey[600],
               ),
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'Hora de Início: 10:00 - Hora de Término: 11:00',
               style: TextStyle(
                 fontSize: 18,
               ),
             ),
-            Text(
+            const Text(
               'Endereço: 123 Rua Principal, Cidade',
               style: TextStyle(
                 fontSize: 18,
               ),
             ),
-            Text(
+            const Text(
               'Data: 01/01/2023',
               style: TextStyle(
                 fontSize: 18,
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -101,25 +101,27 @@ class _DetalhesServicoState extends State<DetalhesServico> {
                   onPressed: () {
                     _mostrarEditarServicoDialog(context);
                   },
-                  child: Text('Editar Serviço'),
                   style: ElevatedButton.styleFrom(
-                    primary: Color(0xFF73C9C9), // Cor do botão
+                    backgroundColor: const Color(0xFF73C9C9), // Cor do botão
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.0), // Torna o botão redondo
+                      borderRadius:
+                          BorderRadius.circular(30.0), // Torna o botão redondo
                     ),
                   ),
+                  child: const Text('Editar Serviço'),
                 ),
                 ElevatedButton(
                   onPressed: () {
                     _mostrarCancelarServicoDialog(context);
                   },
-                  child: Text('Cancelar Serviço'),
                   style: ElevatedButton.styleFrom(
-                    primary: Color(0xFF73C9C9), // Cor do botão
+                    backgroundColor: const Color(0xFF73C9C9), // Cor do botão
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.0), // Torna o botão redondo
+                      borderRadius:
+                          BorderRadius.circular(30.0), // Torna o botão redondo
                     ),
                   ),
+                  child: const Text('Cancelar Serviço'),
                 ),
               ],
             ),
@@ -134,29 +136,31 @@ class _DetalhesServicoState extends State<DetalhesServico> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Editar Serviço'),
+          title: const Text('Editar Serviço'),
           content: SingleChildScrollView(
             child: Column(
               children: [
                 TextFormField(
                   controller: serviceNameController,
-                  decoration: InputDecoration(labelText: 'Nome do Serviço'),
+                  decoration:
+                      const InputDecoration(labelText: 'Nome do Serviço'),
                 ),
                 TextFormField(
                   controller: serviceDescriptionController,
-                  decoration: InputDecoration(labelText: 'Descrição do Serviço'),
+                  decoration:
+                      const InputDecoration(labelText: 'Descrição do Serviço'),
                 ),
                 TextFormField(
                   controller: serviceTimeController,
-                  decoration: InputDecoration(labelText: 'Horário'),
+                  decoration: const InputDecoration(labelText: 'Horário'),
                 ),
                 TextFormField(
                   controller: serviceAddressController,
-                  decoration: InputDecoration(labelText: 'Endereço'),
+                  decoration: const InputDecoration(labelText: 'Endereço'),
                 ),
                 TextFormField(
                   controller: serviceDateController,
-                  decoration: InputDecoration(labelText: 'Data'),
+                  decoration: const InputDecoration(labelText: 'Data'),
                 ),
               ],
             ),
@@ -166,14 +170,14 @@ class _DetalhesServicoState extends State<DetalhesServico> {
               onPressed: () {
                 Navigator.of(context).pop(); // Fechar o diálogo
               },
-              child: Text('Cancelar'),
+              child: const Text('Cancelar'),
             ),
             TextButton(
               onPressed: () {
                 // Aqui você pode implementar a lógica para salvar as edições do serviço
                 Navigator.of(context).pop(); // Fechar o diálogo
               },
-              child: Text('Salvar'),
+              child: const Text('Salvar'),
             ),
           ],
         );
@@ -186,21 +190,21 @@ class _DetalhesServicoState extends State<DetalhesServico> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Cancelar Serviço'),
-          content: Text('Tem certeza que deseja cancelar o serviço?'),
+          title: const Text('Cancelar Serviço'),
+          content: const Text('Tem certeza que deseja cancelar o serviço?'),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Fechar o diálogo
               },
-              child: Text('Não'),
+              child: const Text('Não'),
             ),
             TextButton(
               onPressed: () {
                 // Aqui você pode implementar a lógica para cancelar o serviço
                 Navigator.of(context).pop(); // Fechar o diálogo
               },
-              child: Text('Sim'),
+              child: const Text('Sim'),
             ),
           ],
         );
