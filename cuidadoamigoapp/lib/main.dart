@@ -1,6 +1,7 @@
 import 'package:cuidadoamigoapp/views/Cliente/cadastro2.dart';
 import 'package:cuidadoamigoapp/views/Prestador/CadastroCuidado.dart';
 import 'package:cuidadoamigoapp/views/Cliente/Perfil.dart';
+import 'package:cuidadoamigoapp/views/Prestador/Carteira.dart';
 import 'package:cuidadoamigoapp/views/RecuperarSenha.dart';
 import 'package:cuidadoamigoapp/views/Cliente/SolicitarCuidado1.dart';
 import 'package:cuidadoamigoapp/views/Cliente/SolicitarCuidador2.dart';
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(primaryColor: Colors.red),
-      home: Login(),
+      home: const Login(),
       routes: {
         '/login': (context) => Login(),
         '/cadastro1': (context) => Cadastro1(),
@@ -40,10 +41,8 @@ class MyApp extends StatelessWidget {
         "/homePrestador":(context) => HomePrestador(),
         '/solicitarCuidador1':(context) => SolicitarCuidado1(),
         '/solicitarCuidador2':(context) => CuidadorInfoPage(),
+        '/carteira':(context) => Carteira(),
       },
     );
   }
 }
-
-
-

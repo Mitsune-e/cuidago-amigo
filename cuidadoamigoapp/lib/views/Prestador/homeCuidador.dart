@@ -17,10 +17,10 @@ class HomePrestador extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () {
-              // Adicione ação para visualizar solicitações pendentes
+               Navigator.of(context).pushReplacementNamed('/carteira');
             },
             icon: const Icon(
-                Icons.notifications), // Ícone de notificações à direita
+                Icons.wallet), // Ícone de notificações à direita
           ),
           IconButton(
             onPressed: () {
