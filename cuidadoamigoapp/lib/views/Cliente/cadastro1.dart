@@ -46,9 +46,9 @@ class Cadastro1 extends StatelessWidget {
             _buildPhoneTextField(),
             SizedBox(height: 40),
             _buildPasswordField('Senha', 'Senha'),
-            SizedBox(height: 5),
+            const SizedBox(height: 5),
             _buildPasswordField('Confirma Senha', 'Confirma Senha'),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             _buildNextButton(context),
           ],
         ),
@@ -75,7 +75,9 @@ class Cadastro1 extends StatelessWidget {
       width: 250,
       child: TextFormField(
         initialValue: initialValue,
-        inputFormatters: maxLength != null ? [LengthLimitingTextInputFormatter(maxLength)] : [],
+        inputFormatters: maxLength != null
+            ? [LengthLimitingTextInputFormatter(maxLength)]
+            : [],
         keyboardType: keyboardType,
         decoration: InputDecoration(
           hintText: hintText,
@@ -143,13 +145,13 @@ class Cadastro1 extends StatelessWidget {
       onPressed: () {
         Navigator.of(context).pushReplacementNamed('/cadastro2');
       },
-      child: Text(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color.fromRGBO(92, 198, 186, 100),
+        shape: const StadiumBorder(),
+      ),
+      child: const Text(
         'Prosseguir',
         style: TextStyle(color: Colors.white),
-      ),
-      style: ElevatedButton.styleFrom(
-        primary: Color.fromRGBO(92, 198, 186, 100),
-        shape: StadiumBorder(),
       ),
     );
   }
