@@ -39,6 +39,7 @@ dependencies:
   footer: ^0.0.4
   intl: ^0.18.1
   firebase_core: ^2.13.1
+  cloud_firestore: ^4.8.0
 
 dev_dependencies:
   flutter_test:

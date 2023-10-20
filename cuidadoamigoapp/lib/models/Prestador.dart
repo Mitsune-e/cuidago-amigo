@@ -1,4 +1,4 @@
-class Cliente {
+class Evento {
   final String id;
   final String name;
   final String imagem;
@@ -7,7 +7,7 @@ class Cliente {
   final String senha;
   
 
-  const Cliente({
+  const Evento({
     required this.id,
     required this.name,
     required this.imagem,
@@ -17,7 +17,7 @@ class Cliente {
   
   });
 
-  Cliente.fromMap(Map<String, dynamic> map)
+  Evento.fromMap(Map<String, dynamic> map)
       : id = map["id"],
         name = map["name"],
         imagem = map["imagem"],
