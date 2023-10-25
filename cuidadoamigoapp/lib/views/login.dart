@@ -1,7 +1,56 @@
+import 'package:cuidadoamigoapp/servicos/autorizacao.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
-class Login extends StatelessWidget {
-  const Login({super.key});
+class Login extends StatefulWidget {
+  Login({Key? key}) : super(key: key);
+
+  @override
+  State<Login> createState() => _LoginState();
+}
+
+class _LoginState extends State<Login> {
+  final formKey = GlobalKey<FormState>();
+  final email = TextEditingController();
+  final senha = TextEditingController();
+
+  bool isLogin = true;
+  late String titulo;
+  late String actionButton;
+  late String toggleButton;
+  bool loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    setFormAction(true);
+  }
+
+  setFormAction(bool acao) {
+    setState(() {
+      isLogin = acao;
+      if (isLogin) {
+        titulo = 'Bem vindo';
+        actionButton = 'Login';
+        toggleButton = 'Ainda não tem conta? Cadastre-se agora.';
+      } else {
+        titulo = 'Crie sua conta';
+        actionButton = 'Cadastrar';
+        toggleButton = 'Voltar ao Login.';
+      }
+    });
+  }
+
+  login() async {
+    setState(() => loading = true);
+    try {
+      await context.read<AuthService>().login(email.text, senha.text);
+    } on AuthException catch (e) {
+      setState(() => loading = false);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.message)));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
