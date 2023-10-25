@@ -1,8 +1,10 @@
+import 'package:cuidadoamigoapp/servicos/autorizacao.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:provider/provider.dart';
 
 class Cadastro1 extends StatefulWidget {
   Cadastro1({Key? key}) : super(key: key);
@@ -19,7 +21,6 @@ class _Cadastro1State extends State<Cadastro1> {
   final codpf = TextEditingController();
   final datanasc = TextEditingController();
   final senha = TextEditingController();
-
 
   bool isCad = true;
   late String titulo;
@@ -47,7 +48,7 @@ class _Cadastro1State extends State<Cadastro1> {
   registrar() async {
     setState(() => loading = true);
     try {
-      await context.read<AuthService>().registrar(nome.text, email.text, fone.text, codpf.text, datanasc.text, senha.text);
+      await context.read<AuthService>().registrar(nome.text, email.text);
     } on AuthException catch (e) {
       setState(() => loading = false);
       ScaffoldMessenger.of(context)
@@ -70,13 +71,12 @@ class _Cadastro1State extends State<Cadastro1> {
               },
               icon: Icon(Icons.arrow_back),
             ),
-            
+
             Text('Informações Pessoais'),
             IconButton(
-            onPressed: () {Navigator.of(context).pushReplacementNamed("/cadastro2");},
-            icon: Icon(Icons.arrow_forward), // Ícone vazio à direita
-          ),
-  
+              onPressed: () {Navigator.of(context).pushReplacementNamed("/cadastro2");},
+              icon: Icon(Icons.arrow_forward), // Ícone vazio à direita
+            ),
           ],
         ),
       ),
@@ -87,20 +87,18 @@ class _Cadastro1State extends State<Cadastro1> {
             SizedBox(height: 20),
             _buildHeader(context),
             SizedBox(height: 20),
-            _buildTextField(controller: nome, 'Nome', TextInputType.text, 20),
+            _buildTextField(controller: nome, hintText: 'Nome', keyboardType: TextInputType.text, maxLength: 20),
             SizedBox(height: 12),
-            _buildCPFTextField(controller: codpf),
+            _buildCPFTextField(),
             SizedBox(height: 15),
-            _buildTextField(controller: email, 'E-mail', TextInputType.emailAddress),
+            _buildTextField(controller: email, hintText: 'E-mail', keyboardType: TextInputType.emailAddress),
             SizedBox(height: 15),
             _buildPhoneTextField(controller: fone),
             SizedBox(height: 10),
-            _buildTextField(controller: datanasc)
+            _buildDateTextField(controller: datanasc),
             SizedBox(height: 40),
-            _buildPasswordField(controller: senha, 'Senha', 'Senha'),
+            _buildPasswordField(controller: senha, hintText: 'Senha', labelText: 'Senha'),
             const SizedBox(height: 5),
-            _buildPasswordField('Confirma Senha', 'Confirma Senha'),
-            const SizedBox(height: 10),
             _buildNextButton(context),
           ],
         ),
@@ -117,17 +115,17 @@ class _Cadastro1State extends State<Cadastro1> {
     );
   }
 
-
-  }
-  Widget _buildTextField(
-    String hintText,
-    TextInputType keyboardType, [
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hintText,
+    required TextInputType keyboardType,
     int? maxLength,
     String? initialValue,
-  ]) {
+  }) {
     return SizedBox(
       width: 250,
       child: TextFormField(
+        controller: controller,
         initialValue: initialValue,
         inputFormatters: maxLength != null
             ? [LengthLimitingTextInputFormatter(maxLength)]
@@ -141,25 +139,6 @@ class _Cadastro1State extends State<Cadastro1> {
     );
   }
 
-  Widget _buildDateTextField(){
-    return SizedBox(
-      width: 250,
-      child: TextFormField(
-        inputFormatters: [
-          MaskTextInputFormatter(
-            mask: '##/##/####',
-            filter: {"#": RegExp(r'[0-9]')},
-            type: MaskAutoCompletionType.lazy,
-          )
-        ],
-        keyboardType: TextInputType.number,
-        decoration: InputDecoration(
-          hintText: 'CPF',
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-        ),
-      ),
-    );
-  }
   Widget _buildCPFTextField() {
     return SizedBox(
       width: 250,
@@ -169,49 +148,85 @@ class _Cadastro1State extends State<Cadastro1> {
             mask: '###.###.###-##',
             filter: {"#": RegExp(r'[0-9]')},
             type: MaskAutoCompletionType.lazy,
-          )
+          ),
         ],
         keyboardType: TextInputType.number,
         decoration: InputDecoration(
           hintText: 'CPF',
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
         ),
-      ),
-    );
+      )
+      );
+    }
   }
 
-  Widget _buildPhoneTextField() {
+  Widget _buildPhoneTextField({
+    required TextEditingController controller,
+  }) {
     return SizedBox(
       width: 250,
       child: TextFormField(
+        controller: controller,
         inputFormatters: [
           MaskTextInputFormatter(
             mask: '(##) #####-####',
             filter: {"#": RegExp(r'[0-9]')},
             type: MaskAutoCompletionType.lazy,
-          )
+          ),
         ],
         keyboardType: TextInputType.phone,
         decoration: InputDecoration(
           hintText: 'Telefone',
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
         ),
-      ),
-    );
-  }
+      )
+      );
+    }
+  
 
-  Widget _buildPasswordField(String hintText, String labelText) {
+  Widget _buildDateTextField({
+    required TextEditingController controller,
+  }) {
     return SizedBox(
       width: 250,
       child: TextFormField(
+        controller: controller,
+        inputFormatters: [
+          MaskTextInputFormatter(
+            mask: '##/##/####',
+            filter: {"#": RegExp(r'[0-9]')},
+            type: MaskAutoCompletionType.lazy,
+          ),
+        ],
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(
+          hintText: 'Data de Nascimento',
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+        ),
+      )
+      );
+    }
+  
+
+  Widget _buildPasswordField({
+    required TextEditingController controller,
+    required String hintText,
+    required String labelText,
+  }) {
+    return SizedBox(
+      width: 250,
+      child: TextFormField(
+        controller: controller,
         obscureText: true,
         decoration: InputDecoration(
           hintText: hintText,
+          labelText: labelText,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
         ),
-      ),
-    );
-  }
+      )
+      );
+    }
+  
 
   Widget _buildNextButton(BuildContext context) {
     return ElevatedButton(
@@ -228,4 +243,4 @@ class _Cadastro1State extends State<Cadastro1> {
       ),
     );
   }
-}
+

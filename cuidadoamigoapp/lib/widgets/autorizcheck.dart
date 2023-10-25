@@ -1,5 +1,5 @@
+import 'package:cuidadoamigoapp/views/Cliente/homeIdoso.dart';
 import 'package:flutter/material.dart';
-import 'package:cuidadoamigoapp/views/homeIdoso.dart';
 import 'package:cuidadoamigoapp/views/login.dart';
 import 'package:cuidadoamigoapp/servicos/autorizacao.dart';
 import 'package:provider/provider.dart';
@@ -19,9 +19,9 @@ class _AuthCheckState extends State<AuthCheck> {
     if (auth.isLoading) {
       return loading();
     } else if (auth.usuario == null) {
-      return login();
+      return Login();
     } else {
-      return homeIdoso();
+      return HomeIdoso();
     }
   }
 
