@@ -2,9 +2,53 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
-class Cadastro2 extends StatelessWidget {
-  const Cadastro2({Key? key});
+class Cadastro2 extends StatefulWidget {
+  Cadastro2({Key? key}) : super(key: key);
 
+  @override
+  State<Cadastro2> createState() => _Cadastro2State();
+}
+
+class _Cadastro2State extends State<Cadastro3> {
+  final formKey = GlobalKey<FormState>();
+  final cep = TextEditingController();
+  final comp = TextEditingController();
+  final numb = TextEditingController();
+  final pref = TextEditingController();
+
+  bool isCad = true;
+  late String titulo;
+  late String actionButton;
+  late String toggleButton;
+  bool loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    setFormAction(true);
+  }
+
+  setFormAction(bool acao) {
+    setState(() {
+      isCad = acao;
+      if (isCad) {
+        titulo = 'Parte 2 de seu cadastro';
+        actionButton = 'Cadastrar';
+        toggleButton = 'Voltar ao Login.';
+      }
+    });
+  }
+
+  registrar() async {
+    setState(() => loading = true);
+    try {
+      await context.read<AuthService>().registrar(cep.text, comp.text, numb.text, pref.text);
+    } on AuthException catch (e) {
+      setState(() => loading = false);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.message)));
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,7 +74,7 @@ class Cadastro2 extends StatelessWidget {
   
           ],
         ),
-        
+       
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -38,19 +82,13 @@ class Cadastro2 extends StatelessWidget {
           children: [
             _buildHeader(context),
             SizedBox(height: 20),
-            _buildCEPTextField(),
+            _buildCEPTextField(controller: cep),
             SizedBox(height: 5),
-            _buildTextField('Estado', TextInputType.text),
+            _buildTextField(controller: comp, 'Complemento', TextInputType.text),
             SizedBox(height: 5),
-            _buildTextField('Cidade', TextInputType.text),
+            _buildTextField(controller: numb, 'Número', TextInputType.number),
             SizedBox(height: 5),
-            _buildTextField('Endereço', TextInputType.text),
-            SizedBox(height: 5),
-            _buildTextField('Complemento', TextInputType.text),
-            SizedBox(height: 5),
-            _buildTextField('Número', TextInputType.number),
-            SizedBox(height: 5),
-            _buildTextField('Ponto de Referência', TextInputType.text),
+            _buildTextField(controller: pref, 'Ponto de Referência', TextInputType.text),
             SizedBox(height: 40),
             _buildNextButton(context),
           ],
