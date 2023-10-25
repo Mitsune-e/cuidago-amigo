@@ -1,4 +1,4 @@
-class Evento {
+/*class Evento {
   final String id;
   final String name;
   final String imagem;
@@ -36,4 +36,4 @@ class Evento {
       "senha": senha,
     };
   }
-}
+}*/

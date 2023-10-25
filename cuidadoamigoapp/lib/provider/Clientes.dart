@@ -1,10 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+/*import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cuidadoamigoapp/models/cliente.dart';
 import 'package:flutter/material.dart';
 
 
 
-class Eventos with ChangeNotifier {
+class Clientes with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<Cliente> listEvento = [];
 
@@ -26,4 +26,4 @@ class Eventos with ChangeNotifier {
     _firestore.collection('Clientes').doc(cliente.id).delete();
     notifyListeners();
   }
-}
+}*/
