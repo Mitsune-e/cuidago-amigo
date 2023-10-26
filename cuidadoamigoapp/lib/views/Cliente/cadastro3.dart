@@ -8,11 +8,10 @@ class Cadastro3 extends StatefulWidget {
 }
 
 class _Cadastro3State extends State<Cadastro3> {
-  final String? respostaPergunta1;
-  final String? respostaPergunta2;
-  final String? respostaPergunta3;
+  String? respostaPergunta1;
+  String? respostaPergunta2;
+  String? respostaPergunta3;
 
-  // Opções para os DropdownButtonFormField
   final List<String> movimentacaoOptions = [
     "Não necessito de Ajuda",
     "Necessito de Ajuda",
@@ -41,11 +40,12 @@ class _Cadastro3State extends State<Cadastro3> {
               icon: Icon(Icons.arrow_back),
             ),
             Text('Informações de Saúde'),
-             IconButton(
-            onPressed: () {Navigator.of(context).pushReplacementNamed('/homeIdoso');},
-            icon: Icon(Icons.arrow_forward), // Ícone vazio à direita
-          ),
-  
+            IconButton(
+              onPressed: () {
+                Navigator.of(context).pushReplacementNamed('/homeIdoso');
+              },
+              icon: Icon(Icons.arrow_forward),
+            ),
           ],
         ),
       ),
@@ -54,8 +54,6 @@ class _Cadastro3State extends State<Cadastro3> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-
-           
             Center(
               child: Image.asset('Assets/imagens/LOGO.png'),
             ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class Cadastro2 extends StatefulWidget {
@@ -9,8 +8,7 @@ class Cadastro2 extends StatefulWidget {
   State<Cadastro2> createState() => _Cadastro2State();
 }
 
-class _Cadastro2State extends State<Cadastro3> {
-  final formKey = GlobalKey<FormState>();
+class _Cadastro2State extends State<Cadastro2> {
   final cep = TextEditingController();
   final comp = TextEditingController();
   final numb = TextEditingController();
@@ -39,16 +37,6 @@ class _Cadastro2State extends State<Cadastro3> {
     });
   }
 
-  registrar() async {
-    setState(() => loading = true);
-    try {
-      await context.read<AuthService>().registrar(cep.text, comp.text, numb.text, pref.text);
-    } on AuthException catch (e) {
-      setState(() => loading = false);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.message)));
-    }
-  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,17 +52,15 @@ class _Cadastro2State extends State<Cadastro3> {
               },
               icon: Icon(Icons.arrow_back),
             ),
-            
             Text('Informações de Endereço'),
-
-          IconButton(
-            onPressed: () {Navigator.of(context).pushReplacementNamed('/cadastro3');},
-            icon: Icon(Icons.arrow_forward), // Ícone vazio à direita
-          ),
-  
+            IconButton(
+              onPressed: () {
+                Navigator.of(context).pushReplacementNamed('/cadastro3');
+              },
+              icon: Icon(Icons.arrow_forward),
+            ),
           ],
         ),
-       
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -84,11 +70,11 @@ class _Cadastro2State extends State<Cadastro3> {
             SizedBox(height: 20),
             _buildCEPTextField(controller: cep),
             SizedBox(height: 5),
-            _buildTextField(controller: comp, 'Complemento', TextInputType.text),
+            _buildTextField('Complemento', TextInputType.text, controller: comp),
             SizedBox(height: 5),
-            _buildTextField(controller: numb, 'Número', TextInputType.number),
+            _buildTextField('Número', TextInputType.number, controller: numb),
             SizedBox(height: 5),
-            _buildTextField(controller: pref, 'Ponto de Referência', TextInputType.text),
+            _buildTextField('Ponto de Referência', TextInputType.text, controller: pref),
             SizedBox(height: 40),
             _buildNextButton(context),
           ],
@@ -108,11 +94,13 @@ class _Cadastro2State extends State<Cadastro3> {
 
   Widget _buildTextField(
     String hintText,
-    TextInputType keyboardType,
-  ) {
+    TextInputType keyboardType, {
+    TextEditingController? controller,
+  }) {
     return SizedBox(
       width: 250,
       child: TextFormField(
+        controller: controller,
         keyboardType: keyboardType,
         decoration: InputDecoration(
           hintText: hintText,
@@ -122,16 +110,17 @@ class _Cadastro2State extends State<Cadastro3> {
     );
   }
 
-  Widget _buildCEPTextField() {
+  Widget _buildCEPTextField({TextEditingController? controller}) {
     return SizedBox(
       width: 250,
       child: TextFormField(
+        controller: controller,
         inputFormatters: [
           MaskTextInputFormatter(
             mask: '##.###.###',
             filter: {"#": RegExp(r'[0-9]')},
             type: MaskAutoCompletionType.lazy,
-          )
+          ),
         ],
         keyboardType: TextInputType.number,
         decoration: InputDecoration(
