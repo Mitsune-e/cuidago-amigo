@@ -8,7 +8,7 @@ import 'package:cuidadoamigoapp/views/Cliente/SolicitarCuidador2.dart';
 import 'package:cuidadoamigoapp/views/Cliente/agenda.dart';
 import 'package:cuidadoamigoapp/views/Cliente/cadastro1.dart';
 import 'package:cuidadoamigoapp/views/Cliente/cadastro3.dart';
-import 'package:cuidadoamigoapp/views/Cliente/detalhamento.dart';
+
 import 'package:cuidadoamigoapp/views/Prestador/homeCuidador.dart';
 import 'package:cuidadoamigoapp/views/login.dart';
 import 'package:cuidadoamigoapp/views/Cliente/homeIdoso.dart';
