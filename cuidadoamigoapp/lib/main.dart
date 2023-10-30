@@ -1,3 +1,4 @@
+import 'package:cuidadoamigoapp/provider/Clientes.dart';
 import 'package:cuidadoamigoapp/views/Cliente/cadastro2.dart';
 import 'package:cuidadoamigoapp/views/Prestador/CadastroCuidado.dart';
 import 'package:cuidadoamigoapp/views/Cliente/Perfil.dart';
@@ -13,6 +14,7 @@ import 'package:cuidadoamigoapp/views/Prestador/homeCuidador.dart';
 import 'package:cuidadoamigoapp/views/login.dart';
 import 'package:cuidadoamigoapp/views/Cliente/homeIdoso.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 
@@ -21,7 +23,15 @@ void main() async{
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
 );
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => Clientes()),
+        // Outros providers, se houver
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

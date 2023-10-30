@@ -1,4 +1,4 @@
-/*class Cliente {
+class Cliente {
   final String id;
   final String name;
   final String imagem;
@@ -37,4 +37,3 @@
     };
   }
 }
-*/

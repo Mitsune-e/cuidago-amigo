@@ -1,6 +1,6 @@
-import 'package:cuidadoamigoapp/servicos/autorizacao.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 
 class Login extends StatefulWidget {
   Login({Key? key}) : super(key: key);
@@ -33,22 +33,31 @@ class _LoginState extends State<Login> {
         titulo = 'Bem vindo';
         actionButton = 'Login';
         toggleButton = 'Ainda não tem conta? Cadastre-se agora.';
-      } else {
-        titulo = 'Crie sua conta';
-        actionButton = 'Cadastrar';
-        toggleButton = 'Voltar ao Login.';
       }
     });
   }
 
-  login() async {
+  Future<void> login() async {
     setState(() => loading = true);
-    try {
-      await context.read<AuthService>().login(email.text, senha.text);
-    } on AuthException catch (e) {
+    final emailText = email.text;
+    final senhaText = senha.text;
+
+    // Consulta Firestore para encontrar um documento com o email e senha correspondentes
+    final clienteDocs = await FirebaseFirestore.instance
+        .collection('Clientes')
+        .where('email', isEqualTo: emailText)
+        .where('senha', isEqualTo: senhaText)
+        .get();
+
+    if (clienteDocs.docs.isNotEmpty) {
+      // Autenticação bem-sucedida - redireciona para a próxima tela
+      Navigator.of(context).pushReplacementNamed('/homeIdoso');
+    } else {
+      // Exiba uma mensagem de erro caso a autenticação falhe
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro de autenticação')),
+      );
       setState(() => loading = false);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.message)));
     }
   }
 
@@ -64,12 +73,10 @@ class _LoginState extends State<Login> {
             content: SingleChildScrollView(
               child: ListBody(
                 children: <Widget>[
-                  const Text(
-                      'Selecione o tipo de conta que você deseja criar:'),
+                  const Text('Selecione o tipo de conta que você deseja criar:'),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
-                      // Lógica para escolher "Usuário"
                       Navigator.of(context).pushReplacementNamed('/cadastro1');
                     },
                     style: ElevatedButton.styleFrom(
@@ -83,9 +90,7 @@ class _LoginState extends State<Login> {
                   const SizedBox(height: 10),
                   ElevatedButton(
                     onPressed: () {
-                      // Lógica para escolher "Cuidador"
-                      Navigator.of(context)
-                          .pushReplacementNamed('/cadastroPrestador');
+                      Navigator.of(context).pushReplacementNamed('/cadastroPrestador');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromRGBO(92, 198, 186, 100),
@@ -121,15 +126,13 @@ class _LoginState extends State<Login> {
               SizedBox(
                 height: 200,
                 width: 400,
-                child:
-                    Image.asset('Assets/imagens/LOGO.png', fit: BoxFit.cover),
+                child: Image.asset('Assets/imagens/LOGO.png', fit: BoxFit.cover),
               ),
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
               TextFormField(
                 inputFormatters: const [],
                 keyboardType: TextInputType.emailAddress,
+                controller: email,
                 decoration: InputDecoration(
                   labelText: 'E-mail',
                   border: OutlineInputBorder(
@@ -137,11 +140,10 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
               TextFormField(
                 obscureText: true,
+                controller: senha,
                 decoration: InputDecoration(
                   labelText: 'Senha',
                   border: OutlineInputBorder(
@@ -149,9 +151,7 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 10,
-              ),
+              const SizedBox(height: 10),
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pushNamed('/recuperarSenha');
@@ -174,12 +174,10 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.of(context).pushReplacementNamed('/homeIdoso');
+                  login();
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromRGBO(92, 198, 186, 100),
