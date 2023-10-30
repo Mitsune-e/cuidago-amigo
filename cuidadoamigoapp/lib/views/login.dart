@@ -55,14 +55,14 @@ class _LoginState extends State<Login> {
       } else {
         // Exiba uma mensagem de erro caso a autenticação falhe
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro de autenticação')),
+          SnackBar(content: Text('Erro de autenticação. Verifique seu email e senha.')),
         );
         setState(() => loading = false);
       }
     } catch (e) {
       print('Erro de autenticação com Firebase Authentication: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro de autenticação')),
+        SnackBar(content: Text('Erro de autenticação. Verifique seu email e senha.')),
       );
       setState(() => loading = false);
     }
