@@ -1,10 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RecuperarSenha extends StatelessWidget {
   const RecuperarSenha({super.key});
 
+  Future<void> recuperarSenha(BuildContext context, String email) async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      // Envio de email de recuperação de senha bem-sucedido
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Email de recuperação de senha enviado com sucesso. Verifique sua caixa de entrada.')),
+      );
+    } catch (e) {
+      // Lidar com erros de envio de email de recuperação de senha
+      print('Erro ao enviar email de recuperação de senha: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao enviar email de recuperação de senha. Verifique seu email e tente novamente.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final emailController = TextEditingController();
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
@@ -46,6 +65,7 @@ class RecuperarSenha extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
+                    controller: emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                       labelText: 'Email',
@@ -57,7 +77,8 @@ class RecuperarSenha extends StatelessWidget {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
-                      // Lógica para enviar o email de recuperação de senha
+                      final email = emailController.text;
+                      recuperarSenha(context, email);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromRGBO(92, 198, 186, 100),
