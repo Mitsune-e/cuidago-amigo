@@ -1,10 +1,10 @@
-/*
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cuidadoamigoapp/models/cliente.dart';
 import 'package:flutter/material.dart';
 
 
-/class Clientes with ChangeNotifier {
+class Clientes with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<Cliente> listEvento = [];
 
@@ -27,4 +27,3 @@ import 'package:flutter/material.dart';
     notifyListeners();
   }
 }
-*/

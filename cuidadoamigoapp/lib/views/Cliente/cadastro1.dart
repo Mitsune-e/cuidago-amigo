@@ -1,10 +1,10 @@
-import 'package:cuidadoamigoapp/servicos/autorizacao.dart';
+import 'package:cuidadoamigoapp/models/cliente.dart';
+import 'package:cuidadoamigoapp/provider/Clientes.dart';
 import 'package:flutter/material.dart';
-
-
-import 'package:flutter/services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 
 class Cadastro1 extends StatefulWidget {
   Cadastro1({Key? key}) : super(key: key);
@@ -14,46 +14,52 @@ class Cadastro1 extends StatefulWidget {
 }
 
 class _Cadastro1State extends State<Cadastro1> {
-  final formKey = GlobalKey<FormState>();
   final nome = TextEditingController();
   final email = TextEditingController();
   final fone = TextEditingController();
-  final codpf = TextEditingController();
-  final datanasc = TextEditingController();
   final senha = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  bool isCad = true;
-  late String titulo;
-  late String actionButton;
-  late String toggleButton;
-  bool loading = false;
+  Widget _buildNextButton(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () async {
+        try {
+          final UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+            email: email.text,
+            password: senha.text,
+          );
 
-  @override
-  void initState() {
-    super.initState();
-    setFormAction(true);
-  }
+          final User? user = userCredential.user;
+          if (user != null) {
+            final uid = user.uid;
 
-  setFormAction(bool acao) {
-    setState(() {
-      isCad = acao;
-      if (isCad) {
-        titulo = 'Crie sua conta';
-        actionButton = 'Cadastrar';
-        toggleButton = 'Voltar ao Login.';
-      }
-    });
-  }
+            final cliente = Cliente(
+              id: Uuid().v5(Uuid.NAMESPACE_URL, uid),
+              name: nome.text,
+              email: email.text,
+              telefone: fone.text,
+              senha: senha.text,
+              imagem: '',
+            );
 
-  registrar() async {
-    setState(() => loading = true);
-    try {
-      await context.read<AuthService>().registrar(nome.text, email.text);
-    } on AuthException catch (e) {
-      setState(() => loading = false);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.message)));
-    }
+            Provider.of<Clientes>(context, listen: false).adiciona(cliente);
+          }
+
+          // Navegue para a próxima página (cadastro2)
+          Navigator.of(context).pushReplacementNamed('/cadastro2');
+        } catch (e) {
+          print('Erro de criação de usuário no Firebase Authentication: $e');
+        }
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color.fromRGBO(92, 198, 186, 100),
+        shape: const StadiumBorder(),
+      ),
+      child: const Text(
+        'Prosseguir',
+        style: TextStyle(color: Colors.white),
+      ),
+    );
   }
 
   @override
@@ -71,11 +77,13 @@ class _Cadastro1State extends State<Cadastro1> {
               },
               icon: Icon(Icons.arrow_back),
             ),
-
             Text('Informações Pessoais'),
             IconButton(
-              onPressed: () {Navigator.of(context).pushReplacementNamed("/cadastro2");},
-              icon: Icon(Icons.arrow_forward), // Ícone vazio à direita
+              onPressed: () {
+                // Chame a função para prosseguir
+                _buildNextButton(context);
+              },
+              icon: Icon(Icons.arrow_forward),
             ),
           ],
         ),
@@ -85,18 +93,9 @@ class _Cadastro1State extends State<Cadastro1> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(height: 20),
-            _buildHeader(context),
-            SizedBox(height: 20),
-            _buildTextField(controller: nome, hintText: 'Nome', keyboardType: TextInputType.text, maxLength: 20),
-            SizedBox(height: 12),
-            _buildCPFTextField(),
-            SizedBox(height: 15),
+            _buildTextField(controller: nome, hintText: 'Nome', keyboardType: TextInputType.text),
             _buildTextField(controller: email, hintText: 'E-mail', keyboardType: TextInputType.emailAddress),
-            SizedBox(height: 15),
             _buildPhoneTextField(controller: fone),
-            SizedBox(height: 10),
-            _buildDateTextField(controller: datanasc),
-            SizedBox(height: 40),
             _buildPasswordField(controller: senha, hintText: 'Senha', labelText: 'Senha'),
             const SizedBox(height: 5),
             _buildNextButton(context),
@@ -106,57 +105,21 @@ class _Cadastro1State extends State<Cadastro1> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Image.asset('Assets/imagens/LOGO.png'),
-      ],
-    );
-  }
-
   Widget _buildTextField({
     required TextEditingController controller,
     required String hintText,
     required TextInputType keyboardType,
-    int? maxLength,
-    String? initialValue,
   }) {
     return SizedBox(
       width: 250,
       child: TextFormField(
         controller: controller,
-        initialValue: initialValue,
-        inputFormatters: maxLength != null
-            ? [LengthLimitingTextInputFormatter(maxLength)]
-            : [],
         keyboardType: keyboardType,
         decoration: InputDecoration(
           hintText: hintText,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
         ),
-      ),
-    );
-  }
-
-  Widget _buildCPFTextField() {
-    return SizedBox(
-      width: 250,
-      child: TextFormField(
-        inputFormatters: [
-          MaskTextInputFormatter(
-            mask: '###.###.###-##',
-            filter: {"#": RegExp(r'[0-9]')},
-            type: MaskAutoCompletionType.lazy,
-          ),
-        ],
-        keyboardType: TextInputType.number,
-        decoration: InputDecoration(
-          hintText: 'CPF',
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-        ),
-      )
-      );
+      ));
     }
   }
 
@@ -179,32 +142,7 @@ class _Cadastro1State extends State<Cadastro1> {
           hintText: 'Telefone',
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
         ),
-      )
-      );
-    }
-  
-
-  Widget _buildDateTextField({
-    required TextEditingController controller,
-  }) {
-    return SizedBox(
-      width: 250,
-      child: TextFormField(
-        controller: controller,
-        inputFormatters: [
-          MaskTextInputFormatter(
-            mask: '##/##/####',
-            filter: {"#": RegExp(r'[0-9]')},
-            type: MaskAutoCompletionType.lazy,
-          ),
-        ],
-        keyboardType: TextInputType.number,
-        decoration: InputDecoration(
-          hintText: 'Data de Nascimento',
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-        ),
-      )
-      );
+      ));
     }
   
 
@@ -223,24 +161,6 @@ class _Cadastro1State extends State<Cadastro1> {
           labelText: labelText,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
         ),
-      )
-      );
+      ));
     }
   
-
-  Widget _buildNextButton(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
-        Navigator.of(context).pushReplacementNamed('/cadastro2');
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color.fromRGBO(92, 198, 186, 100),
-        shape: const StadiumBorder(),
-      ),
-      child: const Text(
-        'Prosseguir',
-        style: TextStyle(color: Colors.white),
-      ),
-    );
-  }
-
