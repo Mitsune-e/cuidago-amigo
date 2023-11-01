@@ -46,7 +46,7 @@ class _Cadastro1State extends State<Cadastro1> {
           }
 
           // Navegue para a próxima página (cadastro2)
-          Navigator.of(context).pushReplacementNamed('/cadastro2');
+          
         } catch (e) {
           print('Erro de criação de usuário no Firebase Authentication: $e');
         }

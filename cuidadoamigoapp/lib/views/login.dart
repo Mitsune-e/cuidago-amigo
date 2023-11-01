@@ -1,6 +1,5 @@
-import 'package:cuidadoamigoapp/servicos/autorizacao.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Login extends StatefulWidget {
   Login({Key? key}) : super(key: key);
@@ -13,12 +12,12 @@ class _LoginState extends State<Login> {
   final formKey = GlobalKey<FormState>();
   final email = TextEditingController();
   final senha = TextEditingController();
-
   bool isLogin = true;
   late String titulo;
   late String actionButton;
   late String toggleButton;
   bool loading = false;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   void initState() {
@@ -33,84 +32,44 @@ class _LoginState extends State<Login> {
         titulo = 'Bem vindo';
         actionButton = 'Login';
         toggleButton = 'Ainda não tem conta? Cadastre-se agora.';
-      } else {
-        titulo = 'Crie sua conta';
-        actionButton = 'Cadastrar';
-        toggleButton = 'Voltar ao Login.';
       }
     });
   }
 
-  login() async {
-    setState(() => loading = true);
+  Future<void> login() async {
     try {
-      await context.read<AuthService>().login(email.text, senha.text);
-    } on AuthException catch (e) {
+      setState(() => loading = true);
+
+      final emailText = email.text;
+      final senhaText = senha.text;
+
+      // Autenticação com Firebase Authentication
+      final userCredential = await _auth.signInWithEmailAndPassword(
+        email: emailText,
+        password: senhaText,
+      );
+
+      if (userCredential.user != null) {
+        // Autenticação bem-sucedida - redireciona para a próxima tela
+        Navigator.of(context).pushReplacementNamed('/homeIdoso');
+      } else {
+        // Exiba uma mensagem de erro caso a autenticação falhe
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro de autenticação. Verifique seu email e senha.')),
+        );
+        setState(() => loading = false);
+      }
+    } catch (e) {
+      print('Erro de autenticação com Firebase Authentication: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro de autenticação. Verifique seu email e senha.')),
+      );
       setState(() => loading = false);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.message)));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    Future<void> _showAccountTypeDialog(BuildContext context) async {
-      return showDialog<void>(
-        context: context,
-        barrierDismissible: false, // Evita fechar o diálogo ao tocar fora
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Escolha o tipo de conta'),
-            content: SingleChildScrollView(
-              child: ListBody(
-                children: <Widget>[
-                  const Text(
-                      'Selecione o tipo de conta que você deseja criar:'),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Lógica para escolher "Usuário"
-                      Navigator.of(context).pushReplacementNamed('/cadastro1');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromRGBO(92, 198, 186, 100),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                    child: const Text('Usuário'),
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Lógica para escolher "Cuidador"
-                      Navigator.of(context)
-                          .pushReplacementNamed('/cadastroPrestador');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromRGBO(92, 198, 186, 100),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                    child: const Text('Cuidador'),
-                  ),
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('Sair'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
-
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
@@ -121,15 +80,13 @@ class _LoginState extends State<Login> {
               SizedBox(
                 height: 200,
                 width: 400,
-                child:
-                    Image.asset('Assets/imagens/LOGO.png', fit: BoxFit.cover),
+                child: Image.asset('Assets/imagens/LOGO.png', fit: BoxFit.cover),
               ),
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
               TextFormField(
                 inputFormatters: const [],
                 keyboardType: TextInputType.emailAddress,
+                controller: email,
                 decoration: InputDecoration(
                   labelText: 'E-mail',
                   border: OutlineInputBorder(
@@ -137,11 +94,10 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
               TextFormField(
                 obscureText: true,
+                controller: senha,
                 decoration: InputDecoration(
                   labelText: 'Senha',
                   border: OutlineInputBorder(
@@ -149,9 +105,7 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 10,
-              ),
+              const SizedBox(height: 10),
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pushNamed('/recuperarSenha');
@@ -174,12 +128,10 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.of(context).pushReplacementNamed('/homeIdoso');
+                  login();
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromRGBO(92, 198, 186, 100),
@@ -196,6 +148,59 @@ class _LoginState extends State<Login> {
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> _showAccountTypeDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Escolha o tipo de conta'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                const Text('Selecione o tipo de conta que você deseja criar:'),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pushReplacementNamed('/cadastro1');
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromRGBO(92, 198, 186, 100),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: const Text('Usuário'),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pushReplacementNamed('/cadastroPrestador');
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromRGBO(92, 198, 186, 100),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: const Text('Cuidador'),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Sair'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
