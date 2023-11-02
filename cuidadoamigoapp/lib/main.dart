@@ -1,4 +1,4 @@
-import 'package:cuidadoamigoapp/views/Cliente/cadastro2.dart';
+
 import 'package:cuidadoamigoapp/views/Prestador/CadastroCuidado.dart';
 import 'package:cuidadoamigoapp/views/Cliente/Perfil.dart';
 import 'package:cuidadoamigoapp/views/Prestador/Carteira.dart';
@@ -7,7 +7,6 @@ import 'package:cuidadoamigoapp/views/Cliente/SolicitarCuidado1.dart';
 import 'package:cuidadoamigoapp/views/Cliente/SolicitarCuidador2.dart';
 import 'package:cuidadoamigoapp/views/Cliente/agenda.dart';
 import 'package:cuidadoamigoapp/views/Cliente/cadastro1.dart';
-import 'package:cuidadoamigoapp/views/Cliente/cadastro3.dart';
 import 'package:cuidadoamigoapp/provider/Clientes.dart';
 import 'package:cuidadoamigoapp/views/Prestador/homeCuidador.dart';
 import 'package:cuidadoamigoapp/views/login.dart';
@@ -44,8 +43,6 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => Login(),
         '/cadastro1': (context) => Cadastro1(),
-        '/cadastro2':(context) => Cadastro2(),
-        '/cadastro3' :(context) => Cadastro3(),
         '/recuperarSenha': (context) => RecuperarSenha(),
         '/homeIdoso': (context) => HomeIdoso(),
         '/cadastroPrestador':(context) => CadastroPrestador(),

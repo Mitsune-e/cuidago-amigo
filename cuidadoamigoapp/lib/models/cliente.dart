@@ -5,6 +5,7 @@ class Cliente {
   final String name;
   final String imagem;
   final String email;
+  final String cpf;
   final String telefone;
   final String senha;
   final List<String> enderecos;
@@ -14,6 +15,7 @@ class Cliente {
     required this.id,
     required this.name,
     required this.imagem,
+    required this.cpf,
     required this.email,
     required this.senha,
     required this.telefone,
@@ -29,6 +31,7 @@ class Cliente {
         email = map["email"],
         telefone = map["telefone"],
         senha = map["senha"],
+        cpf = map["cpf"],
         enderecos = List<String>.from(map["enderecos"] ?? []),
         servicos = List<String>.from(map["servicos"] ?? []);
 
@@ -36,6 +39,7 @@ class Cliente {
     return {
       "id": id,
       "name": name,
+      "cpf":cpf,
       "imagem": imagem,
       "email": email,
       "telefone": telefone,
