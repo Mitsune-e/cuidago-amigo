@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:cuidadoamigoapp/models/cliente.dart';
 import 'package:cuidadoamigoapp/provider/Clientes.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
-import 'package:image_picker/image_picker.dart';
 
 class Cadastro1 extends StatefulWidget {
   Cadastro1({Key? key}) : super(key: key);
@@ -22,17 +19,6 @@ class _Cadastro1State extends State<Cadastro1> {
   final fone = TextEditingController();
   final senha = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  XFile? _image; // Variável para armazenar a imagem selecionada
-
-  Future<void> _getImage() async {
-    final imagePicker = ImagePicker();
-    final XFile? image = await imagePicker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      setState(() {
-        _image = image;
-      });
-    }
-  }
 
   Widget _buildNextButton(BuildContext context) {
     return ElevatedButton(
@@ -53,13 +39,14 @@ class _Cadastro1State extends State<Cadastro1> {
               email: email.text,
               telefone: fone.text,
               senha: senha.text,
-              imagem: _image?.path ?? '', // Use o caminho da imagem ou uma string vazia se nenhuma imagem foi selecionada
+              imagem: '',
             );
 
             Provider.of<Clientes>(context, listen: false).adiciona(cliente);
           }
 
           // Navegue para a próxima página (cadastro2)
+          
         } catch (e) {
           print('Erro de criação de usuário no Firebase Authentication: $e');
         }
@@ -111,8 +98,6 @@ class _Cadastro1State extends State<Cadastro1> {
             _buildPhoneTextField(controller: fone),
             _buildPasswordField(controller: senha, hintText: 'Senha', labelText: 'Senha'),
             const SizedBox(height: 5),
-            _buildImagePickerButton(), // Botão para selecionar a imagem
-            const SizedBox(height: 5),
             _buildNextButton(context),
           ],
         ),
@@ -135,6 +120,7 @@ class _Cadastro1State extends State<Cadastro1> {
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
         ),
       ));
+    }
   }
 
   Widget _buildPhoneTextField({
@@ -149,7 +135,8 @@ class _Cadastro1State extends State<Cadastro1> {
             mask: '(##) #####-####',
             filter: {"#": RegExp(r'[0-9]')},
             type: MaskAutoCompletionType.lazy,
-      )],
+          ),
+        ],
         keyboardType: TextInputType.phone,
         decoration: InputDecoration(
           hintText: 'Telefone',
@@ -157,29 +144,7 @@ class _Cadastro1State extends State<Cadastro1> {
         ),
       ));
     }
-
-  Widget _buildImagePickerButton() {
-    return Column(
-      children: [
-        ElevatedButton(
-          onPressed: _getImage,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.grey, // Cor do botão para selecionar a imagem
-            shape: const StadiumBorder(),
-          ),
-          child: const Text(
-            'Selecionar Imagem',
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-        if (_image != null)
-          Image.file(
-            File(_image!.path),
-            height: 100, // Altura da imagem selecionada
-          ),
-      ],
-    );
-  }
+  
 
   Widget _buildPasswordField({
     required TextEditingController controller,
@@ -198,4 +163,4 @@ class _Cadastro1State extends State<Cadastro1> {
         ),
       ));
     }
-  }
+  

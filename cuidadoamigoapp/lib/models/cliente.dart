@@ -1,5 +1,3 @@
-import 'dart:io';
-
 class Cliente {
   final String id;
   final String name;
@@ -8,8 +6,7 @@ class Cliente {
   final String cpf;
   final String telefone;
   final String senha;
-  final List<String> enderecos;
-  final List<String> servicos;
+  
 
   const Cliente({
     required this.id,
@@ -19,10 +16,8 @@ class Cliente {
     required this.email,
     required this.senha,
     required this.telefone,
-    List<String> enderecos = const [],
-    List<String> servicos = const [],
-  }) : this.enderecos = enderecos,
-       this.servicos = servicos;
+  
+  });
 
   Cliente.fromMap(Map<String, dynamic> map)
       : id = map["id"],
@@ -30,10 +25,15 @@ class Cliente {
         imagem = map["imagem"],
         email = map["email"],
         telefone = map["telefone"],
+<<<<<<< HEAD
         senha = map["senha"],
         cpf = map["cpf"],
         enderecos = List<String>.from(map["enderecos"] ?? []),
         servicos = List<String>.from(map["servicos"] ?? []);
+=======
+        senha = map["senha"];
+        
+>>>>>>> parent of 996035b (image)
 
   Map<String, dynamic> toMap() {
     return {
@@ -44,8 +44,6 @@ class Cliente {
       "email": email,
       "telefone": telefone,
       "senha": senha,
-      "enderecos": enderecos,
-      "servicos": servicos,
     };
   }
 }
