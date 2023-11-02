@@ -10,6 +10,8 @@ class Clientes with ChangeNotifier {
 
   adiciona(Cliente cliente) {
     _firestore.collection("Clientes").doc(cliente.id).set(cliente.toMap());
+    print('esta chamando essa função');
+    print(cliente.toMap());
   }
 
   caregar() async {
