@@ -9,7 +9,7 @@ import 'package:cuidadoamigoapp/views/Cliente/SolicitarCuidador2.dart';
 import 'package:cuidadoamigoapp/views/Cliente/agenda.dart';
 import 'package:cuidadoamigoapp/views/Cliente/cadastro1.dart';
 import 'package:cuidadoamigoapp/views/Cliente/cadastro3.dart';
-
+import 'package:cuidadoamigoapp/provider/Clientes.dart';
 import 'package:cuidadoamigoapp/views/Prestador/homeCuidador.dart';
 import 'package:cuidadoamigoapp/views/login.dart';
 import 'package:cuidadoamigoapp/views/Cliente/homeIdoso.dart';
@@ -18,7 +18,7 @@ import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 
-void main() async{
+Future  main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -33,7 +33,6 @@ void main() async{
     ),
   );
 }
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

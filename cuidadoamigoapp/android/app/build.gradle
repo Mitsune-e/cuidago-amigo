@@ -2,7 +2,10 @@ plugins {
     id "com.android.application"
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
+    id 'com.google.gms.google-services' 
+
   
+
 }
 
 def localProperties = new Properties()
@@ -22,6 +25,7 @@ def flutterVersionName = localProperties.getProperty('flutter.versionName')
 if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
+
 
 android {
     namespace "com.example.cuidadoamigoapp"
@@ -46,7 +50,7 @@ android {
         applicationId "com.example.cuidadoamigoapp"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion flutter.minSdkVersion
+        minSdkVersion 21
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -68,6 +72,7 @@ flutter {
 
 dependencies {
     implementation 'androidx.multidex:multidex:2.0.1' // Adicione esta linha para a dependência Multidex
-    implementation(platform("com.google.firebase:firebase-bom:32.4.0"))
-    implementation("com.google.firebase:firebase-analytics-ktx")
+
+    implementation platform('com.google.firebase:firebase-bom:32.5.0')
+    implementation 'com.google.firebase:firebase-analytics'
 }
