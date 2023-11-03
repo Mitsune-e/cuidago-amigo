@@ -6,9 +6,10 @@ class Cliente {
   final String cpf;
   final String telefone;
   final String senha;
-  
+  List<String>? enderecos;
+  List<String>? servicos;
 
-  const Cliente({
+  Cliente({
     required this.id,
     required this.name,
     required this.imagem,
@@ -16,8 +17,10 @@ class Cliente {
     required this.email,
     required this.senha,
     required this.telefone,
-  
-  });
+    List<String>? enderecos,
+    List<String>? servicos,
+  })   : this.enderecos = enderecos ?? [],
+        this.servicos = servicos ?? [];
 
   Cliente.fromMap(Map<String, dynamic> map)
       : id = map["id"],
@@ -25,25 +28,22 @@ class Cliente {
         imagem = map["imagem"],
         email = map["email"],
         telefone = map["telefone"],
-<<<<<<< HEAD
         senha = map["senha"],
         cpf = map["cpf"],
         enderecos = List<String>.from(map["enderecos"] ?? []),
         servicos = List<String>.from(map["servicos"] ?? []);
-=======
-        senha = map["senha"];
-        
->>>>>>> parent of 996035b (image)
 
   Map<String, dynamic> toMap() {
     return {
       "id": id,
       "name": name,
-      "cpf":cpf,
+      "cpf": cpf,
       "imagem": imagem,
       "email": email,
       "telefone": telefone,
       "senha": senha,
+      "enderecos": enderecos,
+      "servicos": servicos,
     };
   }
 }

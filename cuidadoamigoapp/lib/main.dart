@@ -1,5 +1,6 @@
 
 import 'package:cuidadoamigoapp/provider/Clientes.dart';
+import 'package:cuidadoamigoapp/provider/Enderecos.dart';
 import 'package:cuidadoamigoapp/views/Prestador/CadastroCuidado.dart';
 import 'package:cuidadoamigoapp/views/Cliente/Perfil.dart';
 import 'package:cuidadoamigoapp/views/Prestador/Carteira.dart';
@@ -26,6 +27,7 @@ Future  main() async{
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => Clientes()),
+        ChangeNotifierProvider(create: (context) => Enderecos()),
         // Outros providers, se houver
       ],
       child: MyApp(),
