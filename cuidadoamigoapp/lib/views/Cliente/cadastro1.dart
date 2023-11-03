@@ -106,11 +106,11 @@ class _Cadastro1State extends State<Cadastro1> {
 
     final User? user = userCredential.user;
     if (user != null) {
-      final uid = user.uid;
+     
 
       // Crie um objeto Cliente
       final cliente = Cliente(
-        id: Uuid().v5(Uuid.NAMESPACE_URL, uid),
+        id: user.uid,
         name: nome.text,
         email: email.text,
         telefone: fone.text,
@@ -124,7 +124,7 @@ class _Cadastro1State extends State<Cadastro1> {
         print("teste");
         // Crie um objeto Endereco
         final endereco = Endereco(
-          id: Uuid().v5(Uuid.NAMESPACE_URL, uid), // Gere um ID para o endereço
+          id: Uuid().v1(), // Gere um ID para o endereço
           cep: cepController.text,
           endereco: enderecoController.text,
           numero: numeroController.text,

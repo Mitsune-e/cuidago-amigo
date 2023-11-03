@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Perfil extends StatefulWidget {
   const Perfil({Key? key});
@@ -8,24 +10,49 @@ class Perfil extends StatefulWidget {
 }
 
 class _PerfilState extends State<Perfil> {
-  // Controladores de texto para os campos existentes
-  TextEditingController _nomeController = TextEditingController(text: 'João da Silva');
-  TextEditingController _cpfController = TextEditingController(text: '123.456.789-00');
-  TextEditingController _emailController = TextEditingController(text: 'joao.silva@example.com');
-  TextEditingController _telefoneController = TextEditingController(text: '(12) 3456-7890');
+  FirebaseAuth _auth = FirebaseAuth.instance;
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Controladores de texto para os novos campos
-  TextEditingController _cepController = TextEditingController(text: '12345-678');
-  TextEditingController _estadoController = TextEditingController(text: 'SP');
-  TextEditingController _cidadeController = TextEditingController(text: 'São Paulo');
-  TextEditingController _enderecoController = TextEditingController(text: 'Rua da Paz, 123');
-  TextEditingController _complementoController = TextEditingController(text: 'Apto 101');
-  TextEditingController _numeroController = TextEditingController(text: '123');
-  TextEditingController _pontoReferenciaController = TextEditingController(text: 'Próximo à escola');
+  TextEditingController _nomeController = TextEditingController();
+  TextEditingController _cpfController = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _telefoneController = TextEditingController();
+  List<String> cliente_enderecos = [];
 
-  TextEditingController _movimentacaoController = TextEditingController(text: 'Normal');
-  TextEditingController _alimentacaoController = TextEditingController(text: 'Sem restrições');
-  TextEditingController _doencaCronicaController = TextEditingController(text: 'Nenhuma');
+  @override
+  void initState() {
+    super.initState();
+
+    // Verifique se o usuário está autenticado
+    User? user = _auth.currentUser;
+    if (user != null) {
+      // O usuário está autenticado, agora vamos carregar seus dados do Firestore
+      _loadUserData(user.uid);
+    }
+  }
+
+  Future<void> _loadUserData(String userId) async {
+    try {
+      // Consulte o Firestore para obter os dados do cliente com o mesmo ID de usuário
+      DocumentSnapshot userDoc = await _firestore.collection('Clientes').doc(userId).get();
+
+      if (userDoc.exists) {
+        // Dados encontrados, preencha os controladores de texto
+        setState(() {
+          _nomeController.text = userDoc['name'] ?? '';
+          _cpfController.text = userDoc['cpf'] ?? '';
+          _emailController.text = userDoc['email'] ?? '';
+          _telefoneController.text = userDoc['telefone'] ?? '';
+          cliente_enderecos = List<String>.from(userDoc['enderecos'] ?? []);
+        });
+      } else {
+        // Não foram encontrados dados para o ID do usuário
+      }
+    } catch (e) {
+      // Trate qualquer erro que possa ocorrer
+      print('Erro ao carregar dados do Firestore: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,57 +105,61 @@ class _PerfilState extends State<Perfil> {
             ),
             SizedBox(height: 20),
             _buildInfoBox(
-              title: 'Endereço',
+              title: 'Endereços',
               buttonText: 'Editar',
               onButtonPressed: () {
-                _mostrarEditarDialog(
-                  'Endereço',
-                  [
-                    _cepController,
-                    _estadoController,
-                    _cidadeController,
-                    _enderecoController,
-                    _complementoController,
-                    _numeroController,
-                    _pontoReferenciaController,
-                  ],
-                );
+                // Adicione aqui a lógica para editar os endereços se necessário
               },
-              children: [
-                _buildInfoRow('CEP', _cepController.text),
-                _buildInfoRow('Estado', _estadoController.text),
-                _buildInfoRow('Cidade', _cidadeController.text),
-                _buildInfoRow('Endereço', _enderecoController.text),
-                _buildInfoRow('Complemento', _complementoController.text),
-                _buildInfoRow('Número', _numeroController.text),
-                _buildInfoRow('Ponto de Referência', _pontoReferenciaController.text),
-              ],
-            ),
-            SizedBox(height: 20),
-            _buildInfoBox(
-              title: 'Informações de Saúde',
-              buttonText: 'Editar',
-              onButtonPressed: () {
-                _mostrarEditarDialog(
-                  'Informações de Saúde',
-                  [
-                    _movimentacaoController,
-                    _alimentacaoController,
-                    _doencaCronicaController,
-                  ],
-                );
-              },
-              children: [
-                _buildInfoRow('Movimentação', _movimentacaoController.text),
-                _buildInfoRow('Alimentação', _alimentacaoController.text),
-                _buildInfoRow('Doença Crônica', _doencaCronicaController.text),
-              ],
+              children: _enderecosListView(), // Utilize o ListView para exibir os endereços
             ),
           ],
         ),
       ),
     );
   }
+
+  List<Widget> _enderecosListView() {
+    List<Widget> enderecoWidgets = [];
+
+for (var enderecoId in cliente_enderecos) {
+  enderecoWidgets.add(
+    FutureBuilder<DocumentSnapshot>(
+      future: _firestore.collection('Enderecos').doc(enderecoId).get(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasError) {
+            return Text('Erro ao carregar endereço.');
+          }
+
+          if (snapshot.hasData) {
+            var enderecoData = snapshot.data?.data() as Map<String, dynamic>?;
+
+            if (enderecoData != null) {
+              final cep = enderecoData['cep'] ?? '';
+              final numero = enderecoData['numero'] ?? '';
+              final complemento = enderecoData['complemento'] ?? '';
+
+              return Column(
+                children: [
+                  _buildInfoRow('CEP', cep),
+                  _buildInfoRow('Endereço', enderecoData['endereco'] ?? ''),
+                  _buildInfoRow('Número', numero),
+                  _buildInfoRow('Complemento', complemento),
+                ],
+              );
+            }
+          }
+        }
+
+        return Text('Carregando endereço...');
+      },
+    ),
+  );
+}
+    return enderecoWidgets;
+  }
+
+  // ... outros métodos
 
   Widget _buildInfoBox({
     required String title,
@@ -184,30 +215,30 @@ class _PerfilState extends State<Perfil> {
     );
   }
 
-        Widget _buildInfoRow(String label, String value) {
-        return Padding(
-          padding: EdgeInsets.symmetric(vertical: 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 4), // Espaço entre o rótulo e o valor
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 18,
-                ),
-              ),
-            ],
+  Widget _buildInfoRow(String label, String value) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        );
-      }
+          SizedBox(height: 4),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 18,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   void _mostrarEditarDialog(String title, List<TextEditingController> controllers) {
     showDialog(
