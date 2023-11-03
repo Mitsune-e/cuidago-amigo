@@ -1,4 +1,5 @@
 
+import 'package:cuidadoamigoapp/provider/Clientes.dart';
 import 'package:cuidadoamigoapp/views/Prestador/CadastroCuidado.dart';
 import 'package:cuidadoamigoapp/views/Cliente/Perfil.dart';
 import 'package:cuidadoamigoapp/views/Prestador/Carteira.dart';
