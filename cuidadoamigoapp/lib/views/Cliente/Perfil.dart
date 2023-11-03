@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Perfil extends StatefulWidget {
-  const Perfil({Key? key});
+  const Perfil({Key? key}) : super(key: key);
 
   @override
   _PerfilState createState() => _PerfilState();
@@ -17,6 +17,10 @@ class _PerfilState extends State<Perfil> {
   TextEditingController _cpfController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _telefoneController = TextEditingController();
+  TextEditingController _cepController = TextEditingController();
+  TextEditingController _enderecoController = TextEditingController();
+  TextEditingController _numeroController = TextEditingController();
+  TextEditingController _complementoController = TextEditingController();
   List<String> cliente_enderecos = [];
 
   @override
@@ -110,7 +114,14 @@ class _PerfilState extends State<Perfil> {
               onButtonPressed: () {
                 // Adicione aqui a lógica para editar os endereços se necessário
               },
-              children: _enderecosListView(), // Utilize o ListView para exibir os endereços
+              children: _enderecosListView(),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                _mostrarAdicionarEnderecoDialog();
+              },
+              child: Text('Adicionar Endereço'),
             ),
           ],
         ),
@@ -121,45 +132,44 @@ class _PerfilState extends State<Perfil> {
   List<Widget> _enderecosListView() {
     List<Widget> enderecoWidgets = [];
 
-for (var enderecoId in cliente_enderecos) {
-  enderecoWidgets.add(
-    FutureBuilder<DocumentSnapshot>(
-      future: _firestore.collection('Enderecos').doc(enderecoId).get(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          if (snapshot.hasError) {
-            return Text('Erro ao carregar endereço.');
-          }
+    for (var enderecoId in cliente_enderecos) {
+      enderecoWidgets.add(
+        FutureBuilder<DocumentSnapshot>(
+          future: _firestore.collection('Enderecos').doc(enderecoId).get(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.hasError) {
+                return Text('Erro ao carregar endereço.');
+              }
 
-          if (snapshot.hasData) {
-            var enderecoData = snapshot.data?.data() as Map<String, dynamic>?;
+              if (snapshot.hasData) {
+                var enderecoData = snapshot.data?.data() as Map<String, dynamic>?;
 
-            if (enderecoData != null) {
-              final cep = enderecoData['cep'] ?? '';
-              final numero = enderecoData['numero'] ?? '';
-              final complemento = enderecoData['complemento'] ?? '';
+                if (enderecoData != null) {
+                  final cep = enderecoData['cep'] ?? '';
+                  final numero = enderecoData['numero'] ?? '';
+                  final complemento = enderecoData['complemento'] ?? '';
 
-              return Column(
-                children: [
-                  _buildInfoRow('CEP', cep),
-                  _buildInfoRow('Endereço', enderecoData['endereco'] ?? ''),
-                  _buildInfoRow('Número', numero),
-                  _buildInfoRow('Complemento', complemento),
-                ],
-              );
+                  return Column(
+                    children: [
+                      _buildInfoRow('CEP', cep),
+                      _buildInfoRow('Endereço', enderecoData['endereco'] ?? ''),
+                      _buildInfoRow('Número', numero),
+                      _buildInfoRow('Complemento', complemento),
+                    ],
+                  );
+                }
+              }
             }
-          }
-        }
 
-        return Text('Carregando endereço...');
-      },
-    ),
-  );
-}
+            return Text('Carregando endereço...');
+          },
+        ),
+      );
+    }
+
     return enderecoWidgets;
   }
-
-  // ... outros métodos
 
   Widget _buildInfoBox({
     required String title,
@@ -266,6 +276,56 @@ for (var enderecoId in cliente_enderecos) {
                 Navigator.of(context).pop();
               },
               child: Text('Salvar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _mostrarAdicionarEnderecoDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Adicionar Endereço'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: _cepController,
+                  decoration: InputDecoration(labelText: 'CEP'),
+                ),
+                TextFormField(
+                  controller: _enderecoController,
+                  decoration: InputDecoration(labelText: 'Endereço'),
+                ),
+                TextFormField(
+                  controller: _numeroController,
+                  decoration: InputDecoration(labelText: 'Número'),
+                ),
+                TextFormField(
+                  controller: _complementoController,
+                  decoration: InputDecoration(labelText: 'Complemento'),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                // Adicione a lógica para salvar o endereço no Firestore aqui
+                // Certifique-se de validar os campos antes de salvar
+                Navigator.of(context).pop();
+              },
+              child: Text('Salvar'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancelar'),
             ),
           ],
         );
