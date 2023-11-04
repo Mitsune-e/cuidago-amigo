@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CuidadorInfoPage extends StatefulWidget {
   const CuidadorInfoPage({Key? key}) : super(key: key);
@@ -8,26 +9,25 @@ class CuidadorInfoPage extends StatefulWidget {
 }
 
 class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
-  // Lista de informações de cuidadores (para demonstração)
-  final List<Map<String, dynamic>> cuidadores = [
-    {
-      'nome': 'Cuidador 1',
-      'descricao':
-          'Descrição do Cuidador 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eget dui et quam tincidunt condimentum.',
-      'foto': Icons.person, // Altere para a foto do cuidador
-      'topicos': ['Experiência', 'Especializações', 'Disponibilidade'],
-    },
-    {
-      'nome': 'Cuidador 2',
-      'descricao':
-          'Descrição do Cuidador 2. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eget dui et quam tincidunt condimentum.',
-      'foto': Icons.person, // Altere para a foto do cuidador
-      'topicos': ['Experiência', 'Especializações', 'Disponibilidade'],
-    },
-    // Adicione mais informações de cuidadores conforme necessário
-  ];
-
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  List<Map<String, dynamic>> cuidadores = [];
   int currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCuidadores();
+  }
+
+  Future<void> _loadCuidadores() async {
+    // Consulta o Firestore para obter os prestadores
+    final prestadoresSnapshot = await _firestore.collection('Prestadores').get();
+    if (prestadoresSnapshot.docs.isNotEmpty) {
+      setState(() {
+        cuidadores = prestadoresSnapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,18 +45,14 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
         ],
       ),
       body: GestureDetector(
-        // Detecta gestos de deslizar para a esquerda e direita
         onHorizontalDragEnd: (details) {
-          // Verifica a direção do gesto
           if (details.primaryVelocity! > 0) {
-            // Deslizar para a direita
             if (currentIndex > 0) {
               setState(() {
                 currentIndex--;
               });
             }
           } else if (details.primaryVelocity! < 0) {
-            // Deslizar para a esquerda
             if (currentIndex < cuidadores.length - 1) {
               setState(() {
                 currentIndex++;
@@ -78,15 +74,14 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
                 child: ListView(
                   shrinkWrap: true,
                   children: [
-                    // Foto do cuidador (substituir pelo cuidador real)
                     Icon(
-                      cuidadores[currentIndex]['foto'],
+                      cuidadores[currentIndex]['foto'] ?? Icons.person,
                       size: 80.0,
                       color: const Color(0xFF73C9C9),
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      cuidadores[currentIndex]['nome'],
+                      cuidadores[currentIndex]['nome'] ?? 'Nome do Cuidador',
                       style: const TextStyle(
                         fontSize: 20.0,
                         fontWeight: FontWeight.bold,
@@ -94,9 +89,9 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      cuidadores[currentIndex]['descricao'],
+                      cuidadores[currentIndex]['descricao'] ?? 'Descrição do Cuidador',
                       textAlign: TextAlign.center,
-                      maxLines: 5, // Limite o número de linhas para 5
+                      maxLines: 5,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 20),
@@ -107,12 +102,13 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    // Lista de tópicos com informações do cuidador
-                    for (String topico in cuidadores[currentIndex]['topicos'])
-                      ListTile(
-                        leading: const Icon(Icons.check),
-                        title: Text(topico),
-                      ),
+                    // Adapte a renderização dos tópicos de acordo com seus dados
+                    if (cuidadores[currentIndex]['topicos'] is List<String>)
+                      for (String topico in cuidadores[currentIndex]['topicos'])
+                        ListTile(
+                          leading: const Icon(Icons.check),
+                          title: Text(topico),
+                        ),
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () {
