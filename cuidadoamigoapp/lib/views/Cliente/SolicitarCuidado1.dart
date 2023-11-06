@@ -11,8 +11,8 @@ class SolicitarCuidado1 extends StatefulWidget {
 
 class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
   bool _exibirCamposEndereco = false;
+
   TextEditingController dataController = TextEditingController();
-  double valor = 0.0;
   DateTime? selectedTimeInicio;
   DateTime? selectedTimeFim;
 
@@ -21,6 +21,19 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
   TextEditingController enderecoController = TextEditingController();
   TextEditingController complementoController = TextEditingController();
   TextEditingController numeroController = TextEditingController();
+  double valor = 0.0;
+
+  @override
+  void dispose() {
+    dataController.dispose();
+    cepController.dispose();
+    cidadeController.dispose();
+    enderecoController.dispose();
+    complementoController.dispose();
+    numeroController.dispose();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {

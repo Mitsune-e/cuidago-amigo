@@ -1,5 +1,7 @@
+import 'package:cuidadoamigoapp/provider/servicos.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cuidadoamigoapp/models/servico.dart';
 
 class CuidadorInfoPage extends StatefulWidget {
   const CuidadorInfoPage({Key? key}) : super(key: key);
@@ -12,6 +14,7 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<Map<String, dynamic>> cuidadores = [];
   int currentIndex = 0;
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -20,12 +23,15 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
   }
 
   Future<void> _loadCuidadores() async {
-    // Consulta o Firestore para obter os prestadores
-    final prestadoresSnapshot = await _firestore.collection('Prestadores').get();
-    if (prestadoresSnapshot.docs.isNotEmpty) {
+    try {
+      final prestadoresSnapshot = await _firestore.collection('Prestadores').get();
       setState(() {
         cuidadores = prestadoresSnapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+        isLoading = false;
       });
+    } catch (e) {
+      // Lidar com erros, como falta de conexão com a internet, aqui
+      print('Erro ao carregar cuidadores: $e');
     }
   }
 
@@ -44,94 +50,122 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
           ),
         ],
       ),
-      body: GestureDetector(
-        onHorizontalDragEnd: (details) {
-          if (details.primaryVelocity! > 0) {
-            if (currentIndex > 0) {
-              setState(() {
-                currentIndex--;
-              });
-            }
-          } else if (details.primaryVelocity! < 0) {
-            if (currentIndex < cuidadores.length - 1) {
-              setState(() {
-                currentIndex++;
-              });
-            }
-          }
-        },
-        child: Container(
-          color: const Color(0xFF73C9C9),
-          child: Center(
-            child: Card(
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              margin: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ListView(
-                  shrinkWrap: true,
-                  children: [
-                    Icon(
-                      cuidadores[currentIndex]['foto'] ?? Icons.person,
-                      size: 80.0,
-                      color: const Color(0xFF73C9C9),
+      body: isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : GestureDetector(
+              onHorizontalDragEnd: (details) {
+                if (details.primaryVelocity! > 0) {
+                  if (currentIndex > 0) {
+                    setState(() {
+                      currentIndex--;
+                    });
+                  }
+                } else if (details.primaryVelocity! < 0) {
+                  if (currentIndex < cuidadores.length - 1) {
+                    setState(() {
+                      currentIndex++;
+                    });
+                  }
+                }
+              },
+              child: Container(
+                color: const Color(0xFF73C9C9),
+                child: Center(
+                  child: Card(
+                    elevation: 5.0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
                     ),
-                    const SizedBox(height: 20),
-                    Text(
-                      cuidadores[currentIndex]['nome'] ?? 'Nome do Cuidador',
-                      style: const TextStyle(
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold,
+                    margin: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: ListView(
+                        shrinkWrap: true,
+                        children: [
+                          Icon(
+                            cuidadores[currentIndex]['foto'] ?? Icons.person,
+                            size: 80.0,
+                            color: const Color(0xFF73C9C9),
+                          ),
+                          const SizedBox(height: 20),
+                          Text(
+                            cuidadores[currentIndex]['nome'] ?? 'Nome do Cuidador',
+                            style: const TextStyle(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            cuidadores[currentIndex]['descricao'] ?? 'Descrição do Cuidador',
+                            textAlign: TextAlign.center,
+                            maxLines: 5,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 20),
+                          const Text(
+                            'Informações do Cuidador:',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          if (cuidadores[currentIndex]['topicos'] is List<String>)
+                            for (String topico in cuidadores[currentIndex]['topicos'])
+                              ListTile(
+                                leading: const Icon(Icons.check),
+                                title: Text(topico),
+                              ),
+                          const SizedBox(height: 20),
+                          ElevatedButton(
+                            onPressed: () async {
+                              if (cuidadores.isNotEmpty && currentIndex < cuidadores.length) {
+                                final cuidadorSelecionado = cuidadores[currentIndex];
+                                final servico = Servico(
+                                  id: 'ID_DO_SERVICO', // Você precisa definir um ID único para o serviço
+                                  data: 'DATA_DO_SERVICO', // Substitua pela data real
+                                  horaInicio: 'HORA_DE_INICIO_DO_SERVICO', // Substitua pela hora real
+                                  horaFim: 'HORA_DE_FIM_DO_SERVICO', // Substitua pela hora real
+                                  endereco: 'ENDERECO_DO_SERVICO', // Substitua pelo endereço real
+                                  usuario: 'ID_DO_USUARIO', // Substitua pelo ID real do usuário
+                                  prestador: cuidadorSelecionado['id'], // ID do cuidador selecionado
+                                );
+
+                                // Use o provider para adicionar o serviço ao banco de dados
+                                final servicosProvider = Servicos();
+                                await servicosProvider.adiciona(servico);
+
+                                // Adicione código para lidar com o sucesso do agendamento aqui
+                                print('Serviço agendado com sucesso');
+                              } else {
+                                // Mostrar uma mensagem de erro ou fazer alguma outra ação
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Por favor, selecione um cuidador antes de finalizar o agendamento.'),
+                                  ),
+                                );
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF73C9C9),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
+                            ),
+                            child: const Text(
+                              'Finalizar Agendamento',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    Text(
-                      cuidadores[currentIndex]['descricao'] ?? 'Descrição do Cuidador',
-                      textAlign: TextAlign.center,
-                      maxLines: 5,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Informações do Cuidador:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    // Adapte a renderização dos tópicos de acordo com seus dados
-                    if (cuidadores[currentIndex]['topicos'] is List<String>)
-                      for (String topico in cuidadores[currentIndex]['topicos'])
-                        ListTile(
-                          leading: const Icon(Icons.check),
-                          title: Text(topico),
-                        ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        // Adicione ação para finalizar o agendamento
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF73C9C9),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                        ),
-                      ),
-                      child: const Text(
-                        'Finalizar Agendamento',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
-      ),
     );
   }
 
