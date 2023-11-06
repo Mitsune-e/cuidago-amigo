@@ -275,7 +275,7 @@ class _PerfilState extends State<Perfil> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Salvar'),
+              child: Text('Salvar '),
             ),
           ],
         );
