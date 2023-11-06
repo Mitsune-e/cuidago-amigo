@@ -11,6 +11,20 @@ class Enderecos with ChangeNotifier {
     _firestore.collection("Enderecos").doc(endereco.id).set(endereco.toMap());
   }
 
+  void edita(Endereco endereco) {
+    // Certifique-se de que o endereço já existe na lista
+    int index = listEvento.indexWhere((e) => e.id == endereco.id);
+    
+    if (index != -1) {
+      // Atualiza a lista local
+      listEvento[index] = endereco;
+
+      // Atualiza os dados no Firestore
+      _firestore.collection("Enderecos").doc(endereco.id).set(endereco.toMap());
+      
+      notifyListeners();
+    }
+  }
   caregar() async {
     List<Endereco> temp = [];
     QuerySnapshot<Map<String, dynamic>> snapshot =
