@@ -12,6 +12,21 @@ class Clientes with ChangeNotifier {
     _firestore.collection("Clientes").doc(cliente.id).set(cliente.toMap());
   }
 
+  editar(Cliente cliente) {
+    // Certifique-se de que o endereço já existe na lista
+    int index = listEvento.indexWhere((e) => e.id == cliente.id);
+    
+    if (index != -1) {
+      // Atualiza a lista local
+      listEvento[index] = cliente;
+
+      // Atualiza os dados no Firestore
+      _firestore.collection("Clientes").doc(cliente.id).set(cliente.toMap());
+      
+      notifyListeners();
+    }
+  }
+
   caregar() async {
     List<Cliente> temp = [];
     QuerySnapshot<Map<String, dynamic>> snapshot =
