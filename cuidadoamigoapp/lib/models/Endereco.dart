@@ -10,7 +10,7 @@ class Endereco {
     required this.cep,
     required this.endereco,
     required this.numero,
-    required this.complemento
+    required this.complemento, 
   });
 
   Endereco.fromMap(Map<String, dynamic> map)

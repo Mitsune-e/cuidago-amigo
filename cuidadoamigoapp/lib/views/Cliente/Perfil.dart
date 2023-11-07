@@ -1,6 +1,9 @@
+import 'package:cuidadoamigoapp/provider/Enderecos.dart';
 import 'package:flutter/material.dart';
+import 'package:cuidadoamigoapp/models/Endereco.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 
 class Perfil extends StatefulWidget {
   const Perfil({Key? key}) : super(key: key);
@@ -112,7 +115,10 @@ class _PerfilState extends State<Perfil> {
               title: 'Endereços',
               buttonText: 'Editar',
               onButtonPressed: () {
-                // Adicione aqui a lógica para editar os endereços se necessário
+                Endereco end = Endereco(id: '', cep: _cepController.text, endereco: _enderecoController.text, numero: _numeroController.text, complemento: _complementoController.text);
+                Provider.of<Enderecos>(context, listen: false).caregar();   
+                Provider.of<Enderecos>(context, listen: false).edita(end);  
+                Provider.of<Enderecos>(context, listen: false).remove(end);                
               },
               children: _enderecosListView(),
             ),
@@ -314,9 +320,9 @@ class _PerfilState extends State<Perfil> {
           ),
           actions: [
             ElevatedButton(
-              onPressed: () {
-                // Adicione a lógica para salvar o endereço no Firestore aqui
-                // Certifique-se de validar os campos antes de salvar
+              onPressed: () {               
+                Endereco endAdd = Endereco(id: '', cep: _cepController.text, endereco: _enderecoController.text, numero: _numeroController.text, complemento: _complementoController.text);
+                Provider.of<Enderecos>(context, listen: false).adiciona(endAdd);  
                 Navigator.of(context).pop();
               },
               child: Text('Salvar'),

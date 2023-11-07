@@ -48,7 +48,7 @@ class _Cadastro1State extends State<Cadastro1> {
     confirmaSenha.addListener(enableButton);
   }
 
-  void enableButton() {
+ void enableButton() {
     setState(() {
       isButtonEnabled = nome.text.isNotEmpty &&
           email.text.isNotEmpty &&
@@ -65,6 +65,7 @@ class _Cadastro1State extends State<Cadastro1> {
     });
   }
 
+
   Future<void> _getImage() async {
     final imagePicker = ImagePicker();
     final XFile? image = await imagePicker.pickImage(source: ImageSource.gallery);
@@ -80,7 +81,6 @@ class _Cadastro1State extends State<Cadastro1> {
       onPressed: isButtonEnabled
           ? () {
               if (showEnderecoForm) {
-                endereco = '${enderecoController.text}';
                 enderecoButtonText = 'Editar Endereço';
               }
               _registerUser(context);
@@ -120,7 +120,7 @@ class _Cadastro1State extends State<Cadastro1> {
       );
 
       // Se todos os campos de endereço forem preenchidos
-      if (cepController.text.isNotEmpty && enderecoController.text.isNotEmpty) {
+      if (cepController.text.isNotEmpty && enderecoController.text.isNotEmpty && numeroController.text.isNotEmpty && complementoController.text.isNotEmpty) {
         print("teste");
         // Crie um objeto Endereco
         final endereco = Endereco(
@@ -220,7 +220,7 @@ class _Cadastro1State extends State<Cadastro1> {
             controller: controller,
             inputFormatters: [
               MaskTextInputFormatter(
-                mask: '###.###-##',
+                mask: '###.###.###-##',
                 filter: {"#": RegExp(r'[0-9]')},
                 type: MaskAutoCompletionType.lazy,
               ),
@@ -296,8 +296,9 @@ class _Cadastro1State extends State<Cadastro1> {
           key: formKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            
             children: [
-              _buildTextField(controller: cepController, hintText: 'CEP'),
+              _buildTextField(controller: cepController, hintText: 'CEP',),
               _buildTextField(controller: enderecoController, hintText: 'Endereço'),
               _buildTextField(controller: numeroController, hintText: 'Número'),
               _buildTextField(controller: complementoController, hintText: 'Complemento'),
@@ -313,7 +314,7 @@ class _Cadastro1State extends State<Cadastro1> {
           child: const Text('Cancelar'),
         ),
         ElevatedButton(
-          onPressed: () {
+          onPressed: isButtonEnabled ? (){
             if (formKey.currentState!.validate()) {
               formKey.currentState!.save();
               setState(() {
@@ -321,8 +322,11 @@ class _Cadastro1State extends State<Cadastro1> {
                 enderecoButtonText = 'Editar Endereço';
               });
               Navigator.of(context).pop();
+              if (cepController.text.isNotEmpty && enderecoController.text.isNotEmpty && numeroController.text.isNotEmpty && complementoController.text.isNotEmpty){
+                  isButtonEnabled = true;
+              }
             }
-          },
+          }: null,
           child: Text(actionText),
         ),
       ],
