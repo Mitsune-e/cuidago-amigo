@@ -5,6 +5,7 @@ import 'package:cuidadoamigoapp/provider/Clientes.dart';
 import 'package:cuidadoamigoapp/provider/Enderecos.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -27,6 +28,7 @@ class _Cadastro1State extends State<Cadastro1> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   XFile? _image;
   bool isButtonEnabled = false;
+  bool allFieldsFilled = false;
 
   final cepController = TextEditingController();
   final enderecoController = TextEditingController();
@@ -75,17 +77,62 @@ class _Cadastro1State extends State<Cadastro1> {
       });
     }
   }
+bool _isValidEmail(String email) {
+  final emailRegExp = RegExp(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$');
+  return emailRegExp.hasMatch(email);
+}
 
   Widget _buildNextButton(BuildContext context) {
     return ElevatedButton(
       onPressed: isButtonEnabled
           ? () {
-              if (showEnderecoForm) {
-                enderecoButtonText = 'Editar Endereço';
-              }
+             if (senha.text == confirmaSenha.text) {
+              if (_isValidEmail(email.text)) {
+                if (showEnderecoForm) {
+                  enderecoButtonText = 'Editar Endereço';
+                }
               _registerUser(context);
+              } else{
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Erro'),
+                      content: Text('Por favor, insira um e-mail válido.'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text('OK'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              }
+            } else{
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text('Erro'),
+                    content: Text('A senha e a confirmação de senha devem ser iguais.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text('OK'),
+                      ),
+                    ],
+                  );
+                },
+              );
             }
-          : null,
+          }
+        : null,
+          
       style: ElevatedButton.styleFrom(
         backgroundColor: isButtonEnabled ? const Color.fromRGBO(92, 198, 186, 100) : Colors.grey,
         shape: const StadiumBorder(),
@@ -177,6 +224,29 @@ class _Cadastro1State extends State<Cadastro1> {
   Widget _buildPhoneTextField({
     required TextEditingController controller,
   }) {
+    var maskFormatter = TextInputFormatter.withFunction(
+      (oldValue, newValue) {
+        if (newValue.text.isEmpty) {
+          return newValue.copyWith(
+            text: '',
+            selection: TextSelection.collapsed(offset: 0),
+          );
+        }
+
+        var text = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+
+        if (text.length > 10) {
+          text = text.substring(0, 11);
+        }
+
+        var maskedText = '(${text.substring(0, 2)}) ${text.substring(2, 7)}-${text.substring(7)}';
+
+        return newValue.copyWith(
+          text: maskedText,
+          selection: TextSelection.collapsed(offset: maskedText.length),
+        );
+      },
+    );
     return Column(
       children: [
         if (controller.text.isEmpty)
@@ -188,13 +258,8 @@ class _Cadastro1State extends State<Cadastro1> {
           width: 250,
           child: TextFormField(
             controller: controller,
-            inputFormatters: [
-              MaskTextInputFormatter(
-                mask: '(##) #####-####',
-                filter: {"#": RegExp(r'[0-9]')},
-                type: MaskAutoCompletionType.lazy,
-              ),
-            ],
+            keyboardType: TextInputType.phone,
+            inputFormatters: [maskFormatter],
             decoration: InputDecoration(
               hintText: 'Telefone',
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
@@ -207,6 +272,29 @@ class _Cadastro1State extends State<Cadastro1> {
   Widget _buildCPFTextField({
     required TextEditingController controller,
   }) {
+  var maskFormatter = TextInputFormatter.withFunction(
+    (oldValue, newValue) {
+      if (newValue.text.isEmpty) {
+        return newValue.copyWith(
+          text: '',
+          selection: TextSelection.collapsed(offset: 0),
+        );
+      }
+
+      var text = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+
+      if (text.length > 11) {
+        text = text.substring(0, 11);
+      }
+
+      var maskedText = '${text.substring(0, 3)}.${text.substring(3, 6)}.${text.substring(6, 9)}-${text.substring(9)}';
+
+      return newValue.copyWith(
+        text: maskedText,
+        selection: TextSelection.collapsed(offset: maskedText.length),
+      );
+    },
+  );
     return Column(
       children: [
         if (controller.text.isEmpty)
@@ -218,13 +306,8 @@ class _Cadastro1State extends State<Cadastro1> {
           width: 250,
           child: TextFormField(
             controller: controller,
-            inputFormatters: [
-              MaskTextInputFormatter(
-                mask: '###.###.###-##',
-                filter: {"#": RegExp(r'[0-9]')},
-                type: MaskAutoCompletionType.lazy,
-              ),
-            ],
+            keyboardType: TextInputType.number, 
+            inputFormatters: [maskFormatter],     
             decoration: InputDecoration(
               hintText: 'CPF',
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
@@ -283,62 +366,85 @@ class _Cadastro1State extends State<Cadastro1> {
     );
   }
 
-  Future<void> _showEnderecoAlert(BuildContext context) async {
-    final formKey = GlobalKey<FormState>();
+Future<void> _showEnderecoAlert(BuildContext context) async {
+  final formKey = GlobalKey<FormState>();
 
-    final isUpdating = showEnderecoForm;
-    final actionText = isUpdating ? 'Editar' : 'Adicionar';
+  final isUpdating = showEnderecoForm;
+  final actionText = isUpdating ? 'Editar' : 'Adicionar';
 
-    final alert = AlertDialog(
-      title: Text('$actionText Endereço (Opcional)'),
-      content: SingleChildScrollView(
-        child: Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            
-            children: [
-              _buildTextField(controller: cepController, hintText: 'CEP',),
-              _buildTextField(controller: enderecoController, hintText: 'Endereço'),
-              _buildTextField(controller: numeroController, hintText: 'Número'),
-              _buildTextField(controller: complementoController, hintText: 'Complemento'),
-            ],
-          ),
+  final alert = AlertDialog(
+    title: Text('$actionText Endereço (Opcional)'),
+    content: SingleChildScrollView(
+      child: Form(
+        key: formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildTextField(controller: cepController, hintText: 'CEP'),
+            _buildTextField(controller: enderecoController, hintText: 'Endereço'),
+            _buildTextField(controller: numeroController, hintText: 'Número'),
+            _buildTextField(controller: complementoController, hintText: 'Complemento'),
+          ],
         ),
       ),
-      actions: <Widget>[
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: const Text('Cancelar'),
-        ),
-        ElevatedButton(
-          onPressed: isButtonEnabled ? (){
-            if (formKey.currentState!.validate()) {
+    ),
+    actions: <Widget>[
+      TextButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: const Text('Cancelar'),
+      ),
+      ElevatedButton(
+        onPressed: () {
+          if (formKey.currentState!.validate()) {
+            // Verifica se todos os campos obrigatórios estão preenchidos
+            if (cepController.text.isNotEmpty &&
+                enderecoController.text.isNotEmpty &&
+                numeroController.text.isNotEmpty &&
+                complementoController.text.isNotEmpty) {
               formKey.currentState!.save();
               setState(() {
                 showEnderecoForm = true;
                 enderecoButtonText = 'Editar Endereço';
               });
               Navigator.of(context).pop();
-              if (cepController.text.isNotEmpty && enderecoController.text.isNotEmpty && numeroController.text.isNotEmpty && complementoController.text.isNotEmpty){
-                  isButtonEnabled = true;
-              }
+            } else {
+              // Se algum campo obrigatório estiver vazio, exibe um AlertDialog
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text('Aviso'),
+                    content: Text('Por favor, preencha todos os campos obrigatórios.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text('OK'),
+                      ),
+                    ],
+                  );
+                },
+              );
             }
-          }: null,
-          child: Text(actionText),
-        ),
-      ],
-    );
+          }
+        },
+        child: Text(actionText),
+      ),
+    ],
+  );
 
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return alert;
-      },
-    );
-  }
+  await showDialog(
+    context: context,
+    builder: (context) {
+      return alert;
+    },
+  );
+}
+
+
 
   @override
   Widget build(BuildContext context) {

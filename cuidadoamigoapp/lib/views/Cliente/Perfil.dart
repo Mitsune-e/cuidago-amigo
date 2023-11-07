@@ -1,3 +1,5 @@
+import 'package:cuidadoamigoapp/models/cliente.dart';
+import 'package:cuidadoamigoapp/provider/Clientes.dart';
 import 'package:cuidadoamigoapp/provider/Enderecos.dart';
 import 'package:flutter/material.dart';
 import 'package:cuidadoamigoapp/models/Endereco.dart';
@@ -60,7 +62,32 @@ class _PerfilState extends State<Perfil> {
       print('Erro ao carregar dados do Firestore: $e');
     }
   }
-
+Future<void> _endEdit() async {
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: false, // user must tap button!
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Alerta!'),
+        content: const SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              Text('Nenhum endereço a se editar.'),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('OK'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -115,10 +142,9 @@ class _PerfilState extends State<Perfil> {
               title: 'Endereços',
               buttonText: 'Editar',
               onButtonPressed: () {
-                Endereco end = Endereco(id: '', cep: _cepController.text, endereco: _enderecoController.text, numero: _numeroController.text, complemento: _complementoController.text);
-                Provider.of<Enderecos>(context, listen: false).caregar();   
-                Provider.of<Enderecos>(context, listen: false).edita(end);  
-                Provider.of<Enderecos>(context, listen: false).remove(end);                
+                if (_enderecosListView().isEmpty){
+                  _endEdit();
+                }                      
               },
               children: _enderecosListView(),
             ),
@@ -148,24 +174,14 @@ class _PerfilState extends State<Perfil> {
                 return Text('Erro ao carregar endereço.');
               }
 
-              if (snapshot.hasData) {
-                var enderecoData = snapshot.data?.data() as Map<String, dynamic>?;
-
-                if (enderecoData != null) {
-                  final cep = enderecoData['cep'] ?? '';
-                  final numero = enderecoData['numero'] ?? '';
-                  final complemento = enderecoData['complemento'] ?? '';
-
                   return Column(
                     children: [
-                      _buildInfoRow('CEP', cep),
-                      _buildInfoRow('Endereço', enderecoData['endereco'] ?? ''),
-                      _buildInfoRow('Número', numero),
-                      _buildInfoRow('Complemento', complemento),
+                      _buildInfoRow('CEP', _cepController.text),
+                      _buildInfoRow('Endereço', _cepController.text),
+                      _buildInfoRow('Número', _cepController.text),
+                      _buildInfoRow('Complemento', _cepController.text),
                     ],
-                  );
-                }
-              }
+                  );               
             }
 
             return Text('Carregando endereço...');
@@ -256,6 +272,40 @@ class _PerfilState extends State<Perfil> {
     );
   }
 
+  void _mostrarEditarDialogEnd(String title, List<TextEditingController> controllers) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Editar $title'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (int i = 0; i < controllers.length; i++)
+                  TextFormField(
+                    controller: controllers[i],
+                    decoration: InputDecoration(
+                      labelText: controllers[i].text,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Endereco end = Endereco(id: '', cep: _cepController.text, endereco: _enderecoController.text, numero: _numeroController.text, complemento: _complementoController.text);
+                Provider.of<Enderecos>(context, listen: false).edita(end);  
+                Navigator.of(context).pop();
+              },
+              child: Text('Salvar '),
+            ),
+          ],
+        );
+      },
+    );
+  }
   void _mostrarEditarDialog(String title, List<TextEditingController> controllers) {
     showDialog(
       context: context,
@@ -279,9 +329,11 @@ class _PerfilState extends State<Perfil> {
           actions: [
             ElevatedButton(
               onPressed: () {
+                Cliente c = Cliente(id: '', name: _nomeController.text, imagem: '', cpf: _cpfController.text, email: _emailController.text, senha: '', telefone: _telefoneController.text);
+                Provider.of<Clientes>(context, listen: false).editar(c);  
                 Navigator.of(context).pop();
               },
-              child: Text('Salvar '),
+              child: Text('Salvar'),
             ),
           ],
         );
@@ -322,7 +374,7 @@ class _PerfilState extends State<Perfil> {
             ElevatedButton(
               onPressed: () {               
                 Endereco endAdd = Endereco(id: '', cep: _cepController.text, endereco: _enderecoController.text, numero: _numeroController.text, complemento: _complementoController.text);
-                Provider.of<Enderecos>(context, listen: false).adiciona(endAdd);  
+                Provider.of<Enderecos>(context, listen: false).adiciona(endAdd);               
                 Navigator.of(context).pop();
               },
               child: Text('Salvar'),
