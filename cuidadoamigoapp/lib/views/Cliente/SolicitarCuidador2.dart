@@ -1,7 +1,11 @@
+import 'package:cuidadoamigoapp/models/cliente.dart';
+import 'package:cuidadoamigoapp/provider/Clientes.dart';
 import 'package:cuidadoamigoapp/provider/servicos.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cuidadoamigoapp/models/servico.dart';
+import 'package:uuid/uuid.dart';
 
 class CuidadorInfoPage extends StatefulWidget {
   const CuidadorInfoPage({Key? key}) : super(key: key);
@@ -11,10 +15,12 @@ class CuidadorInfoPage extends StatefulWidget {
 }
 
 class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<Map<String, dynamic>> cuidadores = [];
+  FirebaseAuth _auth = FirebaseAuth.instance;
   int currentIndex = 0;
   bool isLoading = true;
+
 
   @override
   void initState() {
@@ -22,21 +28,24 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
     _loadCuidadores();
   }
 
-  Future<void> _loadCuidadores() async {
-    try {
-      final prestadoresSnapshot = await _firestore.collection('Prestadores').get();
-      setState(() {
-        cuidadores = prestadoresSnapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
-        isLoading = false;
-      });
-    } catch (e) {
-      // Lidar com erros, como falta de conexão com a internet, aqui
-      print('Erro ao carregar cuidadores: $e');
-    }
+Future<void> _loadCuidadores() async {
+  try {
+    final prestadoresSnapshot = await _firestore.collection('Prestadores').get();
+    print(prestadoresSnapshot.docs); // Adicione esta linha
+    setState(() {
+      cuidadores = prestadoresSnapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+      isLoading = false;
+    });
+  } catch (e) {
+    // Lidar com erros, como falta de conexão com a internet, aqui
+    print('Erro ao carregar cuidadores: $e');
   }
+}
 
   @override
   Widget build(BuildContext context) {
+     final Map<String, dynamic> dataToPass = ModalRoute.of(context!)!.settings.arguments as Map<String, dynamic>;
+     User? user = _auth.currentUser;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Detalhes do Cuidador'),
@@ -119,23 +128,43 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
                                 title: Text(topico),
                               ),
                           const SizedBox(height: 20),
-                          ElevatedButton(
+                         ElevatedButton(
                             onPressed: () async {
+                              final cuidadorSelecionado = cuidadores[currentIndex];
+                              final prestadorID = cuidadorSelecionado['id'];
+
                               if (cuidadores.isNotEmpty && currentIndex < cuidadores.length) {
-                                final cuidadorSelecionado = cuidadores[currentIndex];
+                                // Crie o serviço
                                 final servico = Servico(
-                                  id: 'ID_DO_SERVICO', // Você precisa definir um ID único para o serviço
-                                  data: 'DATA_DO_SERVICO', // Substitua pela data real
-                                  horaInicio: 'HORA_DE_INICIO_DO_SERVICO', // Substitua pela hora real
-                                  horaFim: 'HORA_DE_FIM_DO_SERVICO', // Substitua pela hora real
-                                  endereco: 'ENDERECO_DO_SERVICO', // Substitua pelo endereço real
-                                  usuario: 'ID_DO_USUARIO', // Substitua pelo ID real do usuário
-                                  prestador: cuidadorSelecionado['id'], // ID do cuidador selecionado
+                                  id: Uuid().v1(),
+                                  data: dataToPass['data'],
+                                  horaInicio: dataToPass['horaInicio'],
+                                  horaFim: dataToPass['horaFim'],
+                                  endereco: dataToPass['endereco'],
+                                  usuario: user!.uid,
+                                  prestador: prestadorID,
                                 );
 
                                 // Use o provider para adicionar o serviço ao banco de dados
                                 final servicosProvider = Servicos();
                                 await servicosProvider.adiciona(servico);
+
+                                // Atualize a lista de serviços do cliente
+                                final clientesProvider = Clientes();
+                                final clientes = await clientesProvider.caregar();
+                                final clienteIndex = clientes.indexWhere((c) => c.id == user!.uid);
+
+                                if (clienteIndex != -1) {
+                                  clientes[clienteIndex].servicos.add(servico.id);
+                                  await clientesProvider.adiciona(clientes[clienteIndex]);
+                                } else {
+                                  // Trate o caso em que o cliente não é encontrado (por exemplo, exibindo um erro)
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Cliente não encontrado. Certifique-se de estar autenticado como cliente.'),
+                                    ),
+                                  );
+                                }
 
                                 // Adicione código para lidar com o sucesso do agendamento aqui
                                 print('Serviço agendado com sucesso');
@@ -148,6 +177,8 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
                                 );
                               }
                             },
+                            // ...
+
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF73C9C9),
                               shape: RoundedRectangleBorder(
