@@ -1,48 +1,49 @@
+import 'package:cuidadoamigoapp/models/servico.dart';
+import 'package:cuidadoamigoapp/provider/servicos.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class DetalhesServico extends StatefulWidget {
-  final String serviceName;
-  final String serviceDescription;
-  final String serviceTime;
-  final String serviceAddress;
-  final String serviceDate;
-
-  DetalhesServico({
-    required this.serviceName,
-    required this.serviceDescription,
-    required this.serviceTime,
-    required this.serviceAddress,
-    required this.serviceDate,
-  });
+  final Servico servico;
+  DetalhesServico({required this.servico});
 
   @override
   _DetalhesServicoState createState() => _DetalhesServicoState();
 }
 
 class _DetalhesServicoState extends State<DetalhesServico> {
+  // Crie uma variável para armazenar o ID do serviço
+  late String servicoId;
+
   TextEditingController serviceNameController = TextEditingController();
   TextEditingController serviceDescriptionController = TextEditingController();
   TextEditingController serviceTimeController = TextEditingController();
   TextEditingController serviceAddressController = TextEditingController();
   TextEditingController serviceDateController = TextEditingController();
-
+  
   @override
   void initState() {
     super.initState();
     // Inicialize os controladores de texto com os valores recebidos
-    serviceNameController.text = widget.serviceName;
-    serviceDescriptionController.text = widget.serviceDescription;
-    serviceTimeController.text = widget.serviceTime;
-    serviceAddressController.text = widget.serviceAddress;
-    serviceDateController.text = widget.serviceDate;
+    serviceNameController.text = "Teste";
+    serviceDescriptionController.text = "Teste";
+    serviceTimeController.text = widget.servico.horaInicio;
+    serviceAddressController.text = widget.servico.endereco;
+    serviceDateController.text = widget.servico.data;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF73C9C9), // Cor principal da página
+        backgroundColor: const Color(0xFF73C9C9),
         title: const Text('Detalhes do Serviço'),
+         leading: IconButton(
+          icon: Icon(Icons.arrow_back), // Ícone de seta voltar
+          onPressed: () {
+            Navigator.of(context).pushNamed("/agenda"); // Navega de volta à tela anterior
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -102,10 +103,9 @@ class _DetalhesServicoState extends State<DetalhesServico> {
                     _mostrarEditarServicoDialog(context);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF73C9C9), // Cor do botão
+                    backgroundColor: const Color(0xFF73C9C9),
                     shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(30.0), // Torna o botão redondo
+                      borderRadius: BorderRadius.circular(30.0),
                     ),
                   ),
                   child: const Text('Editar Serviço'),
@@ -115,10 +115,9 @@ class _DetalhesServicoState extends State<DetalhesServico> {
                     _mostrarCancelarServicoDialog(context);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF73C9C9), // Cor do botão
+                    backgroundColor: const Color(0xFF73C9C9),
                     shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(30.0), // Torna o botão redondo
+                      borderRadius: BorderRadius.circular(30.0),
                     ),
                   ),
                   child: const Text('Cancelar Serviço'),
@@ -142,13 +141,11 @@ class _DetalhesServicoState extends State<DetalhesServico> {
               children: [
                 TextFormField(
                   controller: serviceNameController,
-                  decoration:
-                      const InputDecoration(labelText: 'Nome do Serviço'),
+                  decoration: const InputDecoration(labelText: 'Nome do Serviço'),
                 ),
                 TextFormField(
                   controller: serviceDescriptionController,
-                  decoration:
-                      const InputDecoration(labelText: 'Descrição do Serviço'),
+                  decoration: const InputDecoration(labelText: 'Descrição do Serviço'),
                 ),
                 TextFormField(
                   controller: serviceTimeController,
@@ -168,14 +165,22 @@ class _DetalhesServicoState extends State<DetalhesServico> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Fechar o diálogo
+                Navigator.of(context).pop();
               },
               child: const Text('Cancelar'),
             ),
             TextButton(
               onPressed: () {
                 // Aqui você pode implementar a lógica para salvar as edições do serviço
-                Navigator.of(context).pop(); // Fechar o diálogo
+                // Use as propriedades do widget para acessar os valores atualizados
+                final novoNome = serviceNameController.text;
+                final novaDescricao = serviceDescriptionController.text;
+                final novoHorario = serviceTimeController.text;
+                final novoEndereco = serviceAddressController.text;
+                final novaData = serviceDateController.text;
+                // Agora, você pode fazer o que desejar com esses valores
+                // Por exemplo, você pode enviá-los de volta para a página anterior
+                Navigator.of(context).pop();
               },
               child: const Text('Salvar'),
             ),
@@ -195,14 +200,15 @@ class _DetalhesServicoState extends State<DetalhesServico> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Fechar o diálogo
+                Navigator.of(context).pop();
               },
               child: const Text('Não'),
             ),
             TextButton(
               onPressed: () {
-                // Aqui você pode implementar a lógica para cancelar o serviço
-                Navigator.of(context).pop(); // Fechar o diálogo
+                Provider.of<Servicos>(context,listen: false).remove(widget.servico);
+                Navigator.of(context).pop();
+                Navigator.of(context).pushNamed('/agenda');
               },
               child: const Text('Sim'),
             ),

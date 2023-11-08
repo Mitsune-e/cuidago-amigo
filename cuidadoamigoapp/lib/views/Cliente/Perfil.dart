@@ -307,39 +307,59 @@ Future<void> _endEdit() async {
     );
   }
   void _mostrarEditarDialog(String title, List<TextEditingController> controllers) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Editar $title'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                for (int i = 0; i < controllers.length; i++)
-                  TextFormField(
-                    controller: controllers[i],
-                    decoration: InputDecoration(
-                      labelText: controllers[i].text,
-                    ),
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Editar $title'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (int i = 0; i < controllers.length; i++)
+                TextFormField(
+                  controller: controllers[i],
+                  decoration: InputDecoration(
+                    labelText: controllers[i].text,
                   ),
-              ],
-            ),
+                ),
+            ],
           ),
-          actions: [
-            ElevatedButton(
-              onPressed: () {
-                Cliente c = Cliente(id: '', name: _nomeController.text, imagem: '', cpf: _cpfController.text, email: _emailController.text, senha: '', telefone: _telefoneController.text);
-                Provider.of<Clientes>(context, listen: false).editar(c);  
-                Navigator.of(context).pop();
-              },
-              child: Text('Salvar'),
-            ),
-          ],
-        );
-      },
-    );
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () async {
+              User? user = _auth.currentUser;
+
+              // Atualize os dados no Firestore
+              await _updateUserData(user!.uid);
+
+              // Atualize os controladores de texto com os novos dados
+              _loadUserData(user.uid);
+
+              Navigator.of(context).pop();
+            },
+            child: Text('Salvar'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+Future<void> _updateUserData(String userId) async {
+  try {
+    await _firestore.collection('Clientes').doc(userId).update({
+      'name': _nomeController.text,
+      'cpf': _cpfController.text,
+      'email': _emailController.text,
+      'telefone': _telefoneController.text,
+    });
+  } catch (e) {
+    // Trate erros de atualização de dados
+    print('Erro ao atualizar dados do usuário no Firestore: $e');
   }
+}
 
   void _mostrarAdicionarEnderecoDialog() {
     showDialog(
