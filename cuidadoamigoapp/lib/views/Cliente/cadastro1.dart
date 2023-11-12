@@ -216,10 +216,7 @@ class _Cadastro1State extends State<Cadastro1> {
     );
   }
 
-  Widget _buildPhoneTextField({
-    required TextEditingController controller,
-    required String label,
-  }) {
+  Widget _buildPhoneTextField({required TextEditingController controller, required String label,}) {
     bool isNotEmpty = controller.text.isNotEmpty;
     var maskFormatter = TextInputFormatter.withFunction(
       (oldValue, newValue) {

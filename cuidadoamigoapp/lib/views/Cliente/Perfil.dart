@@ -1,10 +1,11 @@
-import 'package:cuidadoamigoapp/models/cliente.dart';
 import 'package:cuidadoamigoapp/provider/Clientes.dart';
 import 'package:cuidadoamigoapp/provider/Enderecos.dart';
 import 'package:flutter/material.dart';
 import 'package:cuidadoamigoapp/models/Endereco.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
@@ -29,6 +30,10 @@ class _PerfilState extends State<Perfil> {
   TextEditingController _complementoController = TextEditingController();
   List<String> cliente_enderecos = [];
 
+  MaskTextInputFormatter mascaraCPF = MaskTextInputFormatter(mask: '###.###.###-##', filter: { "#": RegExp(r'[0-9]') });
+  MaskTextInputFormatter mascaraTEL = MaskTextInputFormatter(mask: '(##) #####-####', filter: { "#": RegExp(r'[0-9]') });
+  MaskTextInputFormatter mascaraCEP = MaskTextInputFormatter(mask: '#####-###', filter: { "#": RegExp(r'[0-9]') });
+
   @override
   void initState() {
     super.initState();
@@ -39,23 +44,39 @@ class _PerfilState extends State<Perfil> {
     }
   }
 
-  Future<void> _loadUserData(String userId) async {
-    try {
-      DocumentSnapshot userDoc = await _firestore.collection('Clientes').doc(userId).get();
+Future<void> _loadUserData(String userId) async {
+  try {
+    DocumentSnapshot userDoc = await _firestore.collection('Clientes').doc(userId).get();
 
-      if (userDoc.exists) {
-        setState(() {
-          _nomeController.text = userDoc['name'] ?? '';
-          _cpfController.text = userDoc['cpf'] ?? '';
-          _emailController.text = userDoc['email'] ?? '';
-          _telefoneController.text = userDoc['telefone'] ?? '';
-          cliente_enderecos = List<String>.from(userDoc['enderecos'] ?? []);
-        });
-      }
-    } catch (e) {
-      print('Erro ao carregar dados do Firestore: $e');
+    if (userDoc.exists) {
+      setState(() {
+        _nomeController.text = userDoc['name'] ?? '';
+        _cpfController.text = userDoc['cpf'] ?? '';
+        _emailController.text = userDoc['email'] ?? '';
+        _telefoneController.text = userDoc['telefone'] ?? '';
+        cliente_enderecos = List<String>.from(userDoc['enderecos'] ?? []);
+      });
+
+      // Carregar detalhes dos endereços
+      await _loadEnderecosDetails();
+
+      updateMascaras();
+    }
+  } catch (e) {
+    print('Erro ao carregar dados do Firestore: $e');
+  }
+}
+
+Future<void> _loadEnderecosDetails() async {
+  // Atualizar os detalhes dos endereços
+  for (var enderecoId in cliente_enderecos) {
+    DocumentSnapshot enderecoDoc = await _firestore.collection('Enderecos').doc(enderecoId).get();
+
+    if (enderecoDoc.exists) {
+      // Processar os detalhes do endereço aqui, se necessário
     }
   }
+}
 
   Future<void> _endEdit() async {
     return showDialog<void>(
@@ -84,8 +105,14 @@ class _PerfilState extends State<Perfil> {
     );
   }
 
+  void updateMascaras() {
+    _cpfController.text = mascaraCPF.formatEditUpdate(TextEditingValue.empty, TextEditingValue(text: _cpfController.text)).text;
+    _telefoneController.text = mascaraTEL.formatEditUpdate(TextEditingValue.empty, TextEditingValue(text: _telefoneController.text)).text;
+    _cepController.text = mascaraCEP.formatEditUpdate(TextEditingValue.empty, TextEditingValue(text: _cepController.text)).text;
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {   
     return Scaffold(
       appBar: AppBar(
         title: Text('Minha Conta'),
@@ -126,7 +153,8 @@ class _PerfilState extends State<Perfil> {
                   ],
                 );
               },
-              children: [
+              children: 
+              [
                 _buildInfoRow('Nome', _nomeController.text),
                 _buildInfoRow('CPF', _cpfController.text),
                 _buildInfoRow('E-mail', _emailController.text),
@@ -232,13 +260,17 @@ class _PerfilState extends State<Perfil> {
     return FutureBuilder<DocumentSnapshot>(
       future: _firestore.collection('Enderecos').doc(enderecoId).get(),
       builder: (context, snapshot) {
+
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasError) {
             return Text('Erro ao carregar endereço.');
           }
+          if (snapshot.data?.exists ?? false) {
 
-          var enderecoData = snapshot.data?.data() as Map<String, dynamic>;
+            var enderecoData = snapshot.data?.data() as Map<String, dynamic>?;
 
+          print("Dados do endereço carregados corretamente: $enderecoData");
+          
           return Container(
             margin: EdgeInsets.only(bottom: 20),
             padding: EdgeInsets.all(16),
@@ -307,19 +339,23 @@ class _PerfilState extends State<Perfil> {
                   ],
                 ),
                 SizedBox(height: 10),
-                _buildInfoRow('CEP', enderecoData['cep'] ?? ''),
-                _buildInfoRow('Endereço', enderecoData['endereco'] ?? ''),
-                _buildInfoRow('Número', enderecoData['numero'] ?? ''),
-                _buildInfoRow('Complemento', enderecoData['complemento'] ?? ''),
+                _buildInfoRow('CEP', enderecoData?['cep'] ?? ''),
+                _buildInfoRow('Endereço', enderecoData?['endereco'] ?? ''),
+                _buildInfoRow('Número', enderecoData?['numero'] ?? ''),
+                _buildInfoRow('Complemento', enderecoData?['complemento'] ?? ''),
               ],
             ),
           );
-        }
-
-        return Text('Carregando endereço...');
+        } 
+        
+          else {
+            return Text('Dados do endereço não existem.');
+          }
+      }
       },
     );
   }
+
 
   void _mostrarEditarDialogEnd(String title, List<TextEditingController> controllers) {
     showDialog(
@@ -402,6 +438,7 @@ class _PerfilState extends State<Perfil> {
         'cpf': _cpfController.text,
         'email': _emailController.text,
         'telefone': _telefoneController.text,
+        'endereco': cliente_enderecos,
       });
     } catch (e) {
       print('Erro ao atualizar dados do usuário no Firestore: $e');
@@ -424,16 +461,17 @@ void _mostrarExcluirEnderecoDialog(String enderecoId) {
           TextButton(
             onPressed: () async {
               User? user = _auth.currentUser;
-              final clientesProvider = Clientes();
-              final clientes = await clientesProvider.caregar();
-              final clienteIndex = clientes.indexWhere((c) => c.id == user!.uid);
 
-              // Remova o ID do endereço da lista de endereços do cliente
-              clientes[clienteIndex].enderecos.remove(enderecoId);
-              await clientesProvider.adiciona(clientes[clienteIndex]);
+              // Remova o ID do endereço da lista de endereços do cliente no front-end
+              setState(() {
+                cliente_enderecos.remove(enderecoId);
+              });
+
+              // Atualize os dados do cliente no Firestore
+              await _updateUserData(user!.uid);
 
               // Remova o endereço do provedor de endereços
-             Provider.of<Enderecos>(context, listen: false).removeById(enderecoId);
+              Provider.of<Enderecos>(context, listen: false).removeById(enderecoId);
 
               Navigator.of(context).pop();
             },
@@ -444,59 +482,120 @@ void _mostrarExcluirEnderecoDialog(String enderecoId) {
     },
   );
 }
-  void _mostrarAdicionarEnderecoDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Adicionar Endereço'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(
-                  controller: _cepController,
-                  decoration: InputDecoration(labelText: 'CEP'),
-                ),
-                TextFormField(
-                  controller: _enderecoController,
-                  decoration: InputDecoration(labelText: 'Endereço'),
-                ),
-                TextFormField(
-                  controller: _numeroController,
-                  decoration: InputDecoration(labelText: 'Número'),
-                ),
-                TextFormField(
-                  controller: _complementoController,
-                  decoration: InputDecoration(labelText: 'Complemento'),
-                ),
-              ],
-            ),
+void _mostrarAdicionarEnderecoDialog() {
+  print("Iniciando _mostrarAdicionarEnderecoDialog"); // Adicione esta linha
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Adicionar Endereço'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: _cepController,
+                decoration: InputDecoration(labelText: 'CEP'),
+              ),
+              TextFormField(
+                controller: _enderecoController,
+                decoration: InputDecoration(labelText: 'Endereço'),
+              ),
+              TextFormField(
+                controller: _numeroController,
+                decoration: InputDecoration(labelText: 'Número'),
+              ),
+              TextFormField(
+                controller: _complementoController,
+                decoration: InputDecoration(labelText: 'Complemento'),
+              ),
+            ],
           ),
-          actions: [
+        ),
+        actions: [
             ElevatedButton(
-              onPressed: () async {
-                User? user = _auth.currentUser;
-                final clientesProvider = Clientes();
-                final clientes = await clientesProvider.caregar();
-                final clienteIndex = clientes.indexWhere((c) => c.id == user!.uid);
-                Endereco endAdd = Endereco(id: Uuid().v1(), cep: _cepController.text, endereco: _enderecoController.text, numero: _numeroController.text, complemento: _complementoController.text);
-                Provider.of<Enderecos>(context, listen: false).adiciona(endAdd);
-                clientes[clienteIndex].enderecos.add(endAdd.id);
-                await clientesProvider.adiciona(clientes[clienteIndex]);
-                Navigator.of(context).pop();
-              },
-              child: Text('Salvar'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancelar'),
-            ),
-          ],
-        );
-      },
+    onPressed: () async {
+      User? user = _auth.currentUser;
+      final clientesProvider = Clientes();
+      final clientes = await clientesProvider.caregar();
+      final clienteIndex = clientes.indexWhere((c) => c.id == user!.uid);
+
+      // Criar um novo endereço
+      Endereco endAdd = Endereco(
+        id: Uuid().v1(),
+        cep: _cepController.text,
+        endereco: _enderecoController.text,
+        numero: _numeroController.text,
+        complemento: _complementoController.text,
+      );
+
+      // Verificar se o endereço já existe
+      if (!_enderecoJaExiste(clientes[clienteIndex].enderecos, endAdd)) {
+        // Adicionar o endereço se não existir
+        Provider.of<Enderecos>(context, listen: false).adiciona(endAdd);
+        clientes[clienteIndex].enderecos.add(endAdd.id);
+        await clientesProvider.adiciona(clientes[clienteIndex]);
+        Navigator.of(context).pop();
+      } else {
+        // Mostrar alerta se o endereço já existir
+        _mostrarAlertaEnderecoExistente();
+      }
+    },
+    child: Text('Salvar'),
     );
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('Cancelar'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+void _mostrarAlertaEnderecoExistente() {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Endereço Existente'),
+        content: const Text('Este endereço já foi adicionado.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('OK'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+bool _enderecoJaExiste(List<String> enderecosIds, Endereco novoEndereco) async{
+  for (String enderecoId in enderecosIds) {
+    DocumentSnapshot enderecoSnapshot = await _firestore.collection('Enderecos').doc(enderecoId).get();
+    Map<String, dynamic> enderecoData = enderecoSnapshot.data() as Map<String, dynamic>;
+
+    if (_mesmoEndereco(enderecoData, novoEndereco)) {
+      return true; // Endereço já existe
+    }
   }
+  return false; // Endereço não existe
+}
+
+bool _mesmoEndereco(Map<String, dynamic> enderecoData, Endereco novoEndereco) {
+  return enderecoData['cep'] == novoEndereco.cep &&
+      enderecoData['endereco'] == novoEndereco.endereco &&
+      enderecoData['numero'] == novoEndereco.numero &&
+      enderecoData['complemento'] == novoEndereco.complemento;
+}
+
+
+
+
 }
