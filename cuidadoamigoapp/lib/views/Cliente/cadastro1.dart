@@ -254,10 +254,7 @@ void _showRegistrationSuccessDialog(BuildContext context) {
     );
   }
 
-  Widget _buildPhoneTextField({
-    required TextEditingController controller,
-    required String label,
-  }) {
+  Widget _buildPhoneTextField({required TextEditingController controller, required String label,}) {
     bool isNotEmpty = controller.text.isNotEmpty;
     var maskFormatter = TextInputFormatter.withFunction(
       (oldValue, newValue) {
