@@ -6,10 +6,15 @@ import 'package:cuidadoamigoapp/provider/Enderecos.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:brasil_fields/brasil_fields.dart';
+import 'package:csc_picker/csc_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class Cadastro1 extends StatefulWidget {
   Cadastro1({Key? key}) : super(key: key);
@@ -25,19 +30,18 @@ class _Cadastro1State extends State<Cadastro1> {
   final cpf = TextEditingController();
   final senha = TextEditingController();
   final confirmaSenha = TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  XFile? _image;
-  bool isButtonEnabled = false;
-  bool allFieldsFilled = false;
-
-  final cepController = TextEditingController();
+  final estadoController = TextEditingController();
+  final cidadeController = TextEditingController();
   final enderecoController = TextEditingController();
   final numeroController = TextEditingController();
   final complementoController = TextEditingController();
-
-  bool showEnderecoForm = false;
-  String endereco = '';
-  String enderecoButtonText = 'Adicionar Endereço (Opcional)';
+  final cepController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  XFile? _image;
+  bool isButtonEnabled = false;
+  var estado = '';
+  var cidade = '';
+  String? selectedCity = 'Selecione a Cidade';
 
   @override
   void initState() {
@@ -48,6 +52,12 @@ class _Cadastro1State extends State<Cadastro1> {
     cpf.addListener(enableButton);
     senha.addListener(enableButton);
     confirmaSenha.addListener(enableButton);
+    estadoController.addListener(enableButton);
+    cidadeController.addListener(enableButton);
+    enderecoController.addListener(enableButton);
+    numeroController.addListener(enableButton);
+    complementoController.addListener(enableButton);
+    cepController.addListener(enableButton);
   }
 
   void enableButton() {
@@ -57,11 +67,11 @@ class _Cadastro1State extends State<Cadastro1> {
           fone.text.isNotEmpty &&
           cpf.text.isNotEmpty &&
           senha.text.isNotEmpty &&
-          confirmaSenha.text.isNotEmpty;
-
-      if (showEnderecoForm) {
-        isButtonEnabled = isButtonEnabled && (cepController.text.isNotEmpty || enderecoController.text.isNotEmpty);
-      }
+          estado != '' &&
+          cidade != "" &&
+          enderecoController.text.isNotEmpty &&
+          numeroController.text.isNotEmpty &&
+          complementoController.text.isNotEmpty;
     });
   }
 
@@ -80,10 +90,32 @@ class _Cadastro1State extends State<Cadastro1> {
     return emailRegExp.hasMatch(email);
   }
 
+void _showRegistrationSuccessDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    barrierDismissible: false, // Impede o fechamento do alert ao tocar fora dele
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Cadastro Finalizado'),
+        content: Text('Seu cadastro foi concluído com sucesso!'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              // Navegar de volta para a página de login
+              Navigator.of(context).pop();
+              Navigator.of(context).pop(); // Pop novamente para voltar para a página de login (ajuste conforme a necessidade)
+            },
+            child: Text('Ir para o Login'),
+          ),
+        ],
+      );
+    },
+  );
+}
   Widget _buildNextButton(BuildContext context) {
     return ElevatedButton(
       onPressed: isButtonEnabled
-          ? () {
+          ? ()  {
               if (senha.text != confirmaSenha.text) {
                 showDialog(
                   context: context,
@@ -119,16 +151,18 @@ class _Cadastro1State extends State<Cadastro1> {
                           },
                           child: Text('OK'),
                         ),
-                    ]);
-                     });
+                      ],
+                    );
+                  },
+                );
                 return; // Retorna sem prosseguir com o registro
               }
 
-              if (showEnderecoForm) {
-                enderecoButtonText = 'Editar Endereço';
-              }
+               _showRegistrationSuccessDialog(context);
               _registerUser(context);
             }
+              // ... (código existente)
+
           : null,
       style: ElevatedButton.styleFrom(
         backgroundColor: isButtonEnabled ? const Color.fromRGBO(92, 198, 186, 100) : Colors.grey,
@@ -158,6 +192,11 @@ class _Cadastro1State extends State<Cadastro1> {
           senha: senha.text,
           cpf: cpf.text,
           imagem: _image?.path ?? '',
+          estado: estado,
+          cidade: cidade,
+          endereco: enderecoController.text,
+          numero: numeroController.text,
+          complemento: complementoController.text,
         );
 
         if (cepController.text.isNotEmpty &&
@@ -172,7 +211,6 @@ class _Cadastro1State extends State<Cadastro1> {
             complemento: complementoController.text,
           );
           Provider.of<Enderecos>(context, listen: false).adiciona(endereco);
-          cliente.enderecos?.add(endereco.id);
         }
 
         Provider.of<Clientes>(context, listen: false).adiciona(cliente);
@@ -274,39 +312,40 @@ class _Cadastro1State extends State<Cadastro1> {
   }
 
   Widget _buildPasswordField({
-  required TextEditingController controller,
-  required String hintText,
-  required String label
-}) {
-  bool isNotEmpty = controller.text.isNotEmpty;
-  return Column(
-    children: [
-      SizedBox(
-        width: 250,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '$label${isNotEmpty ? '' : ' (Obrigatório)'}',
-              style: TextStyle(
-                color: isNotEmpty ? Colors.black : Colors.red,
+    required TextEditingController controller,
+    required String hintText,
+    required String label,
+  }) {
+    bool isNotEmpty = controller.text.isNotEmpty;
+    return Column(
+      children: [
+        SizedBox(
+          width: 250,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '$label${isNotEmpty ? '' : ' (Obrigatório)'}',
+                style: TextStyle(
+                  color: isNotEmpty ? Colors.black : Colors.red,
+                ),
               ),
-            ),
-            TextFormField(
-              controller: controller,
-              keyboardType: TextInputType.text,
-              obscureText: true, // Para ocultar a senha
-              decoration: InputDecoration(
-                hintText: hintText,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+              TextFormField(
+                controller: controller,
+                keyboardType: TextInputType.text,
+                obscureText: true, // Para ocultar a senha
+                decoration: InputDecoration(
+                  hintText: hintText,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    ],
-  );
-}
+      ],
+    );
+  }
+
   Widget _buildCPFTextField({
     required TextEditingController controller,
     required String label,
@@ -387,136 +426,88 @@ class _Cadastro1State extends State<Cadastro1> {
     );
   }
 
-  Future<void> _showEnderecoAlert(BuildContext context) async {
-    final formKey = GlobalKey<FormState>();
-
-    final isUpdating = showEnderecoForm;
-    final actionText = isUpdating ? 'Editar' : 'Adicionar';
-
-    final alert = AlertDialog(
-      title: Text('$actionText Endereço (Opcional)'),
-      content: SingleChildScrollView(
-        child: Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildTextField(controller: cepController, hintText: 'CEP', label: "CEP"),
-              _buildTextField(controller: enderecoController, hintText: 'Endereço', label: "Endereço"),
-              _buildTextField(controller: numeroController, hintText: 'Número', label: "Número"),
-              _buildTextField(controller: complementoController, hintText: 'Complemento', label: "Complemento"),
-            ],
-          ),
-        ),
-      ),
-      actions: <Widget>[
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: const Text('Cancelar'),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            if (formKey.currentState!.validate()) {
-              if (cepController.text.isNotEmpty &&
-                  enderecoController.text.isNotEmpty &&
-                  numeroController.text.isNotEmpty &&
-                  complementoController.text.isNotEmpty) {
-                formKey.currentState!.save();
-                setState(() {
-                  showEnderecoForm = true;
-                  enderecoButtonText = 'Editar Endereço';
-                  endereco = '${enderecoController.text}\n Numero: ${numeroController.text}\n Complemento ${complementoController.text}';
-                });
-                Navigator.of(context).pop();
-              } else {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: Text('Aviso'),
-                      content: Text('Por favor, preencha todos os campos obrigatórios.'),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Text('OK'),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              }
-            }
-          },
-          child: Text(actionText),
-        ),
-      ],
-    );
-
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return alert;
+  Widget _buildCSCPicker() {
+    return CSCPicker(
+      layout: Layout.vertical,
+      currentCountry: "Brazil",
+      defaultCountry: CscCountry.Brazil,
+      disableCountry: true,
+      flagState: CountryFlag.DISABLE,
+      onCountryChanged: (Country) {},
+      onStateChanged: (value) {
+        setState(() {
+          estado = value.toString();
+        });
       },
+      onCityChanged: (value) {
+        setState(() {
+          cidade = value.toString();
+        });
+      },
+      countryDropdownLabel: "Pais",
+      stateDropdownLabel: "Estado",
+      cityDropdownLabel: "cidade",
+      dropdownDialogRadius: 30,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF73C9C9),
-        title: Text('Cadastro'),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: const Color(0xFF73C9C9),
+          title: Text('Cadastro'),
+          bottom: TabBar(
+            tabs: [
+              Tab(text: 'Informações Pessoais'),
+              Tab(text: 'Endereço'),
+            ],
+          ),
+        ),
+        body: TabBarView(
           children: [
-            const SizedBox(height: 20),
-            _buildTextField(controller: nome, hintText: 'Nome', label: "Nome"),
-            const SizedBox(height: 10),
-            _buildTextField(controller: email, hintText: 'E-mail', label: "E-mail"),
-            const SizedBox(height: 10),
-            _buildPhoneTextField(controller: fone, label: "Telefone"),
-            const SizedBox(height: 10),
-            _buildCPFTextField(controller: cpf, label: "CPF"),
-            const SizedBox(height: 10),
-            _buildPasswordField(controller: senha, hintText: 'Senha', label: "Senha"),
-            const SizedBox(height: 10),
-            _buildPasswordField(controller: confirmaSenha, hintText: 'Confirmação de Senha', label: 'Confirmação de Senha'),
-            const SizedBox(height: 5),
-            _buildImagePickerButton(),
-            const SizedBox(height: 10),
-            Column(
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    if (showEnderecoForm) {
-                      _showEnderecoAlert(context);
-                    } else {
-                      setState(() {
-                        showEnderecoForm = true;
-                      });
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.grey,
-                  ),
-                  child: Text(enderecoButtonText),
-                ),
-                if (showEnderecoForm)
-                  Column(
-                    children: [
-                      Text('Endereço: $endereco'),
-                    ],
-                  ),
-              ],
+            SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  //Informações Pessoais
+                  const SizedBox(height: 20),
+                  _buildImagePickerButton(),
+                  const SizedBox(height: 10),
+                  _buildTextField(controller: nome, hintText: 'Nome', label: 'Nome'),
+                  const SizedBox(height: 10),
+                  _buildTextField(controller: email, hintText: 'E-mail', label: 'E-mail'),
+                  const SizedBox(height: 10),
+                  _buildPhoneTextField(controller: fone, label: 'Telefone'),
+                  const SizedBox(height: 10),
+                  _buildCPFTextField(controller: cpf, label: 'CPF'),
+                  const SizedBox(height: 10),
+                  _buildPasswordField(controller: senha, hintText: 'Senha', label: 'Senha'),
+                  const SizedBox(height: 10),
+                  _buildPasswordField(controller: confirmaSenha, hintText: 'Confirmação de Senha', label: 'Confirmação de Senha'),
+                  const SizedBox(height: 10),
+                  const SizedBox(height: 5),
+                  _buildNextButton(context),
+                ],
+              ),
             ),
-            const SizedBox(height: 5),
-            _buildNextButton(context),
+            SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Endereço
+                  const SizedBox(height: 20),
+                  _buildCSCPicker(),
+                  _buildTextField(controller: enderecoController, hintText: 'Endereço', label: 'Endereço'),
+                  _buildTextField(controller: numeroController, hintText: 'Número', label: 'Número'),
+                  _buildTextField(controller: complementoController, hintText: 'Complemento', label: 'Complemento'),
+                  const SizedBox(height: 5),
+                  _buildNextButton(context),
+                ],
+              ),
+            ),
           ],
         ),
       ),

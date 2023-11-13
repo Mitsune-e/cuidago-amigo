@@ -48,6 +48,9 @@ dependencies:
   uuid: ^4.1.0
   image_picker: ^1.0.4
   flutter_time_picker_spinner: ^2.0.0
+  brasil_fields: ^1.14.0
+  csc_picker: ^0.2.7
+  easy_localization: ^3.0.3
 
 dev_dependencies:
   flutter_test:

@@ -1,6 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cuidadoamigoapp/widgets/HourPickerSpinner.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:csc_picker/csc_picker.dart';
 import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
+
 
 class SolicitarCuidado1 extends StatefulWidget {
   const SolicitarCuidado1({Key? key}) : super(key: key);
@@ -10,31 +15,38 @@ class SolicitarCuidado1 extends StatefulWidget {
 }
 
 class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
-  bool _exibirCamposEndereco = false;
+  bool _exibirCamposEndereco = true; // Modificado para sempre mostrar os campos de endereço
 
   TextEditingController dataController = TextEditingController();
   DateTime? selectedTimeInicio;
   DateTime? selectedTimeFim;
-
-  TextEditingController cepController = TextEditingController();
-  TextEditingController cidadeController = TextEditingController();
-  TextEditingController enderecoController = TextEditingController();
-  TextEditingController complementoController = TextEditingController();
   TextEditingController numeroController = TextEditingController();
+  TextEditingController complementoController = TextEditingController();
+  String estado = '';
+  String cidade = '';
+  TextEditingController enderecoController = TextEditingController();
   double valor = 0.0;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  @override
-  void dispose() {
-    dataController.dispose();
-    cepController.dispose();
-    cidadeController.dispose();
-    enderecoController.dispose();
-    complementoController.dispose();
-    numeroController.dispose();
-    super.dispose();
+void _loadUserData(String userId) async {
+  try {
+    DocumentSnapshot userDoc =
+        await _firestore.collection('Clientes').doc(userId).get();
+
+    if (userDoc.exists) {
+      setState(() {
+        enderecoController.text = userDoc['endereco'] ?? '';
+        numeroController.text = userDoc['numero'] ?? ''; 
+        complementoController.text = userDoc['complemento'] ?? '';
+        cidade = userDoc['cidade'] ?? '';
+        estado = userDoc['estado'] ?? '';
+      });
+    }
+  } catch (e) {
+    print('Erro ao carregar dados do Firestore: $e');
   }
-
-
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,6 +64,7 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                 'Data',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
+                  fontSize: 18,
                 ),
               ),
               TextFormField(
@@ -81,6 +94,7 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                 'Horário',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
+                  fontSize: 18,
                 ),
               ),
               Row(
@@ -102,7 +116,7 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                           selectedTimeInicio != null
                               ? DateFormat('HH:mm').format(selectedTimeInicio!)
                               : 'Início',
-                          style: const TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Colors.white, fontSize: 16),
                         ),
                       ),
                     ),
@@ -132,7 +146,7 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                           selectedTimeFim != null
                               ? DateFormat('HH:mm').format(selectedTimeFim!)
                               : 'Fim',
-                          style: const TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Colors.white, fontSize: 16),
                         ),
                       ),
                     ),
@@ -144,19 +158,26 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                 'Valor: R\$ ${valor.toStringAsFixed(2)}',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: const Color(0xFF73C9C9), // Cor destacada
                 ),
               ),
               const Text(
                 'Endereço',
                 style: TextStyle(
-          
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
                 ),
               ),
               Row(
                 children: [
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        setState(() {
+                          _loadUserData(_auth.currentUser!.uid);
+                        });
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF73C9C9),
                         shape: RoundedRectangleBorder(
@@ -177,7 +198,10 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                     child: ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          _exibirCamposEndereco = !_exibirCamposEndereco;
+                          // Limpar os campos ao clicar em Novo
+                          enderecoController.clear();
+                          numeroController.clear();
+                          complementoController.clear();
                         });
                       },
                       style: ElevatedButton.styleFrom(
@@ -202,29 +226,67 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 20),
+                    CSCPicker(
+                      currentCountry: "Brazil",
+                      defaultCountry: CscCountry.Brazil,
+                      currentState: estado,
+                      currentCity: cidade,
+                      disableCountry: true,
+                    
+                      flagState: CountryFlag.DISABLE,
+                      dropdownDecoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        color: Colors.white,
+                        border: Border.all(
+                          color: Colors.grey.withOpacity(0.5),
+                          style: BorderStyle.solid,
+                        ),
+                      ),
+                      disabledDropdownDecoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        color: Colors.grey[200],
+                        border: Border.all(
+                          color: Colors.grey.withOpacity(0.5),
+                          style: BorderStyle.solid,
+                        ),
+                      ),
+                      selectedItemStyle: TextStyle(
+                        color: Colors.black,
+                        fontSize: 14,
+                      ),
+                      dropdownHeadingStyle: TextStyle(
+                        color: Colors.black,
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      dropdownItemStyle: TextStyle(
+                        color: Colors.black,
+                        fontSize: 14,
+                      ),
+                      dropdownDialogRadius: 10.0,
+                      searchBarRadius: 10.0,
+                      onCountryChanged: (value) {
+                        // Handle country change
+                      },
+                      onStateChanged: (value) {
+                        setState(() {
+                          estado = value.toString();
+                        });
+                      },
+                      onCityChanged: (value) {
+                        setState(() {
+                          cidade =  value.toString();
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 20),
                     TextFormField(
-                      // Campo de CEP
-                      controller: cepController,
+                      // Campo de Número
+                      controller: numeroController,
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
-                        hintText: 'CEP',
-                        prefixIcon: Icon(Icons.location_on),
-                      ),
-                    ),
-                    TextFormField(
-                      // Campo de Cidade
-                      controller: cidadeController,
-                      decoration: const InputDecoration(
-                        hintText: 'Cidade',
-                        prefixIcon: Icon(Icons.location_city),
-                      ),
-                    ),
-                    TextFormField(
-                      // Campo de Endereço
-                      controller: enderecoController,
-                      decoration: const InputDecoration(
-                        hintText: 'Endereço',
-                        prefixIcon: Icon(Icons.home),
+                        hintText: 'Número',
+                        prefixIcon: Icon(Icons.format_list_numbered),
                       ),
                     ),
                     TextFormField(
@@ -233,15 +295,6 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                       decoration: const InputDecoration(
                         hintText: 'Complemento (opcional)',
                         prefixIcon: Icon(Icons.add),
-                      ),
-                    ),
-                    TextFormField(
-                      // Campo de Número
-                      controller: numeroController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        hintText: 'Número',
-                        prefixIcon: Icon(Icons.format_list_numbered),
                       ),
                     ),
                   ],
@@ -260,9 +313,9 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                         'horaInicio': DateFormat('HH:mm').format(selectedTimeInicio!),
                         'horaFim': DateFormat('HH:mm').format(selectedTimeFim!),
                         'valor': valor,
-                        'cep': cepController.text,
-                        'cidade': cidadeController.text,
-                        'endereco': enderecoController.text,
+                        'cidade': cidade,
+                        'estado': estado,
+                        'endereco': enderecoController,
                         'complemento': complementoController.text,
                         'numero': numeroController.text,
                       };
@@ -308,7 +361,7 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(isStart ? 'Horário de Início' : 'Horário de Fim'),
-          content: TimePickerSpinner(
+          content: HourPickerSpinner(
             is24HourMode: true,
             normalTextStyle: TextStyle(fontSize: 24, color: Colors.grey),
             highlightedTextStyle: TextStyle(fontSize: 24, color: Colors.black),
@@ -360,8 +413,8 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
   }
 
   bool _validateAddress() {
-    return cepController.text.isNotEmpty &&
-        cidadeController.text.isNotEmpty &&
+    return estado.isNotEmpty &&
+        cidade.isNotEmpty &&
         enderecoController.text.isNotEmpty &&
         numeroController.text.isNotEmpty;
   }

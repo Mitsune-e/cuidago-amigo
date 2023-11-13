@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class Cliente {
   final String id;
   final String name;
@@ -6,7 +8,11 @@ class Cliente {
   final String cpf;
   final String telefone;
   final String senha;
-  List<String>? enderecos;
+  final String estado;
+  final String cidade;
+  final String endereco;
+  final String numero;
+  final String complemento;
   List<String>? servicos;
 
   Cliente({
@@ -17,9 +23,13 @@ class Cliente {
     required this.email,
     required this.senha,
     required this.telefone,
-    List<String>? enderecos,
+    required this.estado,
+    required this.cidade,
+    required this.endereco,
+    required this.numero,
+    required this.complemento,
     List<String>? servicos,
-  })   : this.enderecos = enderecos ?? [],
+  })   : 
         this.servicos = servicos ?? [];
 
   Cliente.fromMap(Map<String, dynamic> map)
@@ -30,7 +40,11 @@ class Cliente {
         telefone = map["telefone"],
         senha = map["senha"],
         cpf = map["cpf"],
-        enderecos = List<String>.from(map["enderecos"] ?? []),
+        endereco = map["endereco"],
+        estado = map['estado'],
+        cidade =map['cidade'],
+        numero = map['numero'],
+        complemento = map['complemento'],
         servicos = List<String>.from(map["servicos"] ?? []);
 
   Map<String, dynamic> toMap() {
@@ -42,8 +56,12 @@ class Cliente {
       "email": email,
       "telefone": telefone,
       "senha": senha,
-      "enderecos": enderecos,
       "servicos": servicos,
+      "endereco": endereco,
+      'estado': estado,
+      'cidade': cidade,
+      'numero': numero,
+      'complemento': complemento,
     };
   }
 }

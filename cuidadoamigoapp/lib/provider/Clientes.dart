@@ -41,4 +41,23 @@ class Clientes with ChangeNotifier {
     _firestore.collection('Clientes').doc(cliente.id).delete();
     notifyListeners();
   }
+
+ 
+  Future<Cliente?> loadClienteById(String clientId) async {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> snapshot =
+          await _firestore.collection('Clientes').doc(clientId).get();
+
+      if (snapshot.exists) {
+        return Cliente.fromMap(snapshot.data()!);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print('Erro ao carregar cliente: $e');
+      return null;
+    }
+  }
+
+
 }
