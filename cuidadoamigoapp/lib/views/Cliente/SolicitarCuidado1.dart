@@ -28,6 +28,7 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
   double valor = 0.0;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  GlobalKey<CSCPickerState> _cscPickerKey = GlobalKey<CSCPickerState>();
 
 void _loadUserData(String userId) async {
   try {

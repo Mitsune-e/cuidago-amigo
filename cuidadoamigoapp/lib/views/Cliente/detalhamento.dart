@@ -98,18 +98,7 @@ class _DetalhesServicoState extends State<DetalhesServico> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                ElevatedButton(
-                  onPressed: () {
-                    _mostrarEditarServicoDialog(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF73C9C9),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                    ),
-                  ),
-                  child: const Text('Editar Serviço'),
-                ),
+               
                 ElevatedButton(
                   onPressed: () {
                     _mostrarCancelarServicoDialog(context);
@@ -130,65 +119,7 @@ class _DetalhesServicoState extends State<DetalhesServico> {
     );
   }
 
-  void _mostrarEditarServicoDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Editar Serviço'),
-          content: SingleChildScrollView(
-            child: Column(
-              children: [
-                TextFormField(
-                  controller: serviceNameController,
-                  decoration: const InputDecoration(labelText: 'Nome do Serviço'),
-                ),
-                TextFormField(
-                  controller: serviceDescriptionController,
-                  decoration: const InputDecoration(labelText: 'Descrição do Serviço'),
-                ),
-                TextFormField(
-                  controller: serviceTimeController,
-                  decoration: const InputDecoration(labelText: 'Horário'),
-                ),
-                TextFormField(
-                  controller: serviceAddressController,
-                  decoration: const InputDecoration(labelText: 'Endereço'),
-                ),
-                TextFormField(
-                  controller: serviceDateController,
-                  decoration: const InputDecoration(labelText: 'Data'),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancelar'),
-            ),
-            TextButton(
-              onPressed: () {
-                // Aqui você pode implementar a lógica para salvar as edições do serviço
-                // Use as propriedades do widget para acessar os valores atualizados
-                final novoNome = serviceNameController.text;
-                final novaDescricao = serviceDescriptionController.text;
-                final novoHorario = serviceTimeController.text;
-                final novoEndereco = serviceAddressController.text;
-                final novaData = serviceDateController.text;
-                // Agora, você pode fazer o que desejar com esses valores
-                // Por exemplo, você pode enviá-los de volta para a página anterior
-                Navigator.of(context).pop();
-              },
-              child: const Text('Salvar'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+ 
 
   void _mostrarCancelarServicoDialog(BuildContext context) {
     showDialog(
