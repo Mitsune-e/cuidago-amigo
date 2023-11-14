@@ -143,6 +143,10 @@ Future<void> _loadCuidadores() async {
                                   endereco: dataToPass['endereco'],
                                   usuario: user!.uid,
                                   prestador: prestadorID,
+                                  numero: dataToPass['numero'],
+                                  complemento: dataToPass['complemento'],
+                                  estado: dataToPass['estado'],
+                                  cidade: dataToPass['cidade']
                                 );
 
                                 // Use o provider para adicionar o serviço ao banco de dados

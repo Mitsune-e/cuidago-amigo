@@ -30,7 +30,9 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   GlobalKey<CSCPickerState> _cscPickerKey = GlobalKey<CSCPickerState>();
 
-void _loadUserData(String userId) async {
+
+
+Future<void> _loadUserData(String userId) async {
   try {
     DocumentSnapshot userDoc =
         await _firestore.collection('Clientes').doc(userId).get();
@@ -283,11 +285,20 @@ void _loadUserData(String userId) async {
                     const SizedBox(height: 20),
                     TextFormField(
                       // Campo de Número
+                      controller: enderecoController,
+                      keyboardType: TextInputType.text,
+                      decoration: const InputDecoration(
+                        hintText: 'Endereco',
+                        prefixIcon: Icon(Icons.home),
+                      ),
+                    ),
+                    TextFormField(
+                      // Campo de Número
                       controller: numeroController,
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
                         hintText: 'Número',
-                        prefixIcon: Icon(Icons.format_list_numbered),
+                        prefixIcon: Icon(Icons.numbers),
                       ),
                     ),
                     TextFormField(

@@ -3,9 +3,13 @@ class Servico {
   final String data;
   final String horaInicio;
   final String horaFim;
-  final String endereco;
   final String usuario;
   final String prestador;
+  final String endereco;
+  final String numero;
+  final String complemento;
+  final String cidade;
+  final String estado ;
 
   Servico({
     required this.id,
@@ -15,6 +19,10 @@ class Servico {
     required this.endereco,
     required this.usuario,
     required this.prestador,
+    required this.numero,
+    required this.complemento,
+    required this.cidade,
+    required this.estado,
   });
 
   Servico.fromMap(Map<String, dynamic> map)
@@ -24,7 +32,11 @@ class Servico {
         horaFim = map["horaFim"],
         endereco = map["endereco"],
         usuario = map["usuario"] ,
-        prestador = map["prestador"];
+        prestador = map["prestador"],
+        numero = map['numero'],
+        complemento = map['complemento'],
+        estado =map['estado'],
+        cidade =map['cidade'];
 
   Map<String, dynamic> toMap() {
     return {
@@ -35,6 +47,10 @@ class Servico {
       "endereco": endereco,
       "usuario": usuario,
       "prestador": prestador,
+      "numero": numero,
+      "Complemento":complemento,
+      "cidade" : cidade,
+      "estado": estado,
     };
   }
 }
