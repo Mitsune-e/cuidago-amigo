@@ -132,6 +132,7 @@ Future<void> _loadCuidadores() async {
                             onPressed: () async {
                               final cuidadorSelecionado = cuidadores[currentIndex];
                               final prestadorID = cuidadorSelecionado['id'];
+                              print(dataToPass);
 
                               if (cuidadores.isNotEmpty && currentIndex < cuidadores.length) {
                                 // Crie o serviço
@@ -147,8 +148,9 @@ Future<void> _loadCuidadores() async {
                                   complemento: dataToPass['complemento'],
                                   estado: dataToPass['estado'],
                                   cidade: dataToPass['cidade']
-                                );
 
+                                );
+                               
                                 // Use o provider para adicionar o serviço ao banco de dados
                                 final servicosProvider = Servicos();
                                 await servicosProvider.adiciona(servico);

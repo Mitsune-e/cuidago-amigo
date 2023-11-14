@@ -25,11 +25,16 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
   final TextEditingController _enderecoController = TextEditingController();
   final TextEditingController _numeroController = TextEditingController();
   final TextEditingController _complementoController = TextEditingController();
-  final TextEditingController _cepController = TextEditingController();
   final TextEditingController _descricaoController = TextEditingController();
   final TextEditingController _imagemController = TextEditingController();
   bool _possuiCarro = false;
+   bool isNomeValid = false;
+  var cidade = '';
+  var estado ='';
 
+  void initState() {
+    super.initState();}
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,31 +82,33 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
   Widget _buildDadosPessoais() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Dados Pessoais',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Dados Pessoais',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
-          _buildImagePickerButton(),
-          const SizedBox(height: 10),
-          _buildTextField(controller: _nomeController, hintText: 'Nome', label: 'Nome'),
-          const SizedBox(height: 10),
-          _buildTextField(controller: _emailController, hintText: 'E-mail', label: 'E-mail'),
-          const SizedBox(height: 10),
-          _buildPhoneTextField(controller: _telefoneController, label: 'Telefone'),
-          const SizedBox(height: 10),
-          _buildCPFTextField(controller: _cpfController, label: 'CPF'),
-          const SizedBox(height: 10),
-          _buildPasswordField(controller: _senhaController, hintText: 'Senha', label: 'Senha'),
-          const SizedBox(height: 10),
-          _buildPasswordField(controller: _confirmaSenhaController, hintText: 'Confirmação de Senha', label: 'Confirmação de Senha'),
-        ],
+            const SizedBox(height: 20),
+            _buildImagePickerButton(),
+            const SizedBox(height: 10),
+            _buildTextField(controller: _nomeController, hintText: 'Nome', label: 'Nome'),
+            const SizedBox(height: 10),
+            _buildTextField(controller: _emailController, hintText: 'E-mail', label: 'E-mail'),
+            const SizedBox(height: 10),
+            _buildPhoneTextField(controller: _telefoneController, label: 'Telefone'),
+            const SizedBox(height: 10),
+            _buildCPFTextField(controller: _cpfController, label: 'CPF'),
+            const SizedBox(height: 10),
+            _buildPasswordField(controller: _senhaController, hintText: 'Senha', label: 'Senha'),
+            const SizedBox(height: 10),
+            _buildPasswordField(controller: _confirmaSenhaController, hintText: 'Confirmação de Senha', label: 'Confirmação de Senha'),
+          ],
+        ),
       ),
     );
   }
@@ -109,22 +116,24 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
   Widget _buildEndereco() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Endereço',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Endereço',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
-          _buildCSCPicker(),
-          _buildTextField(controller: _enderecoController, hintText: 'Endereço', label: 'Endereço'),
-          _buildTextField(controller: _numeroController, hintText: 'Número', label: 'Número'),
-          _buildTextField(controller: _complementoController, hintText: 'Complemento', label: 'Complemento'),
-        ],
+            const SizedBox(height: 20),
+            _buildCSCPicker(),
+            _buildTextField(controller: _enderecoController, hintText: 'Endereço', label: 'Endereço'),
+            _buildTextField(controller: _numeroController, hintText: 'Número', label: 'Número'),
+            _buildTextField(controller: _complementoController, hintText: 'Complemento', label: 'Complemento'),
+          ],
+        ),
       ),
     );
   }
@@ -132,21 +141,23 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
   Widget _buildDadosProfissionais() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Dados Profissionais',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Dados Profissionais',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
-          _buildCarroCheckbox(),
-          const SizedBox(height: 10),
-          _buildDescricaoTextField(),
-        ],
+            const SizedBox(height: 20),
+            _buildCarroCheckbox(),
+            const SizedBox(height: 10),
+            _buildDescricaoTextField(),
+          ],
+        ),
       ),
     );
   }
@@ -209,6 +220,9 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
           ),
         ),
         TextFormField(
+          onChanged: (Text){setState(() {
+            
+          });},
           controller: controller,
           decoration: InputDecoration(
             hintText: hintText,
@@ -259,6 +273,9 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
           ),
         ),
         TextFormField(
+          onChanged: (Text){setState(() {
+            
+          });},
           controller: controller,
           keyboardType: TextInputType.phone,
           inputFormatters: [maskFormatter],
@@ -292,6 +309,9 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
           ),
         ),
         TextFormField(
+          onChanged: (Text){setState(() {
+            
+          });},
           controller: controller,
           keyboardType: TextInputType.text,
           obscureText: true,
@@ -347,6 +367,9 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
           ),
         ),
         TextFormField(
+          onChanged: (Text){setState(() {
+            
+          });},
           controller: controller,
           keyboardType: TextInputType.number,
           inputFormatters: [maskFormatter],
@@ -369,18 +392,20 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
     return CSCPicker(
       layout: Layout.vertical,
       currentCountry: "Brazil",
+      currentState: estado,
+      currentCity: cidade,
       defaultCountry: CscCountry.Brazil,
       disableCountry: true,
       flagState: CountryFlag.DISABLE,
       onCountryChanged: (Country) {},
       onStateChanged: (value) {
         setState(() {
-          _estadoController.text = value.toString();
+          estado = value.toString();
         });
       },
       onCityChanged: (value) {
         setState(() {
-          _cidadeController.text = value.toString();
+          cidade = value.toString();
         });
       },
       countryDropdownLabel: "Pais",
@@ -433,12 +458,15 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Descrição',
+          'Descrição ${ _descricaoController.text.isNotEmpty ? '' : ' (Obrigatório)'}',
           style: TextStyle(
-            fontSize: 16,
+            color:  _descricaoController.text.isNotEmpty ? Colors.black : Colors.red,
           ),
         ),
         TextFormField(
+          onChanged: (Text){setState(() {
+            
+          });},
           controller: _descricaoController,
           maxLines: 3,
           decoration: InputDecoration(
@@ -490,7 +518,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
   }
 
   void _nextPage() {
-    if (_pageController.page! < 2) {
+    if (_pageController.page! < 3) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 500),
         curve: Curves.ease,
@@ -537,12 +565,6 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
     if (_confirmaSenhaController.text.isEmpty) {
       emptyFields.add('Confirmação de Senha');
     }
-    if (_estadoController.text.isEmpty) {
-      emptyFields.add('Estado');
-    }
-    if (_cidadeController.text.isEmpty) {
-      emptyFields.add('Cidade');
-    }
     if (_enderecoController.text.isEmpty) {
       emptyFields.add('Endereço');
     }
@@ -552,15 +574,18 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
     if (_complementoController.text.isEmpty) {
       emptyFields.add('Complemento');
     }
-    if (_cepController.text.isEmpty) {
-      emptyFields.add('CEP');
+    if (cidade == '') {
+      emptyFields.add('Cidade');
+    }
+     if (estado == '') {
+      emptyFields.add('Estado');
     }
     if (_descricaoController.text.isEmpty) {
       emptyFields.add('Descrição');
     }
 
     if (emptyFields.isNotEmpty) {
-      _showErrorDialog('Campos obrigatórios não preenchidos', 'Preencha os seguintes campos: \n ${emptyFields.join(", \n ")}');
+      _showErrorDialog('Campos obrigatórios não preenchidos', 'Preencha os seguintes campos: \n ${emptyFields.join(",\n ")}');
       return false;
     }
 

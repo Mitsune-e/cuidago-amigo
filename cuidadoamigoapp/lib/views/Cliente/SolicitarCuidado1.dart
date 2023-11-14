@@ -327,7 +327,7 @@ Future<void> _loadUserData(String userId) async {
                         'valor': valor,
                         'cidade': cidade,
                         'estado': estado,
-                        'endereco': enderecoController,
+                        'endereco': enderecoController.text,
                         'complemento': complementoController.text,
                         'numero': numeroController.text,
                       };
@@ -399,6 +399,7 @@ Future<void> _loadUserData(String userId) async {
                     setState(() {
                       selectedTimeInicio = selectedTime;
                     });
+                    Navigator.of(context).pop();
                   } else {
                     if (selectedTime!.isAfter(selectedTimeInicio!.add(Duration(minutes: 30)))) {
                       setState(() {
