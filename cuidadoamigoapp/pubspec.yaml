@@ -51,6 +51,7 @@ dependencies:
   brasil_fields: ^1.14.0
   csc_picker: ^0.2.7
   easy_localization: ^3.0.3
+  cached_network_image: ^3.3.0
 
 dev_dependencies:
   flutter_test:

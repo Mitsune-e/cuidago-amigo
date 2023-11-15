@@ -100,7 +100,7 @@ Future<void> _loadCuidadores() async {
                           ),
                           const SizedBox(height: 20),
                           Text(
-                            cuidadores[currentIndex]['nome'] ?? 'Nome do Cuidador',
+                            cuidadores[currentIndex]['name'] ?? 'Nome do Cuidador',
                             style: const TextStyle(
                               fontSize: 20.0,
                               fontWeight: FontWeight.bold,
@@ -153,7 +153,7 @@ Future<void> _loadCuidadores() async {
                                
                                 // Use o provider para adicionar o serviço ao banco de dados
                                 final servicosProvider = Servicos();
-                                await servicosProvider.adiciona(servico);
+                                servicosProvider.adiciona(servico);
 
                                 // Atualize a lista de serviços do cliente
                                 final clientesProvider = Clientes();
@@ -174,6 +174,7 @@ Future<void> _loadCuidadores() async {
 
                                 // Adicione código para lidar com o sucesso do agendamento aqui
                                 print('Serviço agendado com sucesso');
+                                Navigator.of(context).pushNamed('/homeIdoso');
                               } else {
                                 // Mostrar uma mensagem de erro ou fazer alguma outra ação
                                 ScaffoldMessenger.of(context).showSnackBar(

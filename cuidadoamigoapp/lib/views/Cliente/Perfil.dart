@@ -1,12 +1,11 @@
-import 'package:brasil_fields/brasil_fields.dart';
+import 'dart:io';
+
 import 'package:cuidadoamigoapp/models/cliente.dart';
-import 'package:cuidadoamigoapp/provider/Clientes.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:cuidadoamigoapp/models/Endereco.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:provider/provider.dart';
-import 'package:uuid/uuid.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:csc_picker/csc_picker.dart';
 
 class Perfil extends StatefulWidget {
@@ -17,21 +16,22 @@ class Perfil extends StatefulWidget {
 }
 
 class _PerfilState extends State<Perfil> {
-  FirebaseAuth _auth = FirebaseAuth.instance;
-  FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  TextEditingController _nomeController = TextEditingController();
-  TextEditingController _cpfController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _telefoneController = TextEditingController();
-  TextEditingController _enderecoController = TextEditingController();
-  TextEditingController _numeroController = TextEditingController();
-  TextEditingController _complementoController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final TextEditingController _nomeController = TextEditingController();
+  final TextEditingController _cpfController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _telefoneController = TextEditingController();
+  final TextEditingController _enderecoController = TextEditingController();
+  final TextEditingController _numeroController = TextEditingController();
+  final TextEditingController _complementoController = TextEditingController();
+  String ? imageUrl;
   var cidade ="";
   var estado = '';
   var estado_novo = "";
   var cidade_novo = "";
   List<String> cliente_enderecos = [];
+  bool _isLoadingImage = true;
 
   @override
   void initState() {
@@ -51,57 +51,153 @@ Future<void> _loadData() async {
     await _loadUserData(user.uid);
   }
 }
+
   Future<void> _loadUserData(String userId) async {
-    try {
-      DocumentSnapshot userDoc = await _firestore.collection('Clientes').doc(userId).get();
+  try {
+    DocumentSnapshot userDoc = await _firestore.collection('Clientes').doc(userId).get();
 
-      if (userDoc.exists) {
-        setState(() {
-          _nomeController.text = userDoc['name'] ?? '';
-          _cpfController.text = userDoc['cpf'] ?? '';
-          _emailController.text = userDoc['email'] ?? '';
-          _telefoneController.text = userDoc['telefone'] ?? '';
+    if (userDoc.exists) {
+      Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
 
-          _enderecoController.text = userDoc['endereco'] ?? '';
-          _numeroController.text = userDoc['numero'] ?? '';
-          _complementoController.text = userDoc['complemento'] ?? '';
-           cidade = userDoc['cidade'] ?? '';
-           estado = userDoc['estado'] ?? '';
-        });
-      }
-    } catch (e) {
-      print('Erro ao carregar dados do Firestore: $e');
+      Cliente cliente = Cliente.fromMap(userData);
+
+      setState(() {
+        _nomeController.text = cliente.name ?? '';
+        _cpfController.text = cliente.cpf ?? '';
+        _emailController.text = cliente.email ?? '';
+        _telefoneController.text = cliente.telefone ?? '';
+        estado = cliente.estado ?? '';
+        cidade = cliente.cidade ?? '';
+        _enderecoController.text = cliente.endereco ?? '';
+        _numeroController.text = cliente.numero ?? '';
+        _complementoController.text = cliente.complemento ?? '';
+        imageUrl = cliente.imagem ?? '';
+
+
+        _isLoadingImage = false;
+      });
     }
+  } catch (e) {
+    print('Erro ao carregar dados do Firestore: $e');
+    // Em caso de erro, marque que a imagem não está mais carregando
+      setState(() {
+        _isLoadingImage = false;  });
   }
+}
 
-  @override
+
+ Future<void> _mostrarOpcoesImagem() async {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Escolher Imagem'),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              ListTile(
+                leading: const Icon(Icons.photo),
+                title: const Text('Galeria'),
+                onTap: () {
+                  _escolherImagem(ImageSource.gallery);
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.camera),
+                title: const Text('Câmera'),
+                onTap: () {
+                  _escolherImagem(ImageSource.camera);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+Future<void> _escolherImagem(ImageSource source) async {
+  final pickedFile = await ImagePicker().pickImage(source: source);
+
+  if (pickedFile != null) {
+    // Aqui você pode lidar com a imagem selecionada
+    // Por exemplo, você pode carregar a imagem para o Firebase Storage
+    // e atualizar a referência no Firestore
+    // A propriedade pickedFile.path contém o caminho local da imagem selecionada
+
+    // Implemente a lógica para fazer upload da imagem para o Firebase Storage
+    // e obter a URL da imagem
+
+    // Chame a função _updateUserData para atualizar a URL da imagem no Firestore
+    User? user = _auth.currentUser;
+    await _updateUserData(user!.uid);
+  }
+}
+
+Future<String> fazerUploadEObterUrl(String imagePath) async {
+  // Lógica para fazer o upload da imagem e obter a URL
+  // Substitua este código pela implementação real do upload
+
+  // Suponhamos que você esteja usando Firebase Storage para o upload
+  // Aqui está um exemplo hipotético usando o Firebase Storage
+  // Certifique-se de adicionar a biblioteca 'firebase_storage' no seu arquivo pubspec.yaml
+  // e inicializar o Firebase antes de usar o Storage
+
+  // Upload da imagem para o Firebase Storage
+  final Reference storageReference = FirebaseStorage.instance.ref().child('uploads').child('imagem.png');
+  final UploadTask uploadTask = storageReference.putFile(File(imagePath));
+
+  // Aguardar o término do upload
+  await uploadTask.whenComplete(() => print('Upload concluído'));
+
+  // Obter a URL da imagem após o upload
+  final String imageUrl = await storageReference.getDownloadURL();
+
+  return imageUrl;
+}
+
+  
+ @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Minha Conta'),
-        backgroundColor: Color(0xFF73C9C9),
+        title: const Text('Minha Conta'),
+        backgroundColor: const Color(0xFF73C9C9),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: 20),
-            InkWell(
-              onTap: () {
-                // Adicione a lógica para editar a foto do perfil aqui
-              },
-              child: CircleAvatar(
-                radius: 75,
-                backgroundColor: Colors.grey[300],
-                child: Icon(
-                  Icons.person,
-                  size: 100,
-                  color: Colors.grey[600],
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
+            // Use um widget de carregamento enquanto a imagem está sendo carregada
+            _isLoadingImage
+                ? CircularProgressIndicator()
+                : ClipOval(
+                    child: Image.network(
+                      imageUrl ?? '',
+                      width: 150,
+                      height: 150,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                        if (loadingProgress == null) {
+                          return child;
+                        } else {
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
+                                  : null,
+                    ),
+                  );
+      }
+    },
+  ),
+),
+            const SizedBox(height: 20),
             _buildInfoBox(
               title: 'Dados Pessoais',
               buttonText: 'Editar',
@@ -123,7 +219,7 @@ Future<void> _loadData() async {
                 _buildInfoRow('Telefone', _telefoneController.text),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             _buildEnderecoBox()
           ],
         ),
@@ -138,8 +234,8 @@ Future<void> _loadData() async {
     required List<Widget> children,
   }) {
     return Container(
-      margin: EdgeInsets.only(bottom: 20),
-      padding: EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
@@ -148,7 +244,7 @@ Future<void> _loadData() async {
             color: Colors.grey.withOpacity(0.5),
             spreadRadius: 1,
             blurRadius: 4,
-            offset: Offset(0, 3),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -160,7 +256,7 @@ Future<void> _loadData() async {
             children: [
               Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF73C9C9),
@@ -170,7 +266,7 @@ Future<void> _loadData() async {
                 onPressed: onButtonPressed,
                 child: Text(
                   buttonText,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     color: Color(0xFF73C9C9),
                   ),
@@ -178,37 +274,38 @@ Future<void> _loadData() async {
               ),
             ],
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           ...children,
         ],
       ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+  Widget _buildInfoRow(String label, String? value) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
           ),
-          SizedBox(height: 4),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 18,
-            ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value ?? '', // Usando operador de coalescência nula para tratar valores nulos
+          style: const TextStyle(
+            fontSize: 18,
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
+
 
  
 
@@ -222,28 +319,41 @@ Future<void> _loadData() async {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                for (int i = 0; i < controllers.length; i++)
-                  TextFormField(
-                    controller: controllers[i],
-                    decoration: InputDecoration(
-                      labelText: controllers[i].text,
-                    ),
-                  ),
+               for (int i = 0; i < controllers.length; i++)
+              TextFormField(
+                controller: controllers[i],
+                readOnly: i == 2,  // Impede que o campo de e-mail seja editado
+                decoration: InputDecoration(
+                  labelText: i == 0 ? 'Nome' : (i == 1 ? 'CPF' : (i == 2 ? 'E-mail' : 'Telefone')),
+                ),
+              ),
               ],
             ),
           ),
           actions: [
             ElevatedButton(
               onPressed: () async {
-                User? user = _auth.currentUser;
+                  bool camposPreenchidos = controllers.every((controller) => controller.text.isNotEmpty);
+
+              if (!camposPreenchidos) {
+                    // Exibir mensagem de erro se algum campo estiver em branco
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Por favor, preencha todos os campos.'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    return;
+                  }
+                User? user = _auth.currentUser;                             
 
                 await _updateUserData(user!.uid);
 
-                _loadUserData(user.uid);
-
+                await _loadData();
+          
                 Navigator.of(context).pop();
               },
-              child: Text('Salvar'),
+              child: const Text('Salvar'),
             ),
           ],
         );
@@ -263,8 +373,9 @@ Future<void> _loadData() async {
         'endereco': _enderecoController.text,
         'numero':_numeroController.text,
         'complemento': _complementoController.text,
-
+        'imagem': imageUrl,
       });
+      await _loadData();
     } catch (e) {
       print('Erro ao atualizar dados do usuário no Firestore: $e');
     }
@@ -272,8 +383,8 @@ Future<void> _loadData() async {
 
 Widget _buildEnderecoBox() {
     return Container(
-      margin: EdgeInsets.only(bottom: 20),
-      padding: EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
@@ -282,7 +393,7 @@ Widget _buildEnderecoBox() {
             color: Colors.grey.withOpacity(0.5),
             spreadRadius: 1,
             blurRadius: 4,
-            offset: Offset(0, 3),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -292,7 +403,7 @@ Widget _buildEnderecoBox() {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
+              const Text(
                 'Endereço',
                 style: TextStyle(
                   fontSize: 20,
@@ -306,7 +417,7 @@ Widget _buildEnderecoBox() {
                     onPressed: () {
                       _mostrarEditarEnderecoDialog();
                     },
-                    child: Text(
+                    child: const Text(
                       'Editar',
                       style: TextStyle(
                         fontSize: 16,
@@ -318,7 +429,7 @@ Widget _buildEnderecoBox() {
               ),
             ],
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           _buildInfoRow('Estado', estado),
           _buildInfoRow('Cidade', cidade),
           _buildInfoRow('Endereço', _enderecoController.text),
@@ -336,7 +447,7 @@ Widget _buildEnderecoBox() {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
-              title: Text('Editar Endereço'),
+              title: const Text('Editar Endereço'),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -351,7 +462,7 @@ Widget _buildEnderecoBox() {
                       showStates: true,
                       flagState: CountryFlag.DISABLE,
                       dropdownDecoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        borderRadius: const BorderRadius.all(Radius.circular(10)),
                         color: Colors.white,
                         border: Border.all(
                           color: Colors.grey.withOpacity(0.5),
@@ -359,23 +470,23 @@ Widget _buildEnderecoBox() {
                         ),
                       ),
                       disabledDropdownDecoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        borderRadius: const BorderRadius.all(Radius.circular(10)),
                         color: Colors.grey[200],
                         border: Border.all(
                           color: Colors.grey.withOpacity(0.5),
                           style: BorderStyle.solid,
                         ),
                       ),
-                      selectedItemStyle: TextStyle(
+                      selectedItemStyle: const TextStyle(
                         color: Colors.black,
                         fontSize: 14,
                       ),
-                      dropdownHeadingStyle: TextStyle(
+                      dropdownHeadingStyle: const TextStyle(
                         color: Colors.black,
                         fontSize: 17,
                         fontWeight: FontWeight.bold,
                       ),
-                      dropdownItemStyle: TextStyle(
+                      dropdownItemStyle: const TextStyle(
                         color: Colors.black,
                         fontSize: 14,
                       ),
@@ -386,6 +497,7 @@ Widget _buildEnderecoBox() {
                       },
                       onStateChanged: (value) {
                         setState(() {
+                          
                           estado_novo = value.toString();
                         });
                       },
@@ -397,19 +509,19 @@ Widget _buildEnderecoBox() {
                     ),
                     TextFormField(
                       controller: _enderecoController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Endereço',
                       ),
                     ),
                     TextFormField(
                       controller: _numeroController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Número',
                       ),
                     ),
                     TextFormField(
                       controller: _complementoController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Complemento',
                       ),
                     ),
@@ -419,20 +531,33 @@ Widget _buildEnderecoBox() {
               actions: [
                 ElevatedButton(
                   onPressed: () async {
-                  if (estado_novo !="" && cidade_novo != ''){
-                    estado = estado_novo;
-                    cidade = cidade_novo;
+                  bool camposEnderecoPreenchidos =
+                      _enderecoController.text.isNotEmpty &&
+                      _numeroController.text.isNotEmpty &&
+                      _complementoController.text.isNotEmpty;
+
+                  if (estado_novo.isEmpty || cidade_novo.isEmpty || !camposEnderecoPreenchidos) {
+                    // Exibir mensagem de erro se cidade, estado ou algum campo de endereço estiver em branco
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Por favor, preencha todos os campos de endereço, cidade e estado.'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    return;
                   }
+                  cidade = cidade_novo;
+                  estado =estado_novo;
                   
                   User? user = _auth.currentUser;
 
                   await _updateUserData(user!.uid);
 
-                  _loadUserData(user.uid);
+                  await _loadData();
 
                   Navigator.of(context).pop();
                 },
-                  child: Text('Salvar'),
+                  child: const Text('Salvar'),
                 ),
               ],
             );

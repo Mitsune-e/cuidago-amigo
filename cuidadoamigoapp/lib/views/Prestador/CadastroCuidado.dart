@@ -1,9 +1,13 @@
 import 'dart:io';
 
+import 'package:cuidadoamigoapp/models/Prestador.dart';
+import 'package:cuidadoamigoapp/provider/Prestadores.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:csc_picker/csc_picker.dart';
+import 'package:provider/provider.dart';
 
 class CadastroCuidado extends StatefulWidget {
   CadastroCuidado({Key? key}) : super(key: key);
@@ -27,6 +31,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
   final TextEditingController _complementoController = TextEditingController();
   final TextEditingController _descricaoController = TextEditingController();
   final TextEditingController _imagemController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   bool _possuiCarro = false;
    bool isNomeValid = false;
   var cidade = '';
@@ -540,7 +545,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
 
     // All validations passed, proceed with registration
     _showRegistrationSuccessDialog(context);
-    _registerUser();
+    _registerUser(context);
   }
 
   bool _validateFields() {
@@ -633,9 +638,39 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
     );
   }
 
-  void _registerUser() {
-    // Implement your user registration logic here
-    // Use the collected data from controllers to register the user
+ void _registerUser(BuildContext context) async {
+    try {
+      final UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        email: _emailController.text,
+        password: _senhaController.text,
+      );
+
+      final User? user = userCredential.user;
+      if (user != null) {
+        final prestador = Prestador(
+          id: user.uid,
+          name: _nomeController.text,
+          email: _emailController.text,
+          telefone: _telefoneController.text,
+          senha: _senhaController.text,
+          cpf: _cpfController.text,
+          imagem: _imagemController.text ?? '',
+          estado: estado,
+          cidade: cidade,
+          endereco: _enderecoController.text,
+          numero: _numeroController.text,
+          complemento: _complementoController.text,
+          carro: _possuiCarro.toString(),
+          descricao: _descricaoController.text
+        );
+
+        
+
+        Provider.of<Prestadores>(context, listen: false).adiciona(prestador);
+      }
+    } catch (e) {
+      print('Erro de criação de usuário no Firebase Authentication: $e');
+    }
   }
 
   Future<void> _getImage() async {

@@ -1,8 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cuidadoamigoapp/models/cliente.dart';
 import 'package:cuidadoamigoapp/models/servico.dart';
-import 'package:cuidadoamigoapp/views/Cliente/detalhamento.dart';
+import 'package:cuidadoamigoapp/provider/clientes.dart';
+import 'package:cuidadoamigoapp/provider/servicos.dart';
+import 'package:cuidadoamigoapp/views/cliente/detalhamento.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Agenda extends StatefulWidget {
   const Agenda({Key? key});
@@ -11,70 +15,46 @@ class Agenda extends StatefulWidget {
   _AgendaState createState() => _AgendaState();
 }
 
+// ...
+
 class _AgendaState extends State<Agenda> {
   FirebaseAuth _auth = FirebaseAuth.instance;
-  List<Servico> servicosDoCliente = [];
-  List<Servico> servicosEmAberto = [];
-  List<Servico> servicosFinalizados = [];
-  bool exibirEmAberto = true; // Variável para controlar a exibição de serviços em aberto ou finalizados
+  bool exibirEmAberto = true;
 
   @override
   void initState() {
     super.initState();
-
-    final User? user = _auth.currentUser;
-
-    if (user != null) {
-      final firestore = FirebaseFirestore.instance;
-      firestore
-          .collection("Servicos")
-          .where("usuario", isEqualTo: user.uid)
-          .get()
-          .then((querySnapshot) {
-        servicosDoCliente.clear();
-        final now = DateTime.now();
-        querySnapshot.docs.forEach((document) {
-          final servico = Servico.fromMap(document.data() as Map<String, dynamic>);
-          final servicoDateTime = parseDateAndTime(servico.data, servico.horaInicio);
-
-          // Verificar se o serviço é em aberto (data e horaFim após o momento atual)
-          if (servicoDateTime.isAfter(now)) {
-            servicosEmAberto.add(servico);
-          }
-          // Verificar se o serviço é finalizado (data e horaFim antes do momento atual)
-          else if (servicoDateTime.isBefore(now)) {
-            servicosFinalizados.add(servico);
-          }
-        });
-
-        setState(() {
-          servicosDoCliente = servicosEmAberto;
-        });
-      });
-    }
+    _loadData();
   }
 
-  DateTime parseDateAndTime(String date, String hour) {
-    final dateParts = date.split('/');
-    final timeParts = hour.split(':');
-    final day = int.parse(dateParts[0]);
-    final month = int.parse(dateParts[1]);
-    final year = int.parse(dateParts[2]);
-    final hourOfDay = int.parse(timeParts[0]);
-    final minute = int.parse(timeParts[1]);
-    return DateTime(year, month, day, hourOfDay, minute);
+  Future<void> _loadData() async {
+    final user = _auth.currentUser;
+    final servicosProvider = Provider.of<Servicos>(context, listen: false);
+
+    if (user == null) {
+      return;
+    }
+
+    try {
+      await servicosProvider.loadServicosFromFirestore();
+    } catch (e) {
+      print('Erro ao carregar serviços: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final servicosProvider = Provider.of<Servicos>(context);
+    final servicosDoCliente = servicosProvider.listEvento;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF73C9C9),
         title: const Text('Minha Agenda'),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back), // Ícone de seta voltar
+          icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.of(context).pushNamed("/homeIdoso"); // Navega de volta à tela anterior
+            Navigator.of(context).pushNamed("/homeIdoso");
           },
         ),
       ),
@@ -87,7 +67,6 @@ class _AgendaState extends State<Agenda> {
                 onPressed: () {
                   setState(() {
                     exibirEmAberto = true;
-                    servicosDoCliente = servicosEmAberto;
                   });
                 },
                 style: ElevatedButton.styleFrom(
@@ -99,7 +78,6 @@ class _AgendaState extends State<Agenda> {
                 onPressed: () {
                   setState(() {
                     exibirEmAberto = false;
-                    servicosDoCliente = servicosFinalizados;
                   });
                 },
                 style: ElevatedButton.styleFrom(
@@ -110,39 +88,48 @@ class _AgendaState extends State<Agenda> {
             ],
           ),
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(16.0),
-              children: servicosDoCliente.map((servico) {
-                return _buildServiceItem(servico);
-              }).toList(),
-            ),
+            child: servicosProvider.isLoading
+                ? Center(child: CircularProgressIndicator())
+                : ListView(
+                    padding: const EdgeInsets.all(16.0),
+                    children: servicosDoCliente
+                        .where((servico) =>
+                            exibirEmAberto
+                                ? servico.isEmAberto
+                                : servico.isFinalizado)
+                        .map((servico) {
+                      return _buildServiceItem(servico);
+                    }).toList(),
+                  ),
           ),
         ],
       ),
     );
   }
 
- Widget _buildServiceItem(Servico servico) {
-  return Card(
-    elevation: 4,
-    margin: const EdgeInsets.only(bottom: 16),
-    child: ListTile(
-      title: Text('Data: ${servico.data}'),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Horário: ${servico.horaInicio} - ${servico.horaFim}'),
-          Text('Endereço: ${servico.endereco}'),
-        ],
+  Widget _buildServiceItem(Servico servico) {
+    return Card(
+      elevation: 4,
+      margin: const EdgeInsets.only(bottom: 16),
+      child: ListTile(
+        title: Text('Data: ${servico.data}'),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Horário: ${servico.horaInicio} - ${servico.horaFim}'),
+            Text('Endereço: ${servico.endereco}'),
+          ],
+        ),
+        onTap: servico.isEmAberto
+            ? () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => DetalhesServico(servico: servico),
+                  ),
+                );
+              }
+            : null,
       ),
-      onTap: servicosEmAberto.contains(servico) ? () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => DetalhesServico(servico: servico),
-          ),
-        );
-      } : null, // Define onTap como nulo se não estiver em "Em Aberto"
-    ),
-  );
-}
+    );
+  }
 }
