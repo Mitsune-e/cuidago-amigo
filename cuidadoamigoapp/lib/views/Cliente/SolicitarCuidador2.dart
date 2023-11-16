@@ -1,5 +1,6 @@
 import 'package:cuidadoamigoapp/models/cliente.dart';
 import 'package:cuidadoamigoapp/provider/Clientes.dart';
+import 'package:cuidadoamigoapp/provider/Prestadores.dart';
 import 'package:cuidadoamigoapp/provider/servicos.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -212,7 +213,7 @@ Future<void> _loadCuidadores() async {
                                   complemento: dataToPass['complemento'],
                                   estado: dataToPass['estado'],
                                   cidade: dataToPass['cidade'],
-                                  valor: dataToPass['valor'],
+                                  valor: dataToPass['valor'].toString(),
                                 );
                               
 
@@ -236,6 +237,14 @@ Future<void> _loadCuidadores() async {
                                     ),
                                   );
                                 }
+
+                                //Atualizar a lista de servicos do pestador 
+
+                                final prestadoresProvider = Prestadores();
+                                final prestador = await prestadoresProvider.loadClienteById(prestadorID);
+                                  prestador!.servicos!.add(servico.id);
+
+                          
                               qrCodeData = 'ServiçoID:${servico.id}';
                                _mostrarQRCodeDialog(context);
                                 // Adicione código para lidar com o sucesso do agendamento aqui
