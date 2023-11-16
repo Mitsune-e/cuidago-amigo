@@ -43,7 +43,7 @@ class _AgendaState extends State<Agenda> {
     }
 
     try {
-      await servicosProvider.loadServicosFromFirestore();
+      await servicosProvider.loadServicosByUsuario(user.uid);
       // Atualize a variável _dataLoaded após o carregamento bem-sucedido
       setState(() {
         _dataLoaded = true;
