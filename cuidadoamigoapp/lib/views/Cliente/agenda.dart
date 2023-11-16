@@ -16,18 +16,25 @@ class Agenda extends StatefulWidget {
 }
 
 // ...
-
 class _AgendaState extends State<Agenda> {
   FirebaseAuth _auth = FirebaseAuth.instance;
   bool exibirEmAberto = true;
+  bool _dataLoaded = false;
 
   @override
   void initState() {
     super.initState();
-    _loadData();
+    // Chame _loadData apenas uma vez após o término do ciclo de construção inicial
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      _loadData();
+    });
   }
 
   Future<void> _loadData() async {
+    if (_dataLoaded) {
+      return;
+    }
+
     final user = _auth.currentUser;
     final servicosProvider = Provider.of<Servicos>(context, listen: false);
 
@@ -37,6 +44,10 @@ class _AgendaState extends State<Agenda> {
 
     try {
       await servicosProvider.loadServicosFromFirestore();
+      // Atualize a variável _dataLoaded após o carregamento bem-sucedido
+      setState(() {
+        _dataLoaded = true;
+      });
     } catch (e) {
       print('Erro ao carregar serviços: $e');
     }
@@ -88,9 +99,8 @@ class _AgendaState extends State<Agenda> {
             ],
           ),
           Expanded(
-            child: servicosProvider.isLoading
-                ? Center(child: CircularProgressIndicator())
-                : ListView(
+            child: _dataLoaded
+                ? ListView(
                     padding: const EdgeInsets.all(16.0),
                     children: servicosDoCliente
                         .where((servico) =>
@@ -100,7 +110,8 @@ class _AgendaState extends State<Agenda> {
                         .map((servico) {
                       return _buildServiceItem(servico);
                     }).toList(),
-                  ),
+                  )
+                : Center(child: CircularProgressIndicator()),
           ),
         ],
       ),

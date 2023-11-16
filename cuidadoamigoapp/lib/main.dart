@@ -6,6 +6,7 @@ import 'package:cuidadoamigoapp/provider/servicos.dart';
 import 'package:cuidadoamigoapp/views/Prestador/CadastroCuidado.dart';
 import 'package:cuidadoamigoapp/views/Cliente/Perfil.dart';
 import 'package:cuidadoamigoapp/views/Prestador/Carteira.dart';
+import 'package:cuidadoamigoapp/views/Prestador/perfilCuidado.dart';
 import 'package:cuidadoamigoapp/views/RecuperarSenha.dart';
 import 'package:cuidadoamigoapp/views/Cliente/SolicitarCuidado1.dart';
 import 'package:cuidadoamigoapp/views/Cliente/SolicitarCuidador2.dart';
@@ -59,6 +60,7 @@ class MyApp extends StatelessWidget {
         '/solicitarCuidador1':(context) => SolicitarCuidado1(),
         '/solicitarCuidador2':(context) => CuidadorInfoPage(),
         '/carteira':(context) => Carteira(),
+        '/perfilPrestador':(context) => PerfilCuidador(),
       },
     );
   }

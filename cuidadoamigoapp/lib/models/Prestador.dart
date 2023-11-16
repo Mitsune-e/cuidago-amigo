@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 class Prestador {
   final String id;
   final String name;
@@ -12,7 +14,7 @@ class Prestador {
   final String numero;
   final String complemento;
   final String descricao;
-  final String carro;
+  final bool carro;
   List<String>? servicos;
   List<String>? Datas;
 

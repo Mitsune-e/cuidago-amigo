@@ -660,7 +660,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
           endereco: _enderecoController.text,
           numero: _numeroController.text,
           complemento: _complementoController.text,
-          carro: _possuiCarro.toString(),
+          carro: _possuiCarro,
           descricao: _descricaoController.text
         );
 

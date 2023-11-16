@@ -5,6 +5,9 @@ class HomePrestador extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Aqui você precisará ajustar a lógica para verificar se o usuário é um prestador
+    bool isPrestador = true; // Substitua isso pela sua lógica de verificação
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF73C9C9),
@@ -20,55 +23,57 @@ class HomePrestador extends StatelessWidget {
                Navigator.of(context).pushReplacementNamed('/carteira');
             },
             icon: const Icon(
-                Icons.wallet), // Ícone de notificações à direita
+                Icons.wallet), // Ícone de carteira à direita
           ),
           IconButton(
             onPressed: () {
-              // Adicione ação para visualizar perfil do prestador
+              Navigator.of(context).pushReplacementNamed('/perfilPrestador');
             },
             icon: const Icon(Icons.person), // Ícone de perfil à direita
           ),
         ],
       ),
-      body: const Center(
+      body: Center(
         child: Padding(
-          padding: EdgeInsets.only(bottom: 175.0),
+          padding: const EdgeInsets.only(bottom: 175.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircleAvatar(
+              /*CircleAvatar(
                 radius: 80,
                 backgroundColor: Colors.white,
+                // Adicione uma imagem do prestador aqui
+                backgroundImage: AssetImage('caminho/para/sua/imagem.jpg'),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Text(
                 'Bem-vindo(a), Nome do Prestador',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
-              ),
-              SizedBox(height: 40),
+              ),*/
+              const SizedBox(height: 40),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  /* _buildSquare(
+                  _buildSquare(
                     context,
                     'Iniciar Serviço',
-                    'Assets/imagens/iniciar_servico.png',
+                    Icons.play_arrow,
                     () {
                       // Adicione ação para iniciar serviço
                     },
-                  ),*/
-                  /*SizedBox(width: 20),
+                  ),
+                  const SizedBox(width: 20),
                   _buildSquare(
                     context,
                     'Solicitações',
-                    'Assets/imagens/solicitacoes.png',
+                    Icons.notification_important,
                     () {
                       // Adicione ação para visualizar solicitações
                     },
-                  ),*/
+                  ),
                 ],
               ),
             ],
@@ -78,8 +83,8 @@ class HomePrestador extends StatelessWidget {
     );
   }
 
-  Widget _buildSquare(BuildContext context, String title, String imagePath,
-      VoidCallback onPressed) {
+  Widget _buildSquare(
+      BuildContext context, String title, IconData icon, VoidCallback onPressed) {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
@@ -89,10 +94,10 @@ class HomePrestador extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              imagePath,
-              width: 80,
-              height: 80,
+            Icon(
+              icon,
+              color: Colors.white,
+              size: 80,
             ),
             const SizedBox(height: 10),
             Text(

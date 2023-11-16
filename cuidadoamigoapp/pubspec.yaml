@@ -52,6 +52,8 @@ dependencies:
   csc_picker: ^0.2.7
   easy_localization: ^3.0.3
   cached_network_image: ^3.3.0
+  fl_chart: ^0.64.0
+  qr_flutter: ^4.1.0
 
 dev_dependencies:
   flutter_test:

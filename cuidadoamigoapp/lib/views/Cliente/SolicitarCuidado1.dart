@@ -26,9 +26,12 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
   String cidade = '';
   TextEditingController enderecoController = TextEditingController();
   double valor = 0.0;
+  double valorHoraEnfermeiro = 20.0;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   GlobalKey<CSCPickerState> _cscPickerKey = GlobalKey<CSCPickerState>();
+  TextEditingController stateController = TextEditingController();
+  TextEditingController cityController = TextEditingController();
 
 
 
@@ -179,7 +182,11 @@ Future<void> _loadUserData(String userId) async {
                       onPressed: () async {
                         setState(() {
                           _loadUserData(_auth.currentUser!.uid);
+                                stateController.text = estado;
+                                cityController.text = cidade;
                         });
+                         final cscPickerState = _cscPickerKey.currentState;
+                         
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF73C9C9),
@@ -202,6 +209,8 @@ Future<void> _loadUserData(String userId) async {
                       onPressed: () {
                         setState(() {
                           // Limpar os campos ao clicar em Novo
+                          stateController.clear();
+                          cityController.clear();
                           enderecoController.clear();
                           numeroController.clear();
                           complementoController.clear();
@@ -230,10 +239,11 @@ Future<void> _loadUserData(String userId) async {
                   children: [
                     const SizedBox(height: 20),
                     CSCPicker(
+                      key: _cscPickerKey,
                       currentCountry: "Brazil",
                       defaultCountry: CscCountry.Brazil,
-                      currentState: estado,
-                      currentCity: cidade,
+                      currentState: stateController.text,
+                      currentCity: cityController.text,
                       disableCountry: true,
                     
                       flagState: CountryFlag.DISABLE,
@@ -431,16 +441,32 @@ Future<void> _loadUserData(String userId) async {
         enderecoController.text.isNotEmpty &&
         numeroController.text.isNotEmpty;
   }
+void _updateValor() {
+  if (selectedTimeInicio != null && selectedTimeFim != null) {
+    final timeDifference = selectedTimeFim!.difference(selectedTimeInicio!);
+    if (timeDifference.inMinutes >= 30) {
+      // Lógica para calcular o valor baseado no tempo e outros fatores
+      double valorBase = timeDifference.inMinutes.toDouble() / 60 * valorHoraEnfermeiro;
 
-  void _updateValor() {
-    if (selectedTimeInicio != null && selectedTimeFim != null) {
-      final timeDifference = selectedTimeFim!.difference(selectedTimeInicio!);
-      if (timeDifference.inMinutes >= 30) {
-        valor = timeDifference.inMinutes.toDouble() / 60 * 20.0;
-      } else {
-        // Defina um valor padrão ou mostre uma mensagem de erro
-      }
-      setState(() {});
+      // Lógica para adicionar possíveis custos adicionais (exemplo: deslocamento)
+      double custoDeslocamentoPercentual = 0.10; // 10% do valorBase como custo de deslocamento
+      double custoDeslocamento = valorBase * custoDeslocamentoPercentual;
+
+      // Lógica para adicionar margem de lucro
+      double margemLucroPercentual = 0.20; // 20% do valorBase como margem de lucro
+      double margemLucro = valorBase * margemLucroPercentual;
+
+      valor = valorBase + custoDeslocamento + margemLucro;
+    } else {
+      // Defina um valor padrão ou mostre uma mensagem de erro
+      // Exemplo:
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('O tempo mínimo é de 30 minutos.'),
+        ),
+      );
     }
+    setState(() {});
   }
+}
 }

@@ -10,6 +10,7 @@ class Servico {
   final String complemento;
   final String cidade;
   final String estado ;
+  final String valor;
 
   Servico({
     required this.id,
@@ -23,6 +24,7 @@ class Servico {
     required this.complemento,
     required this.cidade,
     required this.estado,
+    required this.valor,
   });
   Servico.fromMap(Map<String, dynamic> map)
         : id = map["id"] ?? "",
@@ -35,7 +37,8 @@ class Servico {
         numero = map['numero'] ?? "",
         complemento = map['complemento'] ?? "",
         estado = map['estado'] ?? "",
-        cidade = map['cidade'] ?? "";
+        cidade = map['cidade'] ?? "",
+        valor = map['valor'] ?? "";
 
   Map<String, dynamic> toMap() {
     return {
@@ -50,6 +53,7 @@ class Servico {
       "Complemento":complemento,
       "cidade" : cidade,
       "estado": estado,
+      "valor":valor,
     };
   }
    bool get isEmAberto {

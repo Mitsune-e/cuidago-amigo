@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cuidadoamigoapp/models/Prestador.dart';
 import 'package:cuidadoamigoapp/models/cliente.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -8,14 +9,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:csc_picker/csc_picker.dart';
 
-class Perfil extends StatefulWidget {
-  const Perfil({Key? key}) : super(key: key);
+class PerfilCuidador extends StatefulWidget {
+  const PerfilCuidador({Key? key}) : super(key: key);
 
   @override
   _PerfilState createState() => _PerfilState();
 }
 
-class _PerfilState extends State<Perfil> {
+class _PerfilState extends State<PerfilCuidador> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final TextEditingController _nomeController = TextEditingController();
@@ -32,6 +33,8 @@ class _PerfilState extends State<Perfil> {
   var cidade_novo = "";
   List<String> cliente_enderecos = [];
   bool _isLoadingImage = true;
+  final TextEditingController _descricaoController = TextEditingController();
+  bool _possuiCarro = false;
   
   @override
   void initState() {
@@ -54,24 +57,26 @@ Future<void> _loadData() async {
 
   Future<void> _loadUserData(String userId) async {
   try {
-    DocumentSnapshot userDoc = await _firestore.collection('Clientes').doc(userId).get();
+    DocumentSnapshot userDoc = await _firestore.collection('Prestadores').doc(userId).get();
 
     if (userDoc.exists) {
       Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
 
-      Cliente cliente = Cliente.fromMap(userData);
+      Prestador prestador = Prestador.fromMap(userData);
 
       setState(() {
-        _nomeController.text = cliente.name ?? '';
-        _cpfController.text = cliente.cpf ?? '';
-        _emailController.text = cliente.email ?? '';
-        _telefoneController.text = cliente.telefone ?? '';
-        estado = cliente.estado ?? '';
-        cidade = cliente.cidade ?? '';
-        _enderecoController.text = cliente.endereco ?? '';
-        _numeroController.text = cliente.numero ?? '';
-        _complementoController.text = cliente.complemento ?? '';
-        imageUrl = cliente.imagem ?? '';
+        _nomeController.text = prestador.name ?? '';
+        _cpfController.text = prestador.cpf ?? '';
+        _emailController.text = prestador.email ?? '';
+        _telefoneController.text = prestador.telefone ?? '';
+        estado = prestador.estado ?? '';
+        cidade = prestador.cidade ?? '';
+        _enderecoController.text = prestador.endereco ?? '';
+        _numeroController.text = prestador.numero ?? '';
+        _complementoController.text = prestador.complemento ?? '';
+        imageUrl = prestador.imagem ?? '';
+        _descricaoController.text = prestador.descricao ?? '' ;
+        _possuiCarro = prestador.carro;
 
 
         _isLoadingImage = false;
@@ -165,6 +170,12 @@ Future<String> fazerUploadEObterUrl(String imagePath) async {
     
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.of(context).popAndPushNamed('/homePrestador');
+          },
+        ),
         title: const Text('Minha Conta'),
         backgroundColor: const Color(0xFF73C9C9),
       ),
@@ -228,7 +239,20 @@ Future<String> fazerUploadEObterUrl(String imagePath) async {
               ],
             ),
             const SizedBox(height: 20),
-            _buildEnderecoBox()
+            _buildEnderecoBox(),
+            const SizedBox(height: 20),
+            _buildInfoBox(
+              title: 'Dados Profissionais',
+              buttonText: 'Editar',
+              onButtonPressed: () {
+                _mostrarEditarProfissionaisDialog();
+              },
+              children: [
+                _buildInfoRow('Descrição', _descricaoController.text),
+                _buildInfoRow('Possui Carro', _possuiCarro ? 'Sim' : 'Não'),
+              ],
+            ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -371,7 +395,7 @@ Future<String> fazerUploadEObterUrl(String imagePath) async {
 
   Future<void> _updateUserData(String userId) async {
     try {
-      await _firestore.collection('Clientes').doc(userId).update({
+      await _firestore.collection('Prestadores').doc(userId).update({
         'name': _nomeController.text,
         'cpf': _cpfController.text,
         'email': _emailController.text,
@@ -382,6 +406,8 @@ Future<String> fazerUploadEObterUrl(String imagePath) async {
         'numero':_numeroController.text,
         'complemento': _complementoController.text,
         'imagem': imageUrl,
+        'carro': _possuiCarro,
+        'descricao': _descricaoController.text,
       });
       await _loadData();
     } catch (e) {
@@ -576,4 +602,66 @@ Widget _buildEnderecoBox() {
   }
 
 
+  void _mostrarEditarProfissionaisDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: const Text('Editar Dados Profissionais'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextFormField(
+                      controller: _descricaoController,
+                      decoration: const InputDecoration(
+                        labelText: 'Descrição',
+                      ),
+                    ),
+                    CheckboxListTile(
+                      title: const Text('Possui Carro?'),
+                      value: _possuiCarro,
+                      onChanged: (value) {
+                        setState(() {
+                          _possuiCarro = value ?? false;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                ElevatedButton(
+                  onPressed: () async {
+                    bool camposPreenchidos = _descricaoController.text.isNotEmpty;
+
+                    if (!camposPreenchidos) {
+                      // Exibir mensagem de erro se algum campo estiver em branco
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Por favor, preencha todos os campos.'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return;
+                    }
+
+                    User? user = _auth.currentUser;
+                    await _updateUserData(user!.uid);
+
+                    await _loadData();
+
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Salvar'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 }

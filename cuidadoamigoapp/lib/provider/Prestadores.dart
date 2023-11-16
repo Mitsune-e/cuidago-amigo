@@ -27,4 +27,36 @@ class Prestadores with ChangeNotifier {
     _firestore.collection('Prestadores').doc(prestador.id).delete();
     notifyListeners();
   }
+
+Future<Prestador?> loadClienteById(String prestadorId) async {
+  try {
+    DocumentSnapshot<Map<String, dynamic>> snapshot =
+        await _firestore.collection('Prestadores').doc(prestadorId).get();
+
+    if (snapshot.exists) {
+      return Prestador.fromMap(snapshot.data()!);
+    } else {
+      return null;
+    }
+  } catch (e) {
+    print('Erro ao carregar cliente: $e');
+    return null;
+  }
+}
+   Prestador? loadClienteByIdSync(String prestadorId) {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> snapshot =
+          _firestore.collection('Prestadores').doc(prestadorId).get() as DocumentSnapshot<Map<String, dynamic>>;
+
+      if (snapshot.exists) {
+        return Prestador.fromMap(snapshot.data()!);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print('Erro ao carregar cliente: $e');
+      return null;
+    }
+  }
+
 }

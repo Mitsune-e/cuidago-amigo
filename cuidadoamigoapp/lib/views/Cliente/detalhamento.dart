@@ -1,4 +1,6 @@
+import 'package:cuidadoamigoapp/models/Prestador.dart';
 import 'package:cuidadoamigoapp/models/servico.dart';
+import 'package:cuidadoamigoapp/provider/Prestadores.dart';
 import 'package:cuidadoamigoapp/provider/servicos.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,114 +14,168 @@ class DetalhesServico extends StatefulWidget {
 }
 
 class _DetalhesServicoState extends State<DetalhesServico> {
-  // Crie uma variável para armazenar o ID do serviço
   late String servicoId;
-
+  Prestador? prestador;
   TextEditingController serviceNameController = TextEditingController();
   TextEditingController serviceDescriptionController = TextEditingController();
   TextEditingController serviceTimeController = TextEditingController();
   TextEditingController serviceAddressController = TextEditingController();
   TextEditingController serviceDateController = TextEditingController();
-  
+
   @override
   void initState() {
     super.initState();
-    // Inicialize os controladores de texto com os valores recebidos
-    serviceNameController.text = "Teste";
-    serviceDescriptionController.text = "Teste";
+    servicoId = widget.servico.id;
+    _carregarPrestadorSync();
     serviceTimeController.text = widget.servico.horaInicio;
     serviceAddressController.text = widget.servico.endereco;
     serviceDateController.text = widget.servico.data;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF73C9C9),
-        title: const Text('Detalhes do Serviço'),
-         leading: IconButton(
-          icon: Icon(Icons.arrow_back), // Ícone de seta voltar
-          onPressed: () {
-            Navigator.of(context).pushNamed("/agenda"); // Navega de volta à tela anterior
-          },
-        ),
+void _carregarPrestadorSync() {
+  prestador = Provider.of<Prestadores>(context, listen: false)
+      .loadClienteByIdSync(widget.servico.prestador);
+
+  if (prestador != null) {
+    serviceNameController.text = prestador!.name;
+  } else {
+    print('Prestador não encontrado');
+  }
+}
+
+ @override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      backgroundColor: const Color(0xFF73C9C9),
+      title: const Text('Detalhes do Serviço'),
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back),
+        onPressed: () {
+          Navigator.of(context).pushNamed("/agenda");
+        },
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const CircleAvatar(
-              backgroundColor: Color(0xFF73C9C9),
-              radius: 60,
-              child: Icon(
-                Icons.person,
-                size: 80,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Nome do Serviço',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Descrição do Serviço',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Hora de Início: 10:00 - Hora de Término: 11:00',
-              style: TextStyle(
-                fontSize: 18,
-              ),
-            ),
-            const Text(
-              'Endereço: 123 Rua Principal, Cidade',
-              style: TextStyle(
-                fontSize: 18,
-              ),
-            ),
-            const Text(
-              'Data: 01/01/2023',
-              style: TextStyle(
-                fontSize: 18,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-               
-                ElevatedButton(
-                  onPressed: () {
-                    _mostrarCancelarServicoDialog(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF73C9C9),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                    ),
-                  ),
-                  child: const Text('Cancelar Serviço'),
+    ),
+   body: Padding(
+    padding: const EdgeInsets.all(16.0),
+    child: FutureBuilder<Prestador?>(
+      future: Provider.of<Prestadores>(context).loadClienteById(widget.servico.prestador),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // Se estiver carregando, você pode exibir um widget de carregamento ou nada.
+          return Container();
+        } else if (snapshot.hasError) {
+          // Se ocorrer um erro, você pode tratá-lo de acordo.
+          return Text('Erro: ${snapshot.error}');
+        } else if (snapshot.hasData) {
+          // Se as informações estiverem prontas, construa a interface do usuário.
+          prestador = snapshot.data!;
+          serviceNameController.text = prestador!.name;
+
+            return SingleChildScrollView(
+              child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const CircleAvatar(
+                backgroundColor: Color(0xFF73C9C9),
+                radius: 60,
+                child: Icon(
+                  Icons.person,
+                  size: 80,
+                  color: Colors.white,
                 ),
+              ),
+              const SizedBox(height: 20),
+               const SizedBox(height: 20),
+              _buildSectionTitle('Informações do Prestador'),
+              if (prestador != null) ...[
+                _buildPrestadorInfo('Nome', prestador!.name),
+                _buildPrestadorInfo('Email', prestador!.email),
+                // Adicione mais informações do prestador conforme necessário
+              ] else ...[
+                Text('Prestador não encontrado'),
               ],
+              _buildSectionTitle('Detalhes do Serviço'),
+              Text(
+                'Horario:',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[600],
+                ),
+              ),
+              Text(
+                '${widget.servico.horaInicio} - ${widget.servico.horaFim}',
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+              _buildServiceInfo('Endereço', widget.servico.endereco),
+              _buildServiceInfo('Data', widget.servico.data),
+             _buildServiceInfo('Valor', 'R\$ ${double.parse(widget.servico.valor).toStringAsFixed(2)}'),
+              const SizedBox(height: 20),
+              ElevatedButton(
+              onPressed: () {
+                WidgetsBinding.instance!.addPostFrameCallback((_) {
+                  _mostrarCancelarServicoDialog(context);
+                });
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF73C9C9),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                ),
+              ),
+              child: const Text('Cancelar Serviço'),
             ),
-          ],
-        ),
+                        ],
+          ),
+      );} else {
+            // Se as informações não estiverem disponíveis, você pode tratar isso de acordo.
+            return Text('Prestador não encontrado');
+          }
+        },
+      ),
+    ),
+  );
+}
+
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
       ),
     );
   }
 
- 
+  Widget _buildServiceInfo(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '$label:',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey[600],
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 18,
+          ),
+        ),
+        const SizedBox(height: 10),
+      ],
+    );
+  }
+
+  Widget _buildPrestadorInfo(String label, String value) {
+    return _buildServiceInfo(label, value);
+  }
 
   void _mostrarCancelarServicoDialog(BuildContext context) {
     showDialog(
@@ -137,7 +193,7 @@ class _DetalhesServicoState extends State<DetalhesServico> {
             ),
             TextButton(
               onPressed: () {
-                Provider.of<Servicos>(context,listen: false).remove(widget.servico);
+                Provider.of<Servicos>(context, listen: false).remove(widget.servico);
                 Navigator.of(context).pop();
                 Navigator.of(context).pushNamed('/agenda');
               },

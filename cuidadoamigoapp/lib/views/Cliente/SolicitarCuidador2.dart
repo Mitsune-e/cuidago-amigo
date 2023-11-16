@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cuidadoamigoapp/models/servico.dart';
 import 'package:uuid/uuid.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+
 
 class CuidadorInfoPage extends StatefulWidget {
   const CuidadorInfoPage({Key? key}) : super(key: key);
@@ -20,32 +22,49 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
   FirebaseAuth _auth = FirebaseAuth.instance;
   int currentIndex = 0;
   bool isLoading = true;
+  String navegacaoInstrucao = "";
+  late String qrCodeData; 
 
-
-  @override
-  void initState() {
-    super.initState();
-    _loadCuidadores();
-  }
-
-Future<void> _loadCuidadores() async {
-  try {
-    final prestadoresSnapshot = await _firestore.collection('Prestadores').get();
-    print(prestadoresSnapshot.docs); // Adicione esta linha
-    setState(() {
-      cuidadores = prestadoresSnapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
-      isLoading = false;
-    });
-  } catch (e) {
-    // Lidar com erros, como falta de conexão com a internet, aqui
-    print('Erro ao carregar cuidadores: $e');
-  }
+@override
+void didChangeDependencies() {
+  super.didChangeDependencies();
+  _loadCuidadores();
 }
 
+Future<void> _loadCuidadores() async {
+  final Map<String, dynamic> dataToPass = ModalRoute.of(context!)!.settings.arguments as Map<String, dynamic>;
+
+  try {
+    User? user = _auth.currentUser;
+    final clienteSnapshot = await _firestore.collection('Clientes').doc(user!.uid).get();
+
+    if (clienteSnapshot.exists) {
+      final clienteData = clienteSnapshot.data() as Map<String, dynamic>;
+
+      final prestadoresSnapshot = await _firestore.collection('Prestadores')
+          .where('estado', isEqualTo: dataToPass['estado'])
+          .where('cidade', isEqualTo: dataToPass['cidade'])
+          .get();
+
+      if (prestadoresSnapshot.size > 0) {
+        setState(() {
+          cuidadores = prestadoresSnapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+        });
+      }
+    }
+  } catch (e) {
+    print('Erro ao carregar cuidadores: $e');
+  } finally {
+    setState(() {
+      isLoading = false;
+    });
+  }
+}
   @override
   Widget build(BuildContext context) {
-     final Map<String, dynamic> dataToPass = ModalRoute.of(context!)!.settings.arguments as Map<String, dynamic>;
-     User? user = _auth.currentUser;
+    final Map<String, dynamic> dataToPass = ModalRoute.of(context!)!.settings.arguments as Map<String, dynamic>;
+    User? user = _auth.currentUser;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Detalhes do Cuidador'),
@@ -59,10 +78,14 @@ Future<void> _loadCuidadores() async {
           ),
         ],
       ),
-      body: isLoading
+     body: isLoading
+        ? Center(
+            child: CircularProgressIndicator(),
+          )
+        : cuidadores.isEmpty
           ? Center(
-              child: CircularProgressIndicator(),
-            )
+              child: Text('Nenhum cuidador disponível na sua região no momento.'),
+             )
           : GestureDetector(
               onHorizontalDragEnd: (details) {
                 if (details.primaryVelocity! > 0) {
@@ -93,12 +116,53 @@ Future<void> _loadCuidadores() async {
                       child: ListView(
                         shrinkWrap: true,
                         children: [
-                          Icon(
-                            cuidadores[currentIndex]['foto'] ?? Icons.person,
-                            size: 80.0,
-                            color: const Color(0xFF73C9C9),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.arrow_back),
+                                onPressed: () {
+                                  if (currentIndex > 0) {
+                                    setState(() {
+                                      currentIndex--;
+                                    });
+                                  }
+                                },
+                              ),
+                              Text(navegacaoInstrucao),
+                              IconButton(
+                                icon: Icon(Icons.arrow_forward),
+                                onPressed: () {
+                                  if (currentIndex < cuidadores.length - 1) {
+                                    setState(() {
+                                      currentIndex++;
+                                    });
+                                  }
+                                },
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Icon(
+                                cuidadores[currentIndex]['foto'] ?? Icons.person,
+                                size: 80.0,
+                                color: const Color(0xFF73C9C9),
+                              ),
+                              cuidadores[currentIndex]['carro'] == 'true'
+                                  ? const Icon(Icons.directions_car, color: Colors.green)
+                                  : Row(
+                                      children: [
+                                        const Icon(Icons.directions_car),
+                                        const SizedBox(width: 5),
+                                        const Icon(Icons.clear, color: Colors.red),
+                                      ],
+                                    ),
+                            ],
+                          ),
+                                                    const SizedBox(height: 20),
                           Text(
                             cuidadores[currentIndex]['name'] ?? 'Nome do Cuidador',
                             style: const TextStyle(
@@ -107,6 +171,7 @@ Future<void> _loadCuidadores() async {
                             ),
                           ),
                           const SizedBox(height: 10),
+                          Text('Descrição:'),
                           Text(
                             cuidadores[currentIndex]['descricao'] ?? 'Descrição do Cuidador',
                             textAlign: TextAlign.center,
@@ -128,12 +193,11 @@ Future<void> _loadCuidadores() async {
                                 title: Text(topico),
                               ),
                           const SizedBox(height: 20),
-                         ElevatedButton(
+                          ElevatedButton(
                             onPressed: () async {
                               final cuidadorSelecionado = cuidadores[currentIndex];
                               final prestadorID = cuidadorSelecionado['id'];
-                              print(dataToPass);
-
+                              
                               if (cuidadores.isNotEmpty && currentIndex < cuidadores.length) {
                                 // Crie o serviço
                                 final servico = Servico(
@@ -147,10 +211,11 @@ Future<void> _loadCuidadores() async {
                                   numero: dataToPass['numero'],
                                   complemento: dataToPass['complemento'],
                                   estado: dataToPass['estado'],
-                                  cidade: dataToPass['cidade']
-
+                                  cidade: dataToPass['cidade'],
+                                  valor: dataToPass['valor'],
                                 );
-                               
+                              
+
                                 // Use o provider para adicionar o serviço ao banco de dados
                                 final servicosProvider = Servicos();
                                 servicosProvider.adiciona(servico);
@@ -171,17 +236,14 @@ Future<void> _loadCuidadores() async {
                                     ),
                                   );
                                 }
-
+                              qrCodeData = 'ServiçoID:${servico.id}';
+                               _mostrarQRCodeDialog(context);
                                 // Adicione código para lidar com o sucesso do agendamento aqui
                                 print('Serviço agendado com sucesso');
-                                Navigator.of(context).pushNamed('/homeIdoso');
-                              } else {
-                                // Mostrar uma mensagem de erro ou fazer alguma outra ação
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Por favor, selecione um cuidador antes de finalizar o agendamento.'),
-                                  ),
-                                );
+                                //Navigator.of(context).pushNamed('/homeIdoso');
+
+                                // Adicione a concatenação ao atributo datas
+                               
                               }
                             },
                             // ...
@@ -247,4 +309,33 @@ Future<void> _loadCuidadores() async {
       },
     );
   }
+
+void _mostrarQRCodeDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('QR Code do Agendamento'),
+        content: Container(
+          width: 200.0, // Set a fixed width
+          height: 200.0, // Set a fixed height
+          child: QrImageView(
+            data: qrCodeData ?? '', // Ensure qrCodeData is not null
+            version: QrVersions.auto,
+          ),
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+             Navigator.of(context).pushNamed('/homeIdoso');// Close the dialog
+            },
+            child: const Text('Concluir'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
 }
