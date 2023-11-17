@@ -5,7 +5,7 @@ import 'package:cuidadoamigoapp/provider/Prestadores.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+
 import 'package:csc_picker/csc_picker.dart';
 import 'package:provider/provider.dart';
 

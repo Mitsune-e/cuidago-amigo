@@ -1,6 +1,4 @@
 
-import 'dart:ffi';
-
 class Prestador {
   final String id;
   final String name;
@@ -16,8 +14,8 @@ class Prestador {
   final String complemento;
   final String descricao;
   final bool carro;
-  String? avaliacao;
-  String? saldo;
+  double avaliacao;
+  double saldo;
   List<String>? servicos;
   List<String>? Datas;
 
@@ -37,13 +35,13 @@ class Prestador {
     required this.numero,
     required this.descricao,
     required this.carro,
-    String?  saldo,
-     String? avaliacao,
+    double saldo = 0.0,
+    double avaliacao = 5.0, 
     List<String>? servicos,
   })   : this.servicos = servicos ?? [],
         this.Datas = servicos ?? [],
-        this.avaliacao = avaliacao ?? '5.0',
-        this.saldo = saldo ?? '0,00'; // Corrigido aqui
+          this.avaliacao = avaliacao,
+        this.saldo = saldo; // Corrigido aqui
 
   Prestador.fromMap(Map<String, dynamic> map)
       : id = map["id"],
@@ -60,8 +58,8 @@ class Prestador {
         complemento = map['complemento'],
         carro = map['carro'],
         descricao = map['descricao'],
-        avaliacao = map['avaliacao'],
-        saldo = map['saldo'],
+        saldo = (map['saldo'] as num?)?.toDouble() ?? 0.0,
+        avaliacao = (map['avaliacao'] as num?)?.toDouble() ?? 5.0,
         Datas = List<String>.from(map["Datas"] ?? []),
         servicos = List<String>.from(map["servicos"] ?? []);
    

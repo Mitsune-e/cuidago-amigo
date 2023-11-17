@@ -3,6 +3,11 @@ import 'package:cuidadoamigoapp/models/servico.dart';
 import 'package:cuidadoamigoapp/views/Cliente/detalhamento.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:timezone/data/latest.dart' as tzdata;
+import 'package:timezone/data/latest.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/timezone.dart';
 
 class Agenda extends StatefulWidget {
   const Agenda({Key? key});
@@ -22,6 +27,21 @@ class _AgendaState extends State<Agenda> {
   void initState() {
     super.initState();
 
+      // Carregue os dados de fuso horário
+      // Configurar o fuso horário para Brasília
+    initializeTimeZones();
+
+    // Obter o fuso horário de Brasília
+    final String brt = 'America/Sao_Paulo';
+    final location = getLocation(brt);
+
+    // Obter a data e hora atual no fuso horário de Brasília
+    var now = DateTime.now().toLocal();
+    now = tz.TZDateTime.from(now, location);
+
+
+     // Configura o fuso horário para o Brasil
+    
     final User? user = _auth.currentUser;
 
     if (user != null) {
@@ -32,10 +52,13 @@ class _AgendaState extends State<Agenda> {
           .get()
           .then((querySnapshot) {
         servicosDoCliente.clear();
-        final now = DateTime.now();
         querySnapshot.docs.forEach((document) {
           final servico = Servico.fromMap(document.data() as Map<String, dynamic>);
-          final servicoDateTime = parseDateAndTime(servico.data, servico.horaInicio);
+          final servicoDateTime = parseDateAndTime(servico.data, servico.horaFim);
+          print(servicoDateTime);
+          print(now);
+          print(servicoDateTime.isAfter(now));
+          
 
           // Verificar se o serviço é em aberto (data e horaFim após o momento atual)
           if (servicoDateTime.isAfter(now)) {

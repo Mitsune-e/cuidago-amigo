@@ -1,4 +1,4 @@
-import 'package:cuidadoamigoapp/models/cliente.dart';
+
 import 'package:cuidadoamigoapp/provider/Clientes.dart';
 import 'package:cuidadoamigoapp/provider/Prestadores.dart';
 import 'package:cuidadoamigoapp/provider/servicos.dart';
@@ -8,7 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cuidadoamigoapp/models/servico.dart';
 import 'package:uuid/uuid.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class CuidadorInfoPage extends StatefulWidget {
   const CuidadorInfoPage({Key? key}) : super(key: key);
@@ -187,6 +187,23 @@ Future<void> _loadCuidadores() async {
                             ),
                           ),
                           const SizedBox(height: 10),
+                          RatingBar.builder(
+                          initialRating: cuidadores[currentIndex]['avaliacao'] ?? 0.0,
+                          minRating: 0,
+                          direction: Axis.horizontal,
+                          allowHalfRating: true,
+                          itemCount: 5,
+                          itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          itemBuilder: (context, _) => const Icon(
+                            Icons.star,
+                            color: Colors.amber,
+                          ),
+                          onRatingUpdate: (rating) {
+                            // Trate a atualização da avaliação, se necessário
+                          },
+                        ),
+
+    const SizedBox(height: 20),
                           if (cuidadores[currentIndex]['topicos'] is List<String>)
                             for (String topico in cuidadores[currentIndex]['topicos'])
                               ListTile(
@@ -242,7 +259,12 @@ Future<void> _loadCuidadores() async {
 
                                 final prestadoresProvider = Prestadores();
                                 final prestador = await prestadoresProvider.loadClienteById(prestadorID);
-                                  prestador!.servicos!.add(servico.id);
+                                prestador!.servicos!.add(servico.id);
+                                prestador!.saldo += dataToPass['valor']; 
+                                  
+                                  
+                                  await prestadoresProvider.adiciona(prestador);
+                                  print(prestador.id);
 
                           
                               qrCodeData = 'ServiçoID:${servico.id}';

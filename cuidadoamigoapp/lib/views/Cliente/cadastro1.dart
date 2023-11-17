@@ -6,15 +6,13 @@ import 'package:cuidadoamigoapp/provider/Enderecos.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/date_symbol_data_local.dart';
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:brasil_fields/brasil_fields.dart';
+
 import 'package:csc_picker/csc_picker.dart';
-import 'package:intl/intl.dart';
-import 'package:easy_localization/easy_localization.dart';
+
 
 class Cadastro1 extends StatefulWidget {
   Cadastro1({Key? key}) : super(key: key);

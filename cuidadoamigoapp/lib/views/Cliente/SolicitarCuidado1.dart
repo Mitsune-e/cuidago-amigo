@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:csc_picker/model/select_status_model.dart';
 import 'package:cuidadoamigoapp/widgets/HourPickerSpinner.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:csc_picker/csc_picker.dart';
-import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
+
 
 
 class SolicitarCuidado1 extends StatefulWidget {
@@ -214,6 +215,8 @@ Future<void> _loadUserData(String userId) async {
                           enderecoController.clear();
                           numeroController.clear();
                           complementoController.clear();
+                          cidade = '';
+                          estado = '';
                         });
                       },
                       style: ElevatedButton.styleFrom(
@@ -238,60 +241,35 @@ Future<void> _loadUserData(String userId) async {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 20),
-                    CSCPicker(
-                      key: _cscPickerKey,
-                      currentCountry: "Brazil",
-                      defaultCountry: CscCountry.Brazil,
-                      currentState: stateController.text,
-                      currentCity: cityController.text,
-                      disableCountry: true,
-                    
-                      flagState: CountryFlag.DISABLE,
-                      dropdownDecoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                        color: Colors.white,
-                        border: Border.all(
-                          color: Colors.grey.withOpacity(0.5),
-                          style: BorderStyle.solid,
+                 Row(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Cidade: ${cidade.isNotEmpty ? cidade : 'Nenhuma cidade selecionada'}',
+                        style: const TextStyle(
+                          fontSize: 18,
                         ),
                       ),
-                      disabledDropdownDecoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                        color: Colors.grey[200],
-                        border: Border.all(
-                          color: Colors.grey.withOpacity(0.5),
-                          style: BorderStyle.solid,
+                      SizedBox(height: 10),
+                      Text(
+                        'Estado: ${estado.isNotEmpty ? estado : 'Nenhum estado selecionado'}',
+                        style: const TextStyle(
+                          fontSize: 18,
                         ),
                       ),
-                      selectedItemStyle: TextStyle(
-                        color: Colors.black,
-                        fontSize: 14,
-                      ),
-                      dropdownHeadingStyle: TextStyle(
-                        color: Colors.black,
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      dropdownItemStyle: TextStyle(
-                        color: Colors.black,
-                        fontSize: 14,
-                      ),
-                      dropdownDialogRadius: 10.0,
-                      searchBarRadius: 10.0,
-                      onCountryChanged: (value) {
-                        // Handle country change
-                      },
-                      onStateChanged: (value) {
-                        setState(() {
-                          estado = value.toString();
-                        });
-                      },
-                      onCityChanged: (value) {
-                        setState(() {
-                          cidade =  value.toString();
-                        });
-                      },
-                    ),
+                    ],
+                  ),
+                  SizedBox(width: 10),
+                  IconButton(
+                    icon: const Icon(Icons.edit),
+                    onPressed: () {
+                      _showEditLocationAlert(context);
+                    },
+                  ),
+                ],
+              ),
                     const SizedBox(height: 20),
                     TextFormField(
                       // Campo de Número
@@ -468,5 +446,110 @@ void _updateValor() {
     }
     setState(() {});
   }
+}
+Future<void> _showEditLocationAlert(BuildContext context) async {
+  TextEditingController cidadeController = TextEditingController(text: cidade);
+  TextEditingController estadoController = TextEditingController(text: estado);
+
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: false, // Não pode ser fechado ao tocar fora
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Estado e Cidade'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min, 
+          children: [
+           
+            CSCPicker(
+              key: _cscPickerKey,
+              layout: Layout.vertical,
+              stateSearchPlaceholder: "Pesquise pelo nome do estado",
+              citySearchPlaceholder: "Pesquise pelo nome da cidade",
+              currentCountry: "Brazil",
+              defaultCountry: CscCountry.Brazil, 
+              stateDropdownLabel: 'Selecione o estado',
+              cityDropdownLabel: 'Selecione a cidade',
+              currentState: estadoController.text,
+              currentCity: cidadeController.text,
+              disableCountry: true,
+              flagState: CountryFlag.DISABLE,
+              dropdownDecoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                color: Colors.white,
+                border: Border.all(
+                  color: Colors.grey.withOpacity(0.5),
+                  style: BorderStyle.solid,
+                ),
+              ),
+              disabledDropdownDecoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                color: Colors.grey[200],
+                border: Border.all(
+                  color: Colors.grey.withOpacity(0.5),
+                  style: BorderStyle.solid,
+                ),
+              ),
+              selectedItemStyle: TextStyle(
+                color: Colors.black,
+                fontSize: 14,
+              ),
+              dropdownHeadingStyle: TextStyle(
+                color: Colors.black,
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+              ),
+              dropdownItemStyle: TextStyle(
+                color: Colors.black,
+                fontSize: 14,
+              ),
+              dropdownDialogRadius: 10.0,
+              searchBarRadius: 10.0,
+              onCountryChanged: (value) {
+                // Handle country change
+              },
+              onStateChanged: (value) {
+                setState(() {
+                  estadoController.text = value.toString();
+                });
+              },
+              onCityChanged: (value) {
+                setState(() {
+                  cidadeController.text = value.toString();
+                });
+              },
+            ),
+          ],
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+              onPressed: () {
+                if (cidadeController.text.isNotEmpty && estadoController.text.isNotEmpty && cidadeController.text != 'City') {
+                  setState(() {
+                    cidade = cidadeController.text;
+                    estado = estadoController.text;
+                  });
+                  Navigator.of(context).pop();
+                } else {
+                  // Mostrar mensagem de erro ou realizar alguma ação
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Por favor, preencha cidade e estado.'),
+                    ),
+                  );
+                }
+              },
+              child: const Text('Salvar'),
+            ),
+        ],
+      );
+    },
+  );
 }
 }

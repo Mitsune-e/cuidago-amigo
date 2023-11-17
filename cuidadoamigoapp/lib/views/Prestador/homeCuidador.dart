@@ -1,13 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cuidadoamigoapp/models/cliente.dart';
 import 'package:cuidadoamigoapp/models/servico.dart';
-import 'package:cuidadoamigoapp/provider/clientes.dart';
-import 'package:cuidadoamigoapp/provider/servicos.dart';
 import 'package:cuidadoamigoapp/views/Prestador/detalhamento2.dart';
-import 'package:cuidadoamigoapp/views/cliente/detalhamento.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:timezone/data/latest.dart';
+import 'package:timezone/timezone.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class HomePrestador extends StatefulWidget {
   const HomePrestador({Key? key});
@@ -30,6 +29,17 @@ class  HomePrestadorState extends State< HomePrestador> {
 
     final User? user = _auth.currentUser;
 
+    initializeTimeZones();
+
+    // Obter o fuso horário de Brasília
+    final String brt = 'America/Sao_Paulo';
+    final location = getLocation(brt);
+
+    // Obter a data e hora atual no fuso horário de Brasília
+    var now = DateTime.now().toLocal();
+    now = tz.TZDateTime.from(now, location);
+
+
     if (user != null) {
       final firestore = FirebaseFirestore.instance;
       firestore
@@ -38,10 +48,9 @@ class  HomePrestadorState extends State< HomePrestador> {
           .get()
           .then((querySnapshot) {
         servicosDoCliente.clear();
-        final now = DateTime.now();
         querySnapshot.docs.forEach((document) {
           final servico = Servico.fromMap(document.data() as Map<String, dynamic>);
-          final servicoDateTime = parseDateAndTime(servico.data, servico.horaInicio);
+          final servicoDateTime = parseDateAndTime(servico.data, servico.horaFim);
 
           // Verificar se o serviço é em aberto (data e horaFim após o momento atual)
           if (servicoDateTime.isAfter(now)) {
@@ -73,6 +82,8 @@ class  HomePrestadorState extends State< HomePrestador> {
 
   @override
   Widget build(BuildContext context) {
+    Color buttonBackgroundColor = const Color(0xFF73C9C9).withOpacity(0.8);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF73C9C9),
@@ -85,16 +96,15 @@ class  HomePrestadorState extends State< HomePrestador> {
         actions: [
           IconButton(
             onPressed: () {
-               Navigator.of(context).pushReplacementNamed('/carteira');
+              Navigator.of(context).pushReplacementNamed('/carteira');
             },
-            icon: const Icon(
-                Icons.wallet), // Ícone de carteira à direita
+            icon: const Icon(Icons.wallet),
           ),
           IconButton(
             onPressed: () {
               Navigator.of(context).pushReplacementNamed('/perfilPrestador');
             },
-            icon: const Icon(Icons.person), // Ícone de perfil à direita
+            icon: const Icon(Icons.person),
           ),
         ],
       ),
@@ -103,29 +113,46 @@ class  HomePrestadorState extends State< HomePrestador> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    exibirEmAberto = true;
-                    servicosDoCliente = servicosEmAberto;
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                  primary: exibirEmAberto ? Colors.blue : Colors.grey,
+              Expanded(
+                child: Container(
+                  height: 50,
+                  color: buttonBackgroundColor,
+                  child: TextButton(
+                    onPressed: () {
+                      setState(() {
+                        exibirEmAberto = true;
+                        servicosDoCliente = servicosEmAberto;
+                      });
+                    },
+                    style: TextButton.styleFrom(
+                      primary: exibirEmAberto ? Colors.green : Colors.black,
+                    ),
+                    child: Text('Em Aberto'),
+                  ),
                 ),
-                child: Text('Em Aberto'),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    exibirEmAberto = false;
-                    servicosDoCliente = servicosFinalizados;
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                  primary: !exibirEmAberto ? Colors.blue : Colors.grey,
+              Container(
+                width: 1,
+                height: 50,
+                color: Colors.black, // Linha preta
+              ),
+              Expanded(
+                child: Container(
+                  height: 50,
+                  color: buttonBackgroundColor,
+                  child: TextButton(
+                    onPressed: () {
+                      setState(() {
+                        exibirEmAberto = false;
+                        servicosDoCliente = servicosFinalizados;
+                      });
+                    },
+                    style: TextButton.styleFrom(
+                      primary: !exibirEmAberto ? Colors.green : Colors.black,
+                    ),
+                    child: Text('Finalizadas'),
+                  ),
                 ),
-                child: Text('Finalizadas'),
               ),
             ],
           ),
@@ -142,7 +169,9 @@ class  HomePrestadorState extends State< HomePrestador> {
     );
   }
 
- Widget _buildServiceItem(Servico servico) {
+  Widget _buildServiceItem(Servico servico) {
+  bool showPlayButton = isShowPlayButton(servico);
+
   return Card(
     elevation: 4,
     margin: const EdgeInsets.only(bottom: 16),
@@ -155,14 +184,39 @@ class  HomePrestadorState extends State< HomePrestador> {
           Text('Endereço: ${servico.endereco}'),
         ],
       ),
-      onTap: servicosEmAberto.contains(servico) ? () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => DetalhesServico(servico: servico),
-          ),
-        );
-      } : null, // Define onTap como nulo se não estiver em "Em Aberto"
+      onTap: servicosEmAberto.contains(servico)
+          ? () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => DetalhesServico2(servico: servico),
+                ),
+              );
+            }
+          : null,
+      trailing: showPlayButton
+          ? IconButton(
+              icon: Icon(
+                Icons.play_circle_fill,
+                color: Colors.green,
+                size: 32,
+              ),
+              onPressed: () {
+                // Adicione ação para iniciar o serviço aqui
+              },
+            )
+          : null,
     ),
   );
 }
+
+bool isShowPlayButton(Servico servico) {
+  DateTime now = DateTime.now();
+  DateTime serviceStart = parseDateAndTime(servico.data, servico.horaInicio);
+  DateTime serviceEnd = parseDateAndTime(servico.data, servico.horaFim);
+
+  return (serviceStart.isAtSameMomentAs(now) || serviceStart.isBefore(now))  &&
+      serviceEnd.isAfter(now) &&
+      serviceStart.day == now.day;
 }
+}
+
