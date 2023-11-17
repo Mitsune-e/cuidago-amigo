@@ -1,5 +1,6 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cuidadoamigoapp/Util/Utils.dart';
 import 'package:cuidadoamigoapp/models/cliente.dart';
 import 'package:flutter/material.dart';
 
@@ -9,8 +10,14 @@ class Clientes with ChangeNotifier {
   List<Cliente> listEvento = [];
 
   adiciona(Cliente cliente) {
+  if (Utils.validarCPF(cliente.cpf)) {
     _firestore.collection("Clientes").doc(cliente.id).set(cliente.toMap());
+    print('Está chamando essa função');
+    print(cliente.toMap());
+  } else {
+    print('CPF inválido');
   }
+}
 
   editar(Cliente cliente) {
     // Certifique-se de que o endereço já existe na lista
