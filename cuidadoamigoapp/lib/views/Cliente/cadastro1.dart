@@ -3,18 +3,14 @@ import 'package:cuidadoamigoapp/models/Endereco.dart';
 import 'package:cuidadoamigoapp/models/cliente.dart';
 import 'package:cuidadoamigoapp/provider/Clientes.dart';
 import 'package:cuidadoamigoapp/provider/Enderecos.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/date_symbol_data_local.dart';
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:brasil_fields/brasil_fields.dart';
 import 'package:csc_picker/csc_picker.dart';
-import 'package:intl/intl.dart';
-import 'package:easy_localization/easy_localization.dart';
 
 class Cadastro1 extends StatefulWidget {
   Cadastro1({Key? key}) : super(key: key);
@@ -75,9 +71,10 @@ class _Cadastro1State extends State<Cadastro1> {
     });
   }
 
-  Future<void> _getImage() async {
+  Future<void> _getImage(ImageSource source) async {
     final imagePicker = ImagePicker();
-    final XFile? image = await imagePicker.pickImage(source: ImageSource.gallery);
+    final XFile? image = await imagePicker.pickImage(source: source);
+
     if (image != null) {
       setState(() {
         _image = image;
@@ -176,28 +173,48 @@ void _showRegistrationSuccessDialog(BuildContext context) {
   }
 
   void _registerUser(BuildContext context) async {
-    try {
-      final UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+  try {
+    final UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      email: email.text,
+      password: senha.text,
+    );
+
+    final User? user = userCredential.user;
+    if (user != null) {
+      String imagePath = ''; // Caminho padrão se não houver imagem
+
+      // Verifica se há uma imagem selecionada
+      if (_image != null) {
+      // Cria uma referência para o local no Firebase Storage onde a imagem será armazenada
+      String imageFileName = 'user_${user.uid}_${DateTime.now().millisecondsSinceEpoch}.png';
+      final firebase_storage.Reference storageReference = firebase_storage.FirebaseStorage.instance
+          .ref('Imagens/$imageFileName'); // Substitua pelo caminho desejado
+
+      // Faz o upload da imagem para o Firebase Storage
+      await storageReference.putFile(File(_image!.path));
+
+      // Obtém a URL da imagem no Firebase Storage
+      String imageUrl = await storageReference.getDownloadURL();
+
+      // Atualiza o caminho da imagem no objeto Cliente
+      imagePath = imageUrl;
+    }
+
+      final cliente = Cliente(
+        id: user.uid,
+        name: nome.text,
         email: email.text,
-        password: senha.text,
+        telefone: fone.text,
+        senha: senha.text,
+        cpf: cpf.text,
+        imagem: imagePath,
+        estado: estado,
+        cidade: cidade,
+        endereco: enderecoController.text,
+        numero: numeroController.text,
+        complemento: complementoController.text,
       );
 
-      final User? user = userCredential.user;
-      if (user != null) {
-        final cliente = Cliente(
-          id: user.uid,
-          name: nome.text,
-          email: email.text,
-          telefone: fone.text,
-          senha: senha.text,
-          cpf: cpf.text,
-          imagem: _image?.path ?? '',
-          estado: estado,
-          cidade: cidade,
-          endereco: enderecoController.text,
-          numero: numeroController.text,
-          complemento: complementoController.text,
-        );
 
         if (cepController.text.isNotEmpty &&
             enderecoController.text.isNotEmpty &&
@@ -404,7 +421,7 @@ void _showRegistrationSuccessDialog(BuildContext context) {
     return Column(
       children: [
         ElevatedButton(
-          onPressed: _getImage,
+          onPressed: () => _showImageSourceSelection(context),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.grey,
             shape: const StadiumBorder(),
@@ -445,6 +462,36 @@ void _showRegistrationSuccessDialog(BuildContext context) {
       stateDropdownLabel: "Estado",
       cityDropdownLabel: "cidade",
       dropdownDialogRadius: 30,
+    );
+  }
+
+Future<void> _showImageSourceSelection(BuildContext context) async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Escolher Origem da Imagem'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton(
+                onPressed: () async {
+                  Navigator.pop(context);
+                  await _getImage(ImageSource.gallery);
+                },
+                child: Text('Galeria'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  Navigator.pop(context);
+                  await _getImage(ImageSource.camera);
+                },
+                child: Text('Câmera'),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
