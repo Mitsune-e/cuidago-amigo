@@ -5,7 +5,7 @@ import 'package:cuidadoamigoapp/provider/servicos.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cuidadoamigoapp/models/servico.dart';
+import 'package:cuidadoamigoapp/models/Servico.dart';
 import 'package:uuid/uuid.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -25,6 +25,7 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
   bool isLoading = true;
   String navegacaoInstrucao = "";
   late String qrCodeData; 
+  bool filtroCarro = false;
 
 @override
 void didChangeDependencies() {
@@ -32,8 +33,10 @@ void didChangeDependencies() {
   _loadCuidadores();
 }
 
+
 Future<void> _loadCuidadores() async {
-  final Map<String, dynamic> dataToPass = ModalRoute.of(context!)!.settings.arguments as Map<String, dynamic>;
+  final Map<String, dynamic> dataToPass =
+      ModalRoute.of(context!)!.settings.arguments as Map<String, dynamic>;
 
   try {
     User? user = _auth.currentUser;
@@ -42,14 +45,28 @@ Future<void> _loadCuidadores() async {
     if (clienteSnapshot.exists) {
       final clienteData = clienteSnapshot.data() as Map<String, dynamic>;
 
-      final prestadoresSnapshot = await _firestore.collection('Prestadores')
-          .where('estado', isEqualTo: dataToPass['estado'])
-          .where('cidade', isEqualTo: dataToPass['cidade'])
-          .get();
+      QuerySnapshot prestadoresSnapshot;
+      if (filtroCarro) {
+        // Se o filtroCarro estiver habilitado, filtre também pelo carro
+        prestadoresSnapshot = await _firestore
+            .collection('Prestadores')
+            .where('estado', isEqualTo: dataToPass['estado'])
+            .where('cidade', isEqualTo: dataToPass['cidade'])
+            .where('carro', isEqualTo: true)
+            .get();
+      } else {
+        prestadoresSnapshot = await _firestore
+            .collection('Prestadores')
+            .where('estado', isEqualTo: dataToPass['estado'])
+            .where('cidade', isEqualTo: dataToPass['cidade'])
+            .get();
+      }
 
       if (prestadoresSnapshot.size > 0) {
         setState(() {
-          cuidadores = prestadoresSnapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+          cuidadores = prestadoresSnapshot.docs
+              .map((doc) => doc.data() as Map<String, dynamic>)
+              .toList();
         });
       }
     }
@@ -152,7 +169,7 @@ Future<void> _loadCuidadores() async {
                                 size: 80.0,
                                 color: const Color(0xFF73C9C9),
                               ),
-                              cuidadores[currentIndex]['carro'] == 'true'
+                              cuidadores[currentIndex]['carro'] == true
                                   ? const Icon(Icons.directions_car, color: Colors.green)
                                   : Row(
                                       children: [
@@ -304,42 +321,54 @@ Future<void> _loadCuidadores() async {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Filtros'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Selecione os filtros desejados:'),
-              CheckboxListTile(
-                title: const Text('Filtro 1'),
-                value: false, // Coloque o valor do filtro aqui
-                onChanged: (bool? value) {
-                  // Atualize o valor do filtro aqui
-                },
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Filtros'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Selecione os filtros desejados:'),
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: filtroCarro,
+                        onChanged: (value) {
+                          setState(() {
+                            filtroCarro = value!;
+                          });
+                        },
+                      ),
+                      const Text('Prestador com Carro'),
+                    ],
+                  ),
+                  // Adicione mais filtros conforme necessário
+                ],
               ),
-              CheckboxListTile(
-                title: const Text('Filtro 2'),
-                value: false, // Coloque o valor do filtro aqui
-                onChanged: (bool? value) {
-                  // Atualize o valor do filtro aqui
-                },
-              ),
-              // Adicione mais filtros conforme necessário
-            ],
-          ),
-          actions: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Fechar o diálogo
-              },
-              child: const Text('Aplicar'),
-            ),
-          ],
+              actions: [
+                ElevatedButton(
+                  onPressed: () {
+                    _aplicarFiltros();
+                    Navigator.of(context).pop(); // Fechar o diálogo
+                  },
+                  child: const Text('Aplicar'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    _limparFiltros();
+                    Navigator.of(context).pop(); // Fechar o diálogo
+                  },
+                  child: const Text('Limpar Filtros'),
+                ),
+              ],
+            );
+          },
         );
       },
     );
   }
+
 
 void _mostrarQRCodeDialog(BuildContext context) {
   showDialog(
@@ -368,5 +397,17 @@ void _mostrarQRCodeDialog(BuildContext context) {
   );
 }
 
+
+  void _aplicarFiltros() {
+         _loadCuidadores();
+ 
+  }
+
+  void _limparFiltros() {
+    setState(() {
+      filtroCarro = false;
+    });
+    _loadCuidadores();
+  }
 
 }

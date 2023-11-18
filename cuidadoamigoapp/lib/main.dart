@@ -12,7 +12,6 @@ import 'package:cuidadoamigoapp/views/Cliente/SolicitarCuidado1.dart';
 import 'package:cuidadoamigoapp/views/Cliente/SolicitarCuidador2.dart';
 import 'package:cuidadoamigoapp/views/Cliente/agenda.dart';
 import 'package:cuidadoamigoapp/views/Cliente/cadastro1.dart';
-import 'package:cuidadoamigoapp/provider/Clientes.dart';
 import 'package:cuidadoamigoapp/views/Prestador/homeCuidador.dart';
 import 'package:cuidadoamigoapp/views/login.dart';
 import 'package:cuidadoamigoapp/views/Cliente/homeIdoso.dart';

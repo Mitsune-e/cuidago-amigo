@@ -1,5 +1,5 @@
 import 'package:cuidadoamigoapp/models/Prestador.dart';
-import 'package:cuidadoamigoapp/models/servico.dart';
+import 'package:cuidadoamigoapp/models/Servico.dart';
 import 'package:cuidadoamigoapp/provider/Prestadores.dart';
 import 'package:cuidadoamigoapp/provider/servicos.dart';
 import 'package:flutter/material.dart';
@@ -114,7 +114,8 @@ Widget build(BuildContext context) {
               _buildServiceInfo('Data', widget.servico.data),
              _buildServiceInfo('Valor', 'R\$ ${double.parse(widget.servico.valor).toStringAsFixed(2)}'),
               const SizedBox(height: 20),
-              ElevatedButton(
+             if (!widget.servico.finalizada)
+            ElevatedButton(
               onPressed: () {
                 WidgetsBinding.instance!.addPostFrameCallback((_) {
                   _mostrarCancelarServicoDialog(context);

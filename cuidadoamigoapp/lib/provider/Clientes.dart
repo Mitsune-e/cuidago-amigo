@@ -50,6 +50,22 @@ class Clientes with ChangeNotifier {
   }
 
  
+  Cliente? loadClienteByIdSync(String clienteId) {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> snapshot =
+          _firestore.collection('Clientes').doc(clienteId).get() as DocumentSnapshot<Map<String, dynamic>>;
+
+      if (snapshot.exists) {
+        return Cliente.fromMap(snapshot.data()!);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print('Erro ao carregar cliente: $e');
+      return null;
+    }
+  }
+
   Future<Cliente?> loadClienteById(String clientId) async {
     try {
       DocumentSnapshot<Map<String, dynamic>> snapshot =

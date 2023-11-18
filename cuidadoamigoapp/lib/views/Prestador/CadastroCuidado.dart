@@ -608,7 +608,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context).pushReplacementNamed('/login');
               },
               child: Text('OK'),
             ),

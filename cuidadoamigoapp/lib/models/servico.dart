@@ -9,8 +9,12 @@ class Servico {
   final String numero;
   final String complemento;
   final String cidade;
-  final String estado ;
+  final String estado;
   final String valor;
+  double avaliacao; // Novo campo
+  bool finalizada;
+  bool avaliado;
+  bool destaque;
 
   Servico({
     required this.id,
@@ -25,9 +29,14 @@ class Servico {
     required this.cidade,
     required this.estado,
     required this.valor,
+    this.avaliacao = 0.0, // Valor padrão
+    this.finalizada = false,
+    this.avaliado = false,
+    this.destaque = false,
   });
+
   Servico.fromMap(Map<String, dynamic> map)
-        : id = map["id"] ?? "",
+      : id = map["id"] ?? "",
         data = map["data"] ?? "",
         horaInicio = map["horaInicio"] ?? "",
         horaFim = map["horaFim"] ?? "",
@@ -38,7 +47,11 @@ class Servico {
         complemento = map['complemento'] ?? "",
         estado = map['estado'] ?? "",
         cidade = map['cidade'] ?? "",
-        valor = map['valor'] ?? "";
+        valor = map['valor'] ?? "",
+        avaliacao = (map['avaliacao'] ?? 0.0).toDouble(), // Convertido para double
+        finalizada = map['finalizada'] ?? false,
+        avaliado = map['avaliado'] ?? false,
+        destaque = map['destaque'] ?? false;
 
   Map<String, dynamic> toMap() {
     return {
@@ -50,11 +63,41 @@ class Servico {
       "usuario": usuario,
       "prestador": prestador,
       "numero": numero,
-      "Complemento":complemento,
-      "cidade" : cidade,
+      "Complemento": complemento,
+      "cidade": cidade,
       "estado": estado,
-      "valor":valor,
+      "valor": valor,
+      "avaliacao": avaliacao, // Adicionado campo avaliacao
+      "finalizada": finalizada,
+      "avaliado": avaliado,
+      "destaque": destaque,
     };
+  }
+
+  Servico copyWith({
+    double? avaliacao, // Adicionado parâmetro avaliacao
+    bool? finalizada,
+    bool? avaliado,
+    bool? destaque,
+  }) {
+    return Servico(
+      id: this.id,
+      data: this.data,
+      horaInicio: this.horaInicio,
+      horaFim: this.horaFim,
+      endereco: this.endereco,
+      usuario: this.usuario,
+      prestador: this.prestador,
+      numero: this.numero,
+      complemento: this.complemento,
+      cidade: this.cidade,
+      estado: this.estado,
+      valor: this.valor,
+      avaliacao: avaliacao ?? this.avaliacao, // Atualizado campo avaliacao
+      finalizada: finalizada ?? this.finalizada,
+      avaliado: avaliado ?? this.avaliado,
+      destaque: destaque ?? this.destaque,
+    );
   }
    bool get isEmAberto {
     final now = DateTime.now();
