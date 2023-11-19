@@ -16,6 +16,17 @@ class Servico {
   bool avaliado;
   bool destaque;
 
+static parseDateAndTime(String date, String hour) {
+    final dateParts = date.split('/');
+    final timeParts = hour.split(':');
+    final day = int.parse(dateParts[0]);
+    final month = int.parse(dateParts[1]);
+    final year = int.parse(dateParts[2]);
+    final hourOfDay = int.parse(timeParts[0]);
+    final minute = int.parse(timeParts[1]);
+    return DateTime(year, month, day, hourOfDay, minute);
+  }
+
   Servico({
     required this.id,
     required this.data,
@@ -33,7 +44,11 @@ class Servico {
     this.finalizada = false,
     this.avaliado = false,
     this.destaque = false,
-  });
+  }) : assert(avaliacao >= 0 && avaliacao <= 5), // Garante que a avaliação esteja dentro do intervalo
+        assert(finalizada != avaliado), // Garante que finalizada e avaliado não sejam ambos true
+        assert(finalizada || isEmAberto(data, horaFim)), // Chamada do método _isEmAberto // Garante que um serviço finalizado não esteja em aberto
+        assert(avaliado || !finalizada); // Garante que um serviço não avaliado não está finalizado;
+
 
   Servico.fromMap(Map<String, dynamic> map)
       : id = map["id"] ?? "",
@@ -99,22 +114,11 @@ class Servico {
       destaque: destaque ?? this.destaque,
     );
   }
-   bool get isEmAberto {
+
+  static bool isEmAberto(String data, String horaFim) {
     final now = DateTime.now();
     final servicoDateTime = parseDateAndTime(data, horaFim);
     return servicoDateTime.isAfter(now);
-  }
-
-
-DateTime parseDateAndTime(String date, String hour) {
-    final dateParts = date.split('/');
-    final timeParts = hour.split(':');
-    final day = int.parse(dateParts[0]);
-    final month = int.parse(dateParts[1]);
-    final year = int.parse(dateParts[2]);
-    final hourOfDay = int.parse(timeParts[0]);
-    final minute = int.parse(timeParts[1]);
-    return DateTime(year, month, day, hourOfDay, minute);
   }
 
    bool get isFinalizado {
@@ -125,3 +129,4 @@ DateTime parseDateAndTime(String date, String hour) {
     return now.isAfter(servicoDateTime);
   }
 }
+

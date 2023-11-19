@@ -145,6 +145,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.6"
+  dart_bip21:
+    dependency: "direct main"
+    description:
+      name: dart_bip21
+      sha256: "0de2e7063f74eeb77ae1ccdc0b2ef8b0dbc98e506dc8ccdaaf3fb385fdcb055a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   easy_localization:
     dependency: "direct main"
     description:

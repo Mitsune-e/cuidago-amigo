@@ -41,7 +41,11 @@ Future<Prestador?> loadClienteById(String prestadorId) async {
     print('Erro ao carregar cliente: $e');
     return null;
   }
+ 
 }
+
+
+
    Prestador? loadClienteByIdSync(String prestadorId) {
     try {
       DocumentSnapshot<Map<String, dynamic>> snapshot =

@@ -1,4 +1,3 @@
-
 class Prestador {
   final String id;
   final String name;
@@ -18,6 +17,7 @@ class Prestador {
   double saldo;
   List<String>? servicos;
   List<String>? Datas;
+  final String chavePix;
 
 
   Prestador({
@@ -37,11 +37,12 @@ class Prestador {
     required this.carro,
     double saldo = 0.0,
     double avaliacao = 5.0, 
+    required this.chavePix,
     List<String>? servicos,
-  })   : this.servicos = servicos ?? [],
-        this.Datas = servicos ?? [],
-          this.avaliacao = avaliacao,
-        this.saldo = saldo; // Corrigido aqui
+  })   : this.servicos = servicos ?? [], // Corrigido aqui
+        this.Datas = [], // Corrigido aqui
+        this.avaliacao = (avaliacao >= 0 && avaliacao <= 5) ? avaliacao : 5.0, // Corrigido aqui
+        this.saldo = (saldo >= 0) ? saldo : 0.0; // Corrigido aqui
 
   Prestador.fromMap(Map<String, dynamic> map)
       : id = map["id"],
@@ -60,10 +61,11 @@ class Prestador {
         descricao = map['descricao'],
         saldo = (map['saldo'] as num?)?.toDouble() ?? 0.0,
         avaliacao = (map['avaliacao'] as num?)?.toDouble() ?? 5.0,
+        chavePix = map["chavePix"],
         Datas = List<String>.from(map["Datas"] ?? []),
         servicos = List<String>.from(map["servicos"] ?? []);
-   
         
+  
 
   Map<String, dynamic> toMap() {
     return {
@@ -85,6 +87,7 @@ class Prestador {
       'avaliacao':avaliacao,
       "descricao": descricao,
       "Datas": Datas,
+      "chavepix": chavePix,
     };
   }
 }

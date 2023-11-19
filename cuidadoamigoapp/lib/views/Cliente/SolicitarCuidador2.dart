@@ -1,4 +1,5 @@
-
+import 'package:dart_bip21/dart_bip21.dart' as bip21;
+import 'package:cuidadoamigoapp/models/Prestador.dart';
 import 'package:cuidadoamigoapp/provider/Clientes.dart';
 import 'package:cuidadoamigoapp/provider/Prestadores.dart';
 import 'package:cuidadoamigoapp/provider/servicos.dart';
@@ -6,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cuidadoamigoapp/models/Servico.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -26,6 +28,7 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
   String navegacaoInstrucao = "";
   late String qrCodeData; 
   bool filtroCarro = false;
+  String nomeCliente = "";
 
 @override
 void didChangeDependencies() {
@@ -45,27 +48,47 @@ Future<void> _loadCuidadores() async {
     if (clienteSnapshot.exists) {
       final clienteData = clienteSnapshot.data() as Map<String, dynamic>;
 
+      setState(() {
+        nomeCliente = clienteData['name'] ?? "";
+      });
+      
       QuerySnapshot prestadoresSnapshot;
       if (filtroCarro) {
-        // Se o filtroCarro estiver habilitado, filtre também pelo carro
+        
         prestadoresSnapshot = await _firestore
             .collection('Prestadores')
             .where('estado', isEqualTo: dataToPass['estado'])
             .where('cidade', isEqualTo: dataToPass['cidade'])
             .where('carro', isEqualTo: true)
+            .where('data', isNotEqualTo: dataToPass['data'])
+            .where('horaInicio', isNotEqualTo: dataToPass['horaInicio'])
+            .where('horaFim', isNotEqualTo: dataToPass['horaFim']) 
             .get();
+        
       } else {
         prestadoresSnapshot = await _firestore
-            .collection('Prestadores')
-            .where('estado', isEqualTo: dataToPass['estado'])
-            .where('cidade', isEqualTo: dataToPass['cidade'])
-            .get();
+      .collection('Prestadores')
+      .where('estado', isEqualTo: dataToPass['estado'])
+      .where('cidade', isEqualTo: dataToPass['cidade'])
+      .where('data', isNotEqualTo: dataToPass['data'])
+      .where('horaInicio', isNotEqualTo: dataToPass['horaInicio'])
+      .where('horaFim', isNotEqualTo: dataToPass['horaFim'])
+      .get();
       }
 
       if (prestadoresSnapshot.size > 0) {
         setState(() {
           cuidadores = prestadoresSnapshot.docs
               .map((doc) => doc.data() as Map<String, dynamic>)
+              .where((prestador) {
+                List<Map<String, dynamic>> servicos = prestador['servicos'] ?? [];
+                bool atendeCriterios = servicos.every((servico) {
+                  return servico['data'] != dataToPass['data'] ||
+                      servico['horaInicio'] != dataToPass['horaInicio'] ||
+                      servico['horaFim'] != dataToPass['horaFim'];
+                });
+                return atendeCriterios;
+              })
               .toList();
         });
       }
@@ -229,31 +252,31 @@ Future<void> _loadCuidadores() async {
                               ),
                           const SizedBox(height: 20),
                           ElevatedButton(
-                            onPressed: () async {
-                              final cuidadorSelecionado = cuidadores[currentIndex];
-                              final prestadorID = cuidadorSelecionado['id'];
-                              
-                              if (cuidadores.isNotEmpty && currentIndex < cuidadores.length) {
-                                // Crie o serviço
-                                final servico = Servico(
-                                  id: Uuid().v1(),
-                                  data: dataToPass['data'],
-                                  horaInicio: dataToPass['horaInicio'],
-                                  horaFim: dataToPass['horaFim'],
-                                  endereco: dataToPass['endereco'],
-                                  usuario: user!.uid,
-                                  prestador: prestadorID,
-                                  numero: dataToPass['numero'],
-                                  complemento: dataToPass['complemento'],
-                                  estado: dataToPass['estado'],
-                                  cidade: dataToPass['cidade'],
-                                  valor: dataToPass['valor'].toString(),
-                                );
-                              
+                              onPressed: () async {
+                                final cuidadorSelecionado = cuidadores[currentIndex];
+                                final prestadorID = cuidadorSelecionado['id'];
+                                
+                                if (cuidadores.isNotEmpty && currentIndex < cuidadores.length) {
+                                  // Crie o serviço
+                                  final servico = Servico(
+                                    id: Uuid().v1(),
+                                    data: dataToPass['data'],
+                                    horaInicio: dataToPass['horaInicio'],
+                                    horaFim: dataToPass['horaFim'],
+                                    endereco: dataToPass['endereco'],
+                                    usuario: user!.uid,
+                                    prestador: prestadorID,
+                                    numero: dataToPass['numero'],
+                                    complemento: dataToPass['complemento'],
+                                    estado: dataToPass['estado'],
+                                    cidade: dataToPass['cidade'],
+                                    valor: dataToPass['valor'].toString(),
+                                  );
 
-                                // Use o provider para adicionar o serviço ao banco de dados
-                                final servicosProvider = Servicos();
-                                servicosProvider.adiciona(servico);
+                                  // Use o provider para adicionar o serviço ao banco de dados
+                                  final servicosProvider = Servicos();
+                                  servicosProvider.adiciona(servico);
+
 
                                 // Atualize a lista de serviços do cliente
                                 final clientesProvider = Clientes();
@@ -276,22 +299,17 @@ Future<void> _loadCuidadores() async {
 
                                 final prestadoresProvider = Prestadores();
                                 final prestador = await prestadoresProvider.loadClienteById(prestadorID);
-                                prestador!.servicos!.add(servico.id);
-                                prestador!.saldo += dataToPass['valor']; 
-                                  
-                                  
-                                  await prestadoresProvider.adiciona(prestador);
-                                  print(prestador.id);
 
-                          
-                              qrCodeData = 'ServiçoID:${servico.id}';
-                               _mostrarQRCodeDialog(context);
-                                // Adicione código para lidar com o sucesso do agendamento aqui
-                                print('Serviço agendado com sucesso');
-                                //Navigator.of(context).pushNamed('/homeIdoso');
-
-                                // Adicione a concatenação ao atributo datas
-                               
+                                if (prestador != null) {
+                                  _mostrarQRCodeDialog(context, prestador.chavePix, servico.valor, nomeCliente, obterInformacoesPrestador() as String);
+                                } else {
+                                  // Trate o caso em que o prestador não é encontrado
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Prestador não encontrado. Certifique-se de estar autenticado como prestador.'),
+                                    ),
+                                  );
+                                }
                               }
                             },
                             // ...
@@ -369,25 +387,48 @@ Future<void> _loadCuidadores() async {
     );
   }
 
+List<String> obterInformacoesPrestador() {
+  final List<String> informacoes = [];
 
-void _mostrarQRCodeDialog(BuildContext context) {
+  informacoes.add('Nome do Prestador: ${cuidadores[currentIndex]['name']}');
+  informacoes.add('Avaliação: ${cuidadores[currentIndex]['avaliacao'] ?? "N/A"}');
+
+  if (cuidadores[currentIndex]['servicos'] is List<Map<String, dynamic>>) {
+    final List<Map<String, dynamic>> servicos = cuidadores[currentIndex]['servicos'];
+    for (final servico in servicos) {
+      informacoes.add('CUIDADO AMIGO INC.\n');
+      informacoes.add('--- Serviço ---\n');
+      informacoes.add('Data: ${servico['data']}\n');
+      informacoes.add('Hora Início: ${servico['horaInicio']}, ');
+      informacoes.add('Hora Fim: ${servico['horaFim']}\n');
+      informacoes.add('Valor do serviço: ${servico['valor']}');
+      informacoes.add('---------------');
+    }
+  }
+
+  return informacoes;
+}
+
+void _mostrarQRCodeDialog(BuildContext context, String pixKey, String valor, String nomeTitular, String descricao) {
+  final urlPix = 'chave=$pixKey&valor=$valor&nome=$nomeTitular&descricao=$descricao';
+
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text('QR Code do Agendamento'),
+        title: const Text('QR Code do Pagamento PIX'),
         content: Container(
-          width: 200.0, // Set a fixed width
-          height: 200.0, // Set a fixed height
+          width: 200.0,
+          height: 200.0,
           child: QrImageView(
-            data: qrCodeData ?? '', // Ensure qrCodeData is not null
+            data: urlPix,
             version: QrVersions.auto,
           ),
         ),
         actions: [
           ElevatedButton(
             onPressed: () {
-             Navigator.of(context).pushNamed('/homeIdoso');// Close the dialog
+              Navigator.of(context).pop(); // Fechar o diálogo
             },
             child: const Text('Concluir'),
           ),

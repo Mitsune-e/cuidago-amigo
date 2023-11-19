@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cuidadoamigoapp/models/Prestador.dart';
+import 'package:cuidadoamigoapp/models/TipoChavePix.dart';
 import 'package:cuidadoamigoapp/provider/Prestadores.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -24,12 +25,11 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
   final TextEditingController _cpfController = TextEditingController();
   final TextEditingController _senhaController = TextEditingController();
   final TextEditingController _confirmaSenhaController = TextEditingController();
-  final TextEditingController _estadoController = TextEditingController();
-  final TextEditingController _cidadeController = TextEditingController();
   final TextEditingController _enderecoController = TextEditingController();
   final TextEditingController _numeroController = TextEditingController();
   final TextEditingController _complementoController = TextEditingController();
   final TextEditingController _descricaoController = TextEditingController();
+  final TextEditingController _chavePixController = TextEditingController();
   final TextEditingController _imagemController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   bool _possuiCarro = false;
@@ -161,6 +161,8 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
             _buildCarroCheckbox(),
             const SizedBox(height: 10),
             _buildDescricaoTextField(),
+            const SizedBox(height: 10),
+            _buildPixTextField(),
           ],
         ),
       ),
@@ -483,6 +485,31 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
     );
   }
 
+  Widget _buildPixTextField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Chave Pix ${ _chavePixController.text.isNotEmpty ? '' : ' (Obrigatório)'}',
+          style: TextStyle(
+            color:  _descricaoController.text.isNotEmpty ? Colors.black : Colors.red,
+          ),
+        ),
+        TextFormField(
+          onChanged: (Text){setState(() {
+            
+          });},
+          controller: _chavePixController,
+          maxLines: 3,
+          decoration: InputDecoration(
+            hintText: 'Digite uma chave Pix válida',
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildFinalizarButton() {
     return ElevatedButton(
       onPressed: _validateAndRegister,
@@ -589,8 +616,17 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
       emptyFields.add('Descrição');
     }
 
+    if (_chavePixController.text.isEmpty){
+      emptyFields.add('Chave Pix');
+      TipoChavePix tipoChave = ValidadorChavePix.validarChave(_chavePixController.text);
+      if (ValidadorChavePix.validarFormatoChave(_chavePixController.text, tipoChave) != true){
+        print('Campo Chave Pix inválido.');
+      }
+    }
+
     if (emptyFields.isNotEmpty) {
       _showErrorDialog('Campos obrigatórios não preenchidos', 'Preencha os seguintes campos: \n ${emptyFields.join(",\n ")}');
+      
       return false;
     }
 
@@ -661,7 +697,8 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
           numero: _numeroController.text,
           complemento: _complementoController.text,
           carro: _possuiCarro,
-          descricao: _descricaoController.text
+          descricao: _descricaoController.text,
+          chavePix: _chavePixController.text,
         );
 
         
