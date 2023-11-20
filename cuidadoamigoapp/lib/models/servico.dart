@@ -45,7 +45,6 @@ static parseDateAndTime(String date, String hour) {
     this.avaliado = false,
     this.destaque = false,
   }) : assert(avaliacao >= 0 && avaliacao <= 5), // Garante que a avaliação esteja dentro do intervalo
-        assert(finalizada != avaliado), // Garante que finalizada e avaliado não sejam ambos true
         assert(finalizada || isEmAberto(data, horaFim)), // Chamada do método _isEmAberto // Garante que um serviço finalizado não esteja em aberto
         assert(avaliado || !finalizada); // Garante que um serviço não avaliado não está finalizado;
 

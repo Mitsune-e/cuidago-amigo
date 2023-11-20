@@ -34,7 +34,7 @@ class _DetalhesServicoState extends State<DetalhesServico> {
 
 void _carregarPrestadorSync() {
   prestador = Provider.of<Prestadores>(context, listen: false)
-      .loadClienteByIdSync(widget.servico.prestador);
+      .loadPrestadorByIdSync(widget.servico.prestador);
 
   if (prestador != null) {
     serviceNameController.text = prestador!.name;
@@ -59,7 +59,7 @@ Widget build(BuildContext context) {
    body: Padding(
     padding: const EdgeInsets.all(16.0),
     child: FutureBuilder<Prestador?>(
-      future: Provider.of<Prestadores>(context).loadClienteById(widget.servico.prestador),
+      future: Provider.of<Prestadores>(context).loadPrestadorById(widget.servico.prestador),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Se estiver carregando, você pode exibir um widget de carregamento ou nada.

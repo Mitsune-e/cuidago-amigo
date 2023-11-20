@@ -1,10 +1,12 @@
 class Utils {
   static bool validarCPF(String cpf) {
-    if (cpf == null || cpf.length != 11) {
+    final cpfNumerico = cpf.replaceAll(RegExp(r'[^0-9]'), '');
+
+    if (cpfNumerico.length != 11) {
       return false;
     }
 
-    List<int> cpfList = cpf.split('').map((e) => int.parse(e)).toList();
+    List<int> cpfList = cpfNumerico.split('').map((e) => int.parse(e)).toList();
 
     // Verifica o primeiro dígito verificador
     int firstVerifierDigit = _calculateVerifierDigit(cpfList.sublist(0, 9));
@@ -30,4 +32,5 @@ class Utils {
 
     return remainder < 2 ? 0 : 11 - remainder;
   }
+  
 }

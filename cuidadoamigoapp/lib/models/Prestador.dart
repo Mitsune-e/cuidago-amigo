@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Prestador {
   final String id;
   final String name;
@@ -40,7 +42,7 @@ class Prestador {
     required this.chavePix,
     List<String>? servicos,
   })   : this.servicos = servicos ?? [], // Corrigido aqui
-        this.Datas = [], // Corrigido aqui
+        this.Datas = servicos ?? [], // Corrigido aqui
         this.avaliacao = (avaliacao >= 0 && avaliacao <= 5) ? avaliacao : 5.0, // Corrigido aqui
         this.saldo = (saldo >= 0) ? saldo : 0.0; // Corrigido aqui
 
@@ -89,5 +91,29 @@ class Prestador {
       "Datas": Datas,
       "chavepix": chavePix,
     };
+  }
+
+factory Prestador.fromFirestore(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return Prestador(
+      id: doc.id,
+      name: data['name'],
+      cpf: data['cpf'],
+      imagem: data['imagem'],
+      email: data['email'],
+      telefone: data['telefone'],
+      senha: data['senha'],
+      endereco: data['endereco'],
+      estado: data['estado'],
+      cidade: data['cidade'],
+      numero: data['numero'],
+      complemento: data['complemento'],
+      servicos: data['servicos'],
+      carro: data['carro'],
+      saldo: data['saldo'],
+      avaliacao: data['avaliacao'],
+      descricao: data['descricao'],
+      chavePix: data['chavepix'],
+    );
   }
 }

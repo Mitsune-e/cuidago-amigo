@@ -40,7 +40,9 @@ void didChangeDependencies() {
 Future<void> _loadCuidadores() async {
   final Map<String, dynamic> dataToPass =
       ModalRoute.of(context!)!.settings.arguments as Map<String, dynamic>;
-
+      print("Filtros: ${dataToPass}");
+      print("Realizando consulta no Firestore...");   
+       
   try {
     User? user = _auth.currentUser;
     final clienteSnapshot = await _firestore.collection('Clientes').doc(user!.uid).get();
@@ -48,53 +50,42 @@ Future<void> _loadCuidadores() async {
     if (clienteSnapshot.exists) {
       final clienteData = clienteSnapshot.data() as Map<String, dynamic>;
 
-      setState(() {
-        nomeCliente = clienteData['name'] ?? "";
-      });
+      if (clienteData.containsKey('name')) {
+    setState(() {
+      nomeCliente = clienteData['name'] ?? "";
+    });
+  } else {
+    print('nomeCliente não existe. Linha 55');
+  }
       
       QuerySnapshot prestadoresSnapshot;
       if (filtroCarro) {
-        
         prestadoresSnapshot = await _firestore
             .collection('Prestadores')
             .where('estado', isEqualTo: dataToPass['estado'])
             .where('cidade', isEqualTo: dataToPass['cidade'])
             .where('carro', isEqualTo: true)
-            .where('data', isNotEqualTo: dataToPass['data'])
-            .where('horaInicio', isNotEqualTo: dataToPass['horaInicio'])
-            .where('horaFim', isNotEqualTo: dataToPass['horaFim']) 
             .get();
-        
       } else {
         prestadoresSnapshot = await _firestore
-      .collection('Prestadores')
-      .where('estado', isEqualTo: dataToPass['estado'])
-      .where('cidade', isEqualTo: dataToPass['cidade'])
-      .where('data', isNotEqualTo: dataToPass['data'])
-      .where('horaInicio', isNotEqualTo: dataToPass['horaInicio'])
-      .where('horaFim', isNotEqualTo: dataToPass['horaFim'])
-      .get();
+            .collection('Prestadores')
+            .where('estado', isEqualTo: dataToPass['estado'])
+            .where('cidade', isEqualTo: dataToPass['cidade'])
+            .get();
       }
 
       if (prestadoresSnapshot.size > 0) {
         setState(() {
           cuidadores = prestadoresSnapshot.docs
               .map((doc) => doc.data() as Map<String, dynamic>)
-              .where((prestador) {
-                List<Map<String, dynamic>> servicos = prestador['servicos'] ?? [];
-                bool atendeCriterios = servicos.every((servico) {
-                  return servico['data'] != dataToPass['data'] ||
-                      servico['horaInicio'] != dataToPass['horaInicio'] ||
-                      servico['horaFim'] != dataToPass['horaFim'];
-                });
-                return atendeCriterios;
-              })
               .toList();
         });
       }
     }
-  } catch (e) {
+  }
+    catch (e) {
     print('Erro ao carregar cuidadores: $e');
+    
   } finally {
     setState(() {
       isLoading = false;
@@ -255,7 +246,7 @@ Future<void> _loadCuidadores() async {
                               onPressed: () async {
                                 final cuidadorSelecionado = cuidadores[currentIndex];
                                 final prestadorID = cuidadorSelecionado['id'];
-                                
+                                try{
                                 if (cuidadores.isNotEmpty && currentIndex < cuidadores.length) {
                                   // Crie o serviço
                                   final servico = Servico(
@@ -289,7 +280,7 @@ Future<void> _loadCuidadores() async {
                                 } else {
                                   // Trate o caso em que o cliente não é encontrado (por exemplo, exibindo um erro)
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
+                                    const SnackBar(
                                       content: Text('Cliente não encontrado. Certifique-se de estar autenticado como cliente.'),
                                     ),
                                   );
@@ -297,20 +288,25 @@ Future<void> _loadCuidadores() async {
 
                                 //Atualizar a lista de servicos do pestador 
 
-                                final prestadoresProvider = Prestadores();
-                                final prestador = await prestadoresProvider.loadClienteById(prestadorID);
+                                final prestadoresProvider = Prestadores();  
+                                final prestador = await prestadoresProvider.loadPrestadorById(prestadorID);                     
+                                final currentContext = Navigator.of(context).overlay!.context;
 
-                                if (prestador != null) {
-                                  _mostrarQRCodeDialog(context, prestador.chavePix, servico.valor, nomeCliente, obterInformacoesPrestador() as String);
+                                if (prestador!= null) {
+                                  // ignore: use_build_context_synchronously
+                                  _mostrarQRCodeDialog(context, prestador!.chavePix, servico.valor, nomeCliente, obterInformacoesPrestador() as String);
                                 } else {
                                   // Trate o caso em que o prestador não é encontrado
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Prestador não encontrado. Certifique-se de estar autenticado como prestador.'),
+                                    const SnackBar(
+                                      content: Text('Prestador não encontrado.'),
                                     ),
                                   );
                                 }
                               }
+                                } catch (e) {
+                                  print('Erro ao finalizar agendamento: $e');
+                                }
                             },
                             // ...
 
@@ -410,33 +406,38 @@ List<String> obterInformacoesPrestador() {
 }
 
 void _mostrarQRCodeDialog(BuildContext context, String pixKey, String valor, String nomeTitular, String descricao) {
-  final urlPix = 'chave=$pixKey&valor=$valor&nome=$nomeTitular&descricao=$descricao';
+  try {
+    final urlPix = 'chave=$pixKey&valor=$valor&nome=$nomeTitular&descricao=$descricao';
 
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('QR Code do Pagamento PIX'),
-        content: Container(
-          width: 200.0,
-          height: 200.0,
-          child: QrImageView(
-            data: urlPix,
-            version: QrVersions.auto,
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('QR Code do Pagamento PIX'),
+          content: Container(
+            width: 200.0,
+            height: 200.0,
+            child: QrImageView(
+              data: urlPix,
+              version: QrVersions.auto,
+            ),
           ),
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Fechar o diálogo
-            },
-            child: const Text('Concluir'),
-          ),
-        ],
-      );
-    },
-  );
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Fechar o diálogo
+              },
+              child: const Text('Concluir'),
+            ),
+          ],
+        );
+      },
+    );
+  } catch (e) {
+    print('Erro ao mostrar o QR Code: $e');
+  }
 }
+
 
 
   void _aplicarFiltros() {
