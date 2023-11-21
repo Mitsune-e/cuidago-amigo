@@ -294,7 +294,7 @@ Future<void> _loadCuidadores() async {
 
                                 if (prestador!= null) {
                                   // ignore: use_build_context_synchronously
-                                  _mostrarQRCodeDialog(context, prestador!.chavePix, servico.valor, nomeCliente, obterInformacoesPrestador() as String);
+                                  _mostrarQRCodeDialog(context, prestador!.chavePix, servico.valor, nomeCliente,);
                                 } else {
                                   // Trate o caso em que o prestador não é encontrado
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -405,9 +405,9 @@ List<String> obterInformacoesPrestador() {
   return informacoes;
 }
 
-void _mostrarQRCodeDialog(BuildContext context, String pixKey, String valor, String nomeTitular, String descricao) {
+void _mostrarQRCodeDialog(BuildContext context, String pixKey, String valor, String nomeTitular) {
   try {
-    final urlPix = 'chave=$pixKey&valor=$valor&nome=$nomeTitular&descricao=$descricao';
+    final urlPix = 'chave=$pixKey&valor=$valor&nome=$nomeTitular';
 
     showDialog(
       context: context,
@@ -425,7 +425,7 @@ void _mostrarQRCodeDialog(BuildContext context, String pixKey, String valor, Str
           actions: [
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Fechar o diálogo
+                Navigator.of(context).pushReplacementNamed('/homeIdoso'); // Fechar o diálogo
               },
               child: const Text('Concluir'),
             ),
