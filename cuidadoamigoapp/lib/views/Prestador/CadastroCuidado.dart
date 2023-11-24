@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:cuidadoamigoapp/models/Prestador.dart';
-import 'package:cuidadoamigoapp/models/TipoChavePix.dart';
+import 'package:cuidadoamigoapp/Util/TipoChavePix.dart';
 import 'package:cuidadoamigoapp/provider/Prestadores.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
