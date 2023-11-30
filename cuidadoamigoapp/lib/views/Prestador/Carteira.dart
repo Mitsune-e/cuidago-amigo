@@ -39,7 +39,7 @@ class _CarteiraState extends State<Carteira> {
             saldo = prestador.saldo;
           });
         } else {
-          print('Prestador não encontrado para o ID do usuário: $idDoUsuario');
+          print('Cuidador não encontrado para o ID do usuário: $idDoUsuario');
         }
       } else {
         print('_auth.currentUser é null');

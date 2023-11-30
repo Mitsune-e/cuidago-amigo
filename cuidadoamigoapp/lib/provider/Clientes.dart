@@ -10,13 +10,8 @@ class Clientes with ChangeNotifier {
   List<Cliente> listEvento = [];
 
   adiciona(Cliente cliente) {
-  if (Utils.validarCPF(cliente.cpf)) {
+
     _firestore.collection("Clientes").doc(cliente.id).set(cliente.toMap());
-    print('Está chamando essa função');
-    print(cliente.toMap());
-  } else {
-    print('CPF inválido');
-  }
 }
 
   editar(Cliente cliente) {

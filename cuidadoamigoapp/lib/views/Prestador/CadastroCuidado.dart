@@ -44,7 +44,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Cadastro Prestador'),
+        title: Text('Cadastra-se como Cuidador'),
       ),
       body: GestureDetector(
         onHorizontalDragEnd: (details) {
