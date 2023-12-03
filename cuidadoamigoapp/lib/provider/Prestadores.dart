@@ -27,6 +27,17 @@ class Prestadores with ChangeNotifier {
     notifyListeners();
   }
 
+    void removeById(String prestadorId) {
+    // Remove do Firestore
+    _firestore.collection('Prestadores').doc(prestadorId).delete();
+
+    // Remove da lista local
+    listEvento.removeWhere((prestador) => prestador.id == prestadorId);
+
+    // Notifica os ouvintes que a lista foi alterada
+    notifyListeners();
+  }
+
 Future<Prestador?> loadClienteById(String prestadorId) async {
   try {
     DocumentSnapshot<Map<String, dynamic>> snapshot =
@@ -57,5 +68,7 @@ Future<Prestador?> loadClienteById(String prestadorId) async {
       return null;
     }
   }
+
+
 
 }

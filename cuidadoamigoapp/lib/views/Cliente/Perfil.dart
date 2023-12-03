@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cuidadoamigoapp/models/cliente.dart';
+import 'package:cuidadoamigoapp/views/login.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -205,6 +206,14 @@ Future<String> fazerUploadEObterUrl(String imagePath) async {
                               size: 150,
                             ),
                 ),
+
+              // Botão para deletar perfil
+            ElevatedButton(
+              onPressed: () {
+                _mostrarConfirmacaoExclusaoDialog();
+              },
+            child: const Text('Deletar Perfil')),
+            
             const SizedBox(height: 20),
             _buildInfoBox(
               title: 'Dados Pessoais',
@@ -575,5 +584,57 @@ Widget _buildEnderecoBox() {
     );
   }
 
+  Future<void> _mostrarConfirmacaoExclusaoDialog() async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirmação'),
+          content: const Text('Tem certeza de que deseja excluir o perfil? Esta ação é irreversível.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Fechar o diálogo
+              },
+              child: const Text('Não'),
+            ),
+            TextButton(
+              onPressed: () async {
+                // Fechar o diálogo
+                Navigator.of(context).pop();
 
+                // Executar a exclusão do perfil
+                await _excluirPerfil();
+              },
+              child: const Text('Sim'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _excluirPerfil() async {
+    try {
+      User? user = _auth.currentUser;
+
+      // Deletar a instância de autenticação
+      await user?.delete();
+
+      // Deletar entrada correspondente na tabela 'Clientes' do Firestore
+      await _firestore.collection('Clientes').doc(user?.uid).delete();
+
+      // Navegar para a próxima página após excluir o perfil
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Login(),
+        ),
+      );
+    } catch (e) {
+      print('Erro ao excluir perfil: $e');
+      // Lide com erros aqui, se necessário
+    }
+  }
 }
+

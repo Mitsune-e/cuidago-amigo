@@ -43,6 +43,18 @@ class Clientes with ChangeNotifier {
     _firestore.collection('Clientes').doc(cliente.id).delete();
     notifyListeners();
   }
+  
+  void removeById(String clienteId) {
+    // Remove do Firestore
+    _firestore.collection('Clientes').doc(clienteId).delete();
+
+    // Remove da lista local
+    listEvento.removeWhere((cliente) => cliente.id == clienteId);
+
+    // Notifica os ouvintes que a lista foi alterada
+    notifyListeners();
+  }
+
 
  
   Cliente? loadClienteByIdSync(String clienteId) {
