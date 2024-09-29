@@ -1,4 +1,3 @@
-
 import 'package:cuidadoamigoapp/provider/Clientes.dart';
 import 'package:cuidadoamigoapp/provider/Enderecos.dart';
 import 'package:cuidadoamigoapp/provider/Prestadores.dart';
@@ -15,29 +14,29 @@ import 'package:cuidadoamigoapp/views/Cliente/cadastro1.dart';
 import 'package:cuidadoamigoapp/views/Prestador/homeCuidador.dart';
 import 'package:cuidadoamigoapp/views/login.dart';
 import 'package:cuidadoamigoapp/views/Cliente/homeIdoso.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:provider/provider.dart';
-import 'firebase_options.dart';
 import 'package:flutter/material.dart';
+/* import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
+import 'firebase_options.dart'; */
 
-Future  main() async{
-  WidgetsFlutterBinding.ensureInitialized();
+Future main() async {
+/*   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-);
+); */
   runApp(
-    MultiProvider(
+    /* MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => Clientes()),
         ChangeNotifierProvider(create: (context) => Enderecos()),
         ChangeNotifierProvider(create: (context) => Prestadores()),
         ChangeNotifierProvider(create: (context) => Servicos()),
         // Outros providers, se houver
-      ],
-      child: MyApp(),
-    ),
+      ], */
+    const MyApp(),
   );
 }
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -46,20 +45,20 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(primaryColor: Colors.red),
-      home:  Login(),
+      home: Login(),
       routes: {
         '/login': (context) => Login(),
         '/cadastro1': (context) => Cadastro1(),
-        '/recuperarSenha': (context) => RecuperarSenha(),
-        '/homeIdoso': (context) => HomeIdoso(),
-        '/cadastroPrestador':(context) => CadastroCuidado(),
-        '/perfil':(context) => Perfil(),
-        '/agenda':(context) => Agenda(),
-        "/homePrestador":(context) => HomePrestador(),
-        '/solicitarCuidador1':(context) => SolicitarCuidado1(),
-        '/solicitarCuidador2':(context) => CuidadorInfoPage(),
-        '/carteira':(context) => Carteira(),
-        '/perfilPrestador':(context) => PerfilCuidador(),
+        '/recuperarSenha': (context) => const RecuperarSenha(),
+        '/homeIdoso': (context) => const HomeIdoso(),
+        '/cadastroPrestador': (context) => CadastroCuidado(),
+        '/perfil': (context) => const Perfil(),
+        '/agenda': (context) => Agenda(),
+        "/homePrestador": (context) => HomePrestador(),
+        '/solicitarCuidador1': (context) => SolicitarCuidado1(),
+        '/solicitarCuidador2': (context) => CuidadorInfoPage(),
+        '/carteira': (context) => Carteira(),
+        '/perfilPrestador': (context) => PerfilCuidador(),
       },
     );
   }

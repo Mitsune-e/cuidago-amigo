@@ -4,6 +4,7 @@ import 'package:cuidadoamigoapp/provider/Prestadores.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 class Carteira extends StatefulWidget {
   const Carteira({Key? key}) : super(key: key);
 
@@ -13,8 +14,8 @@ class Carteira extends StatefulWidget {
 
 class _CarteiraState extends State<Carteira> {
   double saldo = 0.0;
-  FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  FirebaseAuth _auth = FirebaseAuth.instance;
+/*   FirebaseFirestore _firestore = FirebaseFirestore.inswtance;
+  FirebaseAuth _auth = FirebaseAuth.instance; */
 
   @override
   void initState() {
@@ -28,11 +29,11 @@ class _CarteiraState extends State<Carteira> {
           Provider.of<Prestadores>(context, listen: false);
 
       // Verifica se _auth.currentUser não é null antes de acessar uid
-      if (_auth.currentUser != null) {
+      if (auth.currentUser != null) {
         String idDoUsuario = _auth.currentUser!.uid;
         Prestador? prestador =
             await prestadoresProvider.loadClienteById(idDoUsuario);
-            print(prestador!.name);
+        print(prestador!.name);
 
         if (prestador != null) {
           setState(() {
@@ -55,43 +56,43 @@ class _CarteiraState extends State<Carteira> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF73C9C9),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.of(context).popAndPushNamed('/homePrestador');
           },
         ),
-        title: Text('Minha Carteira'),
+        title: const Text('Minha Carteira'),
         actions: [],
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
+            const Text(
               'Saldo',
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF73C9C9),
+                color: Color(0xFF73C9C9),
               ),
             ),
             Text(
               'R\$ ${saldo.toStringAsFixed(2)}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 36,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 40),
-            Text(
+            const SizedBox(height: 40),
+            const Text(
               'Formas de Retirada',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF73C9C9),
+                color: Color(0xFF73C9C9),
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             _buildOpcoesRetirada(context),
           ],
         ),
@@ -107,33 +108,33 @@ class _CarteiraState extends State<Carteira> {
           onPressed: () {
             _mostrarOpcaoPix(context);
           },
-          child: Text('Pix'),
           style: ElevatedButton.styleFrom(
-              primary: const Color(0xFF73C9C9),
-              onPrimary: Colors.white,
-              minimumSize: Size(150, 50)),
+              foregroundColor: Colors.white,
+              backgroundColor: const Color(0xFF73C9C9),
+              minimumSize: const Size(150, 50)),
+          child: const Text('Pix'),
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         ElevatedButton(
           onPressed: () {
             // Adicione ação para retirada via Boleto
           },
-          child: Text('Boleto'),
           style: ElevatedButton.styleFrom(
-              primary: Colors.grey,
-              onPrimary: Colors.white,
-              minimumSize: Size(150, 50)),
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.grey,
+              minimumSize: const Size(150, 50)),
+          child: const Text('Boleto'),
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         ElevatedButton(
           onPressed: () {
             // Adicione ação para retirada via Conta corrente
           },
-          child: Text('Conta Corrente'),
           style: ElevatedButton.styleFrom(
-              primary: Colors.grey,
-              onPrimary: Colors.white,
-              minimumSize: Size(150, 50)),
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.grey,
+              minimumSize: const Size(150, 50)),
+          child: const Text('Conta Corrente'),
         ),
       ],
     );
@@ -147,7 +148,7 @@ class _CarteiraState extends State<Carteira> {
         TextEditingController valorController = TextEditingController();
 
         return AlertDialog(
-          title: Text('Retirar via Pix'),
+          title: const Text('Retirar via Pix'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -155,32 +156,32 @@ class _CarteiraState extends State<Carteira> {
                 keyboardType: TextInputType.number,
                 controller: valorController,
                 decoration:
-                    InputDecoration(labelText: 'Valor a ser retirado'),
+                    const InputDecoration(labelText: 'Valor a ser retirado'),
                 onChanged: (value) {
                   // Você pode realizar validações adicionais aqui, se necessário
                   valorRetirada =
                       double.tryParse(value.replaceAll(',', '.')) ?? 0.0;
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
                   if (valorRetirada > 0 && valorRetirada <= saldo) {
                     _pedirChavePix(context, valorRetirada);
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
+                      const SnackBar(
                         content: Text('Valor inválido!'),
                         backgroundColor: Colors.red,
                       ),
                     );
                   }
                 },
-                child: Text('Continuar'),
                 style: ElevatedButton.styleFrom(
-                  primary: const Color(0xFF73C9C9),
-                  onPrimary: Colors.white,
+                  foregroundColor: Colors.white,
+                  backgroundColor: const Color(0xFF73C9C9),
                 ),
+                child: const Text('Continuar'),
               ),
             ],
           ),
@@ -189,12 +190,13 @@ class _CarteiraState extends State<Carteira> {
     );
   }
 
- Future<void> _pedirChavePix(
+  Future<void> _pedirChavePix(
       BuildContext context, double valorRetirada) async {
     Prestador? prestador =
         await Prestadores().loadClienteById(_auth.currentUser?.uid ?? '');
     double saldoAtual = prestador?.saldo ?? 0.0;
-    valorRetirada = double.tryParse(valorRetirada.toString().replaceAll(',', '.')) ?? 0.0;
+    valorRetirada =
+        double.tryParse(valorRetirada.toString().replaceAll(',', '.')) ?? 0.0;
 
     // Armazene o contexto antes de entrar no código assíncrono
     BuildContext currentContext = context;
@@ -205,17 +207,18 @@ class _CarteiraState extends State<Carteira> {
         String chavePix = '';
 
         return AlertDialog(
-          title: Text('Chave Pix'),
+          title: const Text('Chave Pix'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
-                decoration: InputDecoration(labelText: 'Digite sua chave Pix'),
+                decoration:
+                    const InputDecoration(labelText: 'Digite sua chave Pix'),
                 onChanged: (value) {
                   chavePix = value;
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () async {
                   try {
@@ -224,7 +227,7 @@ class _CarteiraState extends State<Carteira> {
                     // Subtrai o valor retirado do saldo atual
                     double novoSaldo = saldoAtual - valorRetirada;
                     // Atualiza o saldo no Firestore
-                    await _firestore
+                    await firebase_firestore
                         .collection("Prestadores")
                         .doc(prestador!.id)
                         .update({
@@ -256,11 +259,11 @@ class _CarteiraState extends State<Carteira> {
                     // Trate o erro conforme necessário
                   }
                 },
-                child: Text('Confirmar'),
                 style: ElevatedButton.styleFrom(
-                  primary: const Color(0xFF73C9C9),
-                  onPrimary: Colors.white,
+                  foregroundColor: Colors.white,
+                  backgroundColor: const Color(0xFF73C9C9),
                 ),
+                child: const Text('Confirmar'),
               ),
             ],
           ),
@@ -269,4 +272,3 @@ class _CarteiraState extends State<Carteira> {
     );
   }
 }
-

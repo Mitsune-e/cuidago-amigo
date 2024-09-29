@@ -1,15 +1,20 @@
 import 'dart:io';
 
+import 'package:csc_picker/csc_picker.dart';
 import 'package:cuidadoamigoapp/models/Prestador.dart';
 import 'package:cuidadoamigoapp/views/login.dart';
-
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+
+// import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+
+/* import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:csc_picker/csc_picker.dart';
-
+ */
 class PerfilCuidador extends StatefulWidget {
   const PerfilCuidador({Key? key}) : super(key: key);
 
@@ -18,8 +23,8 @@ class PerfilCuidador extends StatefulWidget {
 }
 
 class _PerfilState extends State<PerfilCuidador> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  /* final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance; */
   final TextEditingController _nomeController = TextEditingController();
   final TextEditingController _cpfController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -27,8 +32,8 @@ class _PerfilState extends State<PerfilCuidador> {
   final TextEditingController _enderecoController = TextEditingController();
   final TextEditingController _numeroController = TextEditingController();
   final TextEditingController _complementoController = TextEditingController();
-  String ? imageUrl;
-  var cidade ="";
+  String? imageUrl;
+  var cidade = "";
   var estado = '';
   var estado_novo = "";
   var cidade_novo = "";
@@ -36,7 +41,7 @@ class _PerfilState extends State<PerfilCuidador> {
   bool _isLoadingImage = true;
   final TextEditingController _descricaoController = TextEditingController();
   bool _possuiCarro = false;
-  
+
   @override
   void initState() {
     super.initState();
@@ -48,127 +53,125 @@ class _PerfilState extends State<PerfilCuidador> {
     }
   }
 
-  
-Future<void> _loadData() async {
-  User? user = _auth.currentUser;
-  if (user != null) {
-    await _loadUserData(user.uid);
+  Future<void> _loadData() async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      await _loadUserData(user.uid);
+    }
   }
-}
 
   Future<void> _loadUserData(String userId) async {
-  try {
-    DocumentSnapshot userDoc = await _firestore.collection('Prestadores').doc(userId).get();
+    try {
+      //DocumentSnapshot userDoc = await _firestore.collection('Prestadores').doc(userId).get();
 
-    if (userDoc.exists) {
-      Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+      if (userDoc.exists) {
+        Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
 
-      Prestador prestador = Prestador.fromMap(userData);
+        Prestador prestador = Prestador.fromMap(userData);
 
+        setState(() {
+          _nomeController.text = prestador.name ?? '';
+          _cpfController.text = prestador.cpf ?? '';
+          _emailController.text = prestador.email ?? '';
+          _telefoneController.text = prestador.telefone ?? '';
+          estado = prestador.estado ?? '';
+          cidade = prestador.cidade ?? '';
+          _enderecoController.text = prestador.endereco ?? '';
+          _numeroController.text = prestador.numero ?? '';
+          _complementoController.text = prestador.complemento ?? '';
+          imageUrl = prestador.imagem ?? '';
+          _descricaoController.text = prestador.descricao ?? '';
+          _possuiCarro = prestador.carro;
+
+          _isLoadingImage = false;
+        });
+      }
+    } catch (e) {
+      print('Erro ao carregar dados do Firestore: $e');
+      // Em caso de erro, marque que a imagem não está mais carregando
       setState(() {
-        _nomeController.text = prestador.name ?? '';
-        _cpfController.text = prestador.cpf ?? '';
-        _emailController.text = prestador.email ?? '';
-        _telefoneController.text = prestador.telefone ?? '';
-        estado = prestador.estado ?? '';
-        cidade = prestador.cidade ?? '';
-        _enderecoController.text = prestador.endereco ?? '';
-        _numeroController.text = prestador.numero ?? '';
-        _complementoController.text = prestador.complemento ?? '';
-        imageUrl = prestador.imagem ?? '';
-        _descricaoController.text = prestador.descricao ?? '' ;
-        _possuiCarro = prestador.carro;
-
-
         _isLoadingImage = false;
       });
     }
-  } catch (e) {
-    print('Erro ao carregar dados do Firestore: $e');
-    // Em caso de erro, marque que a imagem não está mais carregando
-      setState(() {
-        _isLoadingImage = false;  });
   }
-}
 
-
- Future<void> _mostrarOpcoesImagem() async {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Escolher Imagem'),
-        content: SingleChildScrollView(
-          child: ListBody(
-            children: <Widget>[
-              ListTile(
-                leading: const Icon(Icons.photo),
-                title: const Text('Galeria'),
-                onTap: () {
-                  _escolherImagem(ImageSource.gallery);
-                  Navigator.of(context).pop();
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.camera),
-                title: const Text('Câmera'),
-                onTap: () {
-                  _escolherImagem(ImageSource.camera);
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
+  Future<void> _mostrarOpcoesImagem() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Escolher Imagem'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                ListTile(
+                  leading: const Icon(Icons.photo),
+                  title: const Text('Galeria'),
+                  onTap: () {
+                    _escolherImagem(ImageSource.gallery);
+                    Navigator.of(context).pop();
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.camera),
+                  title: const Text('Câmera'),
+                  onTap: () {
+                    _escolherImagem(ImageSource.camera);
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
           ),
-        ),
-      );
-    },
-  );
-}
-
-Future<void> _escolherImagem(ImageSource source) async {
-  final pickedFile = await ImagePicker().pickImage(source: source);
-
-  if (pickedFile != null) {
-    // Aqui você pode lidar com a imagem selecionada
-    // Por exemplo, você pode carregar a imagem para o Firebase Storage
-    // e atualizar a referência no Firestore
-    // A propriedade pickedFile.path contém o caminho local da imagem selecionada
-
-    // Implemente a lógica para fazer upload da imagem para o Firebase Storage
-    // e obter a URL da imagem
-
-    // Chame a função _updateUserData para atualizar a URL da imagem no Firestore
-    User? user = _auth.currentUser;
-    await _updateUserData(user!.uid);
+        );
+      },
+    );
   }
-}
 
-Future<String> fazerUploadEObterUrl(String imagePath) async {
-  // Lógica para fazer o upload da imagem e obter a URL
-  // Substitua este código pela implementação real do upload
+  Future<void> _escolherImagem(ImageSource source) async {
+    final pickedFile = await ImagePicker().pickImage(source: source);
 
-  // Suponhamos que você esteja usando Firebase Storage para o upload
-  // Aqui está um exemplo hipotético usando o Firebase Storage
-  // Certifique-se de adicionar a biblioteca 'firebase_storage' no seu arquivo pubspec.yaml
-  // e inicializar o Firebase antes de usar o Storage
+    if (pickedFile != null) {
+      // Aqui você pode lidar com a imagem selecionada
+      // Por exemplo, você pode carregar a imagem para o Firebase Storage
+      // e atualizar a referência no Firestore
+      // A propriedade pickedFile.path contém o caminho local da imagem selecionada
 
-  // Upload da imagem para o Firebase Storage
-  final Reference storageReference = FirebaseStorage.instance.ref().child('uploads').child('imagem.png');
-  final UploadTask uploadTask = storageReference.putFile(File(imagePath));
+      // Implemente a lógica para fazer upload da imagem para o Firebase Storage
+      // e obter a URL da imagem
 
-  // Aguardar o término do upload
-  await uploadTask.whenComplete(() => print('Upload concluído'));
+      // Chame a função _updateUserData para atualizar a URL da imagem no Firestore
+      //User? user = _auth.currentUser;
 
-  // Obter a URL da imagem após o upload
-  final String imageUrl = await storageReference.getDownloadURL();
+      await _updateUserData(user!.uid);
+    }
+  }
 
-  return imageUrl;
-}
+  Future<String> fazerUploadEObterUrl(String imagePath) async {
+    // Lógica para fazer o upload da imagem e obter a URL
+    // Substitua este código pela implementação real do upload
 
-  
- @override
+    // Suponhamos que você esteja usando Firebase Storage para o upload
+    // Aqui está um exemplo hipotético usando o Firebase Storage
+    // Certifique-se de adicionar a biblioteca 'firebase_storage' no seu arquivo pubspec.yaml
+    // e inicializar o Firebase antes de usar o Storage
+
+    // Upload da imagem para o Firebase Storage
+    final Reference storageReference =
+        FirebaseStorage.instance.ref().child('uploads').child('imagem.png');
+    final UploadTask uploadTask = storageReference.putFile(File(imagePath));
+
+    // Aguardar o término do upload
+    await uploadTask.whenComplete(() => print('Upload concluído'));
+
+    // Obter a URL da imagem após o upload
+    final String imageUrl = await storageReference.getDownloadURL();
+
+    return imageUrl;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -190,34 +193,42 @@ Future<String> fazerUploadEObterUrl(String imagePath) async {
             _isLoadingImage
                 ? CircularProgressIndicator()
                 : ClipOval(
-                  child: _isLoadingImage
-                      ? CircularProgressIndicator()
-                      : imageUrl != null && imageUrl!.isNotEmpty
-                          ? Image.network(
-                              imageUrl!,
-                              width: 150,
-                              height: 150,
-                              fit: BoxFit.cover,
-                              loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                                if (loadingProgress == null) {
-                                  return child;
-                                } else {
-                                  return Center(
-                                    child: CircularProgressIndicator(
-                                      value: loadingProgress.expectedTotalBytes != null
-                                          ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
-                                          : null,
-                                    ),
-                                  );
-                                }
-                              },
-                            )
-                          : Icon(
-                              Icons.person,
-                              size: 150,
-                            ),
-                ),
-                 ElevatedButton(
+                    child: _isLoadingImage
+                        ? CircularProgressIndicator()
+                        : imageUrl != null && imageUrl!.isNotEmpty
+                            ? Image.network(
+                                imageUrl!,
+                                width: 150,
+                                height: 150,
+                                fit: BoxFit.cover,
+                                loadingBuilder: (BuildContext context,
+                                    Widget child,
+                                    ImageChunkEvent? loadingProgress) {
+                                  if (loadingProgress == null) {
+                                    return child;
+                                  } else {
+                                    return Center(
+                                      child: CircularProgressIndicator(
+                                        value: loadingProgress
+                                                    .expectedTotalBytes !=
+                                                null
+                                            ? loadingProgress
+                                                    .cumulativeBytesLoaded /
+                                                (loadingProgress
+                                                        .expectedTotalBytes ??
+                                                    1)
+                                            : null,
+                                      ),
+                                    );
+                                  }
+                                },
+                              )
+                            : Icon(
+                                Icons.person,
+                                size: 150,
+                              ),
+                  ),
+            ElevatedButton(
               onPressed: () {
                 _mostrarConfirmacaoExclusaoDialog();
               },
@@ -321,34 +332,33 @@ Future<String> fazerUploadEObterUrl(String imagePath) async {
   }
 
   Widget _buildInfoRow(String label, String? value) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value ?? '', // Usando operador de coalescência nula para tratar valores nulos
-          style: const TextStyle(
-            fontSize: 18,
+          const SizedBox(height: 4),
+          Text(
+            value ??
+                '', // Usando operador de coalescência nula para tratar valores nulos
+            style: const TextStyle(
+              fontSize: 18,
+            ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 
-
- 
-
-  void _mostrarEditarDialog(String title, List<TextEditingController> controllers) {
+  void _mostrarEditarDialog(
+      String title, List<TextEditingController> controllers) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -358,38 +368,42 @@ Future<String> fazerUploadEObterUrl(String imagePath) async {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-               for (int i = 0; i < controllers.length; i++)
-              TextFormField(
-                controller: controllers[i],
-                readOnly: i == 2,  // Impede que o campo de e-mail seja editado
-                decoration: InputDecoration(
-                  labelText: i == 0 ? 'Nome' : (i == 1 ? 'CPF' : (i == 2 ? 'E-mail' : 'Telefone')),
-                ),
-              ),
+                for (int i = 0; i < controllers.length; i++)
+                  TextFormField(
+                    controller: controllers[i],
+                    readOnly:
+                        i == 2, // Impede que o campo de e-mail seja editado
+                    decoration: InputDecoration(
+                      labelText: i == 0
+                          ? 'Nome'
+                          : (i == 1 ? 'CPF' : (i == 2 ? 'E-mail' : 'Telefone')),
+                    ),
+                  ),
               ],
             ),
           ),
           actions: [
             ElevatedButton(
               onPressed: () async {
-                  bool camposPreenchidos = controllers.every((controller) => controller.text.isNotEmpty);
+                bool camposPreenchidos = controllers
+                    .every((controller) => controller.text.isNotEmpty);
 
-              if (!camposPreenchidos) {
-                    // Exibir mensagem de erro se algum campo estiver em branco
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Por favor, preencha todos os campos.'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                    return;
-                  }
-                User? user = _auth.currentUser;                             
+                if (!camposPreenchidos) {
+                  // Exibir mensagem de erro se algum campo estiver em branco
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Por favor, preencha todos os campos.'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+                User? user = _auth.currentUser;
 
                 await _updateUserData(user!.uid);
 
                 await _loadData();
-          
+
                 Navigator.of(context).pop();
               },
               child: const Text('Salvar'),
@@ -410,7 +424,7 @@ Future<String> fazerUploadEObterUrl(String imagePath) async {
         'estado': estado,
         'cidade': cidade,
         'endereco': _enderecoController.text,
-        'numero':_numeroController.text,
+        'numero': _numeroController.text,
         'complemento': _complementoController.text,
         'imagem': imageUrl,
         'carro': _possuiCarro,
@@ -422,7 +436,7 @@ Future<String> fazerUploadEObterUrl(String imagePath) async {
     }
   }
 
-Widget _buildEnderecoBox() {
+  Widget _buildEnderecoBox() {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       padding: const EdgeInsets.all(16),
@@ -503,7 +517,8 @@ Widget _buildEnderecoBox() {
                       showStates: true,
                       flagState: CountryFlag.DISABLE,
                       dropdownDecoration: BoxDecoration(
-                        borderRadius: const BorderRadius.all(Radius.circular(10)),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10)),
                         color: Colors.white,
                         border: Border.all(
                           color: Colors.grey.withOpacity(0.5),
@@ -511,7 +526,8 @@ Widget _buildEnderecoBox() {
                         ),
                       ),
                       disabledDropdownDecoration: BoxDecoration(
-                        borderRadius: const BorderRadius.all(Radius.circular(10)),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10)),
                         color: Colors.grey[200],
                         border: Border.all(
                           color: Colors.grey.withOpacity(0.5),
@@ -538,13 +554,12 @@ Widget _buildEnderecoBox() {
                       },
                       onStateChanged: (value) {
                         setState(() {
-                          
                           estado_novo = value.toString();
                         });
                       },
                       onCityChanged: (value) {
                         setState(() {
-                          cidade_novo =  value.toString();
+                          cidade_novo = value.toString();
                         });
                       },
                     ),
@@ -572,32 +587,35 @@ Widget _buildEnderecoBox() {
               actions: [
                 ElevatedButton(
                   onPressed: () async {
-                  bool camposEnderecoPreenchidos =
-                      _enderecoController.text.isNotEmpty &&
-                      _numeroController.text.isNotEmpty &&
-                      _complementoController.text.isNotEmpty;
+                    bool camposEnderecoPreenchidos =
+                        _enderecoController.text.isNotEmpty &&
+                            _numeroController.text.isNotEmpty &&
+                            _complementoController.text.isNotEmpty;
 
-                  if (estado_novo.isEmpty || cidade_novo.isEmpty || !camposEnderecoPreenchidos) {
-                    // Exibir mensagem de erro se cidade, estado ou algum campo de endereço estiver em branco
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Por favor, preencha todos os campos de endereço, cidade e estado.'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                    return;
-                  }
-                  cidade = cidade_novo;
-                  estado =estado_novo;
-                  
-                  User? user = _auth.currentUser;
+                    if (estado_novo.isEmpty ||
+                        cidade_novo.isEmpty ||
+                        !camposEnderecoPreenchidos) {
+                      // Exibir mensagem de erro se cidade, estado ou algum campo de endereço estiver em branco
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              'Por favor, preencha todos os campos de endereço, cidade e estado.'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return;
+                    }
+                    cidade = cidade_novo;
+                    estado = estado_novo;
 
-                  await _updateUserData(user!.uid);
+                    User? user = _auth.currentUser;
 
-                  await _loadData();
+                    await _updateUserData(user!.uid);
 
-                  Navigator.of(context).pop();
-                },
+                    await _loadData();
+
+                    Navigator.of(context).pop();
+                  },
                   child: const Text('Salvar'),
                 ),
               ],
@@ -607,7 +625,6 @@ Widget _buildEnderecoBox() {
       },
     );
   }
-
 
   void _mostrarEditarProfissionaisDialog() {
     showDialog(
@@ -642,7 +659,8 @@ Widget _buildEnderecoBox() {
               actions: [
                 ElevatedButton(
                   onPressed: () async {
-                    bool camposPreenchidos = _descricaoController.text.isNotEmpty;
+                    bool camposPreenchidos =
+                        _descricaoController.text.isNotEmpty;
 
                     if (!camposPreenchidos) {
                       // Exibir mensagem de erro se algum campo estiver em branco
@@ -672,13 +690,14 @@ Widget _buildEnderecoBox() {
     );
   }
 
-    Future<void> _mostrarConfirmacaoExclusaoDialog() async {
+  Future<void> _mostrarConfirmacaoExclusaoDialog() async {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Confirmação'),
-          content: const Text('Tem certeza de que deseja excluir o perfil? Esta ação é irreversível.'),
+          content: const Text(
+              'Tem certeza de que deseja excluir o perfil? Esta ação é irreversível.'),
           actions: [
             TextButton(
               onPressed: () {
@@ -724,5 +743,4 @@ Widget _buildEnderecoBox() {
       // Lide com erros aqui, se necessário
     }
   }
-
 }

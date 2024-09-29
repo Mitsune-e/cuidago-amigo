@@ -60,8 +60,8 @@ class _AgendaState extends State<Agenda> {
             nomePrestador.text = prestador.name;
           }
 
-          final servicoDateTime =
-              parseDateAndTime(servico.data, servico.horaFim);
+          /* final servicoDateTime =
+              parseDateAndTime(servico.data, servico.horaFim); */
 
           if (!servico.finalizada) {
             servicosEmAberto.add(servico.copyWith(destaque: true));
@@ -115,8 +115,11 @@ class _AgendaState extends State<Agenda> {
 
   Future<Prestador?> loadPrestadorById(String prestadorId) async {
     try {
-      DocumentSnapshot<Map<String, dynamic>> snapshot =
-          await FirebaseFirestore.instance.collection('Prestadores').doc(prestadorId).get();
+      DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
+          .instance
+          .collection('Prestadores')
+          .doc(prestadorId)
+          .get();
 
       if (snapshot.exists) {
         return Prestador.fromMap(snapshot.data()!);
@@ -156,7 +159,7 @@ class _AgendaState extends State<Agenda> {
                   });
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: exibirEmAberto ? Colors.blue : Colors.grey,
+                  backgroundColor: exibirEmAberto ? Colors.blue : Colors.grey,
                 ),
                 child: Text('Em Aberto'),
               ),
@@ -169,7 +172,7 @@ class _AgendaState extends State<Agenda> {
                   });
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: !exibirEmAberto ? Colors.blue : Colors.grey,
+                  backgroundColor: !exibirEmAberto ? Colors.blue : Colors.grey,
                 ),
                 child: Text('Finalizadas'),
               ),
@@ -189,7 +192,7 @@ class _AgendaState extends State<Agenda> {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
                           // Se ainda estiver carregando, mostre o ícone de carregamento
-                          return SpinKitFadingCircle(
+                          return const SpinKitFadingCircle(
                             color: Colors.blue,
                             size: 50.0,
                           );
@@ -225,7 +228,9 @@ class _AgendaState extends State<Agenda> {
       margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(
         side: BorderSide(
-          color: _showRedBorderAndStars(servico, now) ? Colors.red : Colors.transparent,
+          color: _showRedBorderAndStars(servico, now)
+              ? Colors.red
+              : Colors.transparent,
           width: 2.0,
         ),
         borderRadius: BorderRadius.circular(8.0),
@@ -259,7 +264,8 @@ class _AgendaState extends State<Agenda> {
                 children: [
                   Text('Prestador: ${nomePrestador.text}'),
                   RatingBar.builder(
-                    initialRating: servico.avaliacao, // Usar a avaliação do serviço
+                    initialRating:
+                        servico.avaliacao, // Usar a avaliação do serviço
                     minRating: 0,
                     direction: Axis.horizontal,
                     allowHalfRating: true,
@@ -335,7 +341,8 @@ class _AgendaState extends State<Agenda> {
                           servicosFinalizados = servicosFinalizados
                               .where((s) => !s.finalizada)
                               .toList();
-                          servicosDoCliente = servicosFinalizados.map((servico) {
+                          servicosDoCliente =
+                              servicosFinalizados.map((servico) {
                             return servico.copyWith(destaque: false);
                           }).toList();
                         });
@@ -351,12 +358,12 @@ class _AgendaState extends State<Agenda> {
     );
   }
 
-
-    bool _showRedBorderAndStars(Servico servico, DateTime now) {
+  bool _showRedBorderAndStars(Servico servico, DateTime now) {
     return !servico.finalizada &&
         parseDateAndTime(servico.data, servico.horaFim).isBefore(now);
-}
+  }
+
   Duration calculateTimeDifference(DateTime serviceDateTime, DateTime now) {
-  return serviceDateTime.difference(now);
-}
+    return serviceDateTime.difference(now);
+  }
 }

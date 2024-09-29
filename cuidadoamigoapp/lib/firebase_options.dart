@@ -44,40 +44,40 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCpKDN14WmF5z1k8jd4eygafKKG9Xm3mJ0',
-    appId: '1:278902939143:web:189476701e7abcfdd414a2',
-    messagingSenderId: '278902939143',
-    projectId: 'cuidadoamigo-f22cd',
-    authDomain: 'cuidadoamigo-f22cd.firebaseapp.com',
-    storageBucket: 'cuidadoamigo-f22cd.appspot.com',
-    measurementId: 'G-2YW18JCCQM',
+    apiKey: '',
+    appId: '',
+    messagingSenderId: '',
+    projectId: '',
+    authDomain: '',
+    storageBucket: '',
+    measurementId: '',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCbD2xTjVNCb6vAoPSwcKeAwknvpjG3z9Y',
-    appId: '1:278902939143:android:f61ae6e72542cab6d414a2',
-    messagingSenderId: '278902939143',
-    projectId: 'cuidadoamigo-f22cd',
-    storageBucket: 'cuidadoamigo-f22cd.appspot.com',
+    apiKey: '',
+    appId: '',
+    messagingSenderId: '',
+    projectId: '',
+    storageBucket: '',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAznOrNvKoUJQXo5I2QjqlBocOwloOWIq8',
-    appId: '1:278902939143:ios:a4098bce977535f8d414a2',
-    messagingSenderId: '278902939143',
-    projectId: 'cuidadoamigo-f22cd',
-    storageBucket: 'cuidadoamigo-f22cd.appspot.com',
-    iosClientId: '278902939143-4usug0obe7s4s26uvmbjl2oep65kf8r2.apps.googleusercontent.com',
-    iosBundleId: 'com.example.cuidadoamigoapp',
+    apiKey: '',
+    appId: '',
+    messagingSenderId: '',
+    projectId: '',
+    storageBucket: '',
+    iosClientId: '',
+    iosBundleId: '',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAznOrNvKoUJQXo5I2QjqlBocOwloOWIq8',
-    appId: '1:278902939143:ios:83c3cd2ca956349ed414a2',
-    messagingSenderId: '278902939143',
-    projectId: 'cuidadoamigo-f22cd',
-    storageBucket: 'cuidadoamigo-f22cd.appspot.com',
-    iosClientId: '278902939143-ndgi4vgm13glh9d58offrp6vdin2lild.apps.googleusercontent.com',
-    iosBundleId: 'com.example.cuidadoamigoapp.RunnerTests',
+    apiKey: '',
+    appId: '',
+    messagingSenderId: '',
+    projectId: '',
+    storageBucket: '',
+    iosClientId: '',
+    iosBundleId: '',
   );
 }
