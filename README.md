@@ -1,2 +1,1 @@
-# CuidadoAmigo
 Test

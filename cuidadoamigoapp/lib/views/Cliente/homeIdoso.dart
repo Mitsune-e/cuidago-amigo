@@ -35,7 +35,7 @@ class HomeIdoso extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const CircleAvatar(
+             /* const CircleAvatar(
                 radius: 80, // Tamanho do ícone de pessoa
                 backgroundColor: Colors.white, // Fundo branco para o ícone
               ),
@@ -46,7 +46,7 @@ class HomeIdoso extends StatelessWidget {
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
-              ),
+              ) , */
               const SizedBox(height: 40),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

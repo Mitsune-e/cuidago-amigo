@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -36,13 +37,20 @@ class _LoginState extends State<Login> {
     });
   }
 
-  Future<void> login() async {
-    try {
-      setState(() => loading = true);
+ Future<void> login() async {
+  try {
+    setState(() => loading = true);
 
-      final emailText = email.text;
-      final senhaText = senha.text;
+    final emailText = email.text;
+    final senhaText = senha.text;
 
+    // Verificar se o e-mail está cadastrado como Cliente
+    final clienteSnapshot = await FirebaseFirestore.instance.collection('Clientes').where('email', isEqualTo: emailText).get();
+    
+    // Verificar se o e-mail está cadastrado como Prestador
+    final prestadorSnapshot = await FirebaseFirestore.instance.collection('Prestadores').where('email', isEqualTo: emailText).get();
+
+    if (clienteSnapshot.docs.isNotEmpty) {
       // Autenticação com Firebase Authentication
       final userCredential = await _auth.signInWithEmailAndPassword(
         email: emailText,
@@ -50,7 +58,7 @@ class _LoginState extends State<Login> {
       );
 
       if (userCredential.user != null) {
-        // Autenticação bem-sucedida - redireciona para a próxima tela
+        // Autenticação bem-sucedida - redireciona para a próxima tela de cliente
         Navigator.of(context).pushReplacementNamed('/homeIdoso');
       } else {
         // Exiba uma mensagem de erro caso a autenticação falhe
@@ -59,14 +67,38 @@ class _LoginState extends State<Login> {
         );
         setState(() => loading = false);
       }
-    } catch (e) {
-      print('Erro de autenticação com Firebase Authentication: $e');
+    } else if (prestadorSnapshot.docs.isNotEmpty) {
+      // Autenticação com Firebase Authentication
+      final userCredential = await _auth.signInWithEmailAndPassword(
+        email: emailText,
+        password: senhaText,
+      );
+
+      if (userCredential.user != null) {
+        // Autenticação bem-sucedida - redireciona para a próxima tela de prestador
+        Navigator.of(context).pushReplacementNamed('/homePrestador');
+      } else {
+        // Exiba uma mensagem de erro caso a autenticação falhe
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro de autenticação. Verifique seu email e senha.')),
+        );
+        setState(() => loading = false);
+      }
+    } else {
+      // Exiba uma mensagem se o e-mail não estiver cadastrado como cliente nem prestador
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro de autenticação. Verifique seu email e senha.')),
+        SnackBar(content: Text('E-mail não cadastrado. Cadastre-se agora.')),
       );
       setState(() => loading = false);
     }
+  } catch (e) {
+    print('Erro de autenticação com Firebase Authentication: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Erro de autenticação. Verifique seu email e senha.')),
+    );
+    setState(() => loading = false);
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -203,5 +235,4 @@ class _LoginState extends State<Login> {
       },
     );
   }
-
-
+}

@@ -1,10 +1,89 @@
-import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cuidadoamigoapp/models/Servico.dart';
+import 'package:cuidadoamigoapp/views/Prestador/detalhamento2.dart';
 
-class HomePrestador extends StatelessWidget {
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:timezone/data/latest.dart';
+import 'package:timezone/timezone.dart';
+import 'package:timezone/timezone.dart' as tz;
+
+class HomePrestador extends StatefulWidget {
   const HomePrestador({Key? key});
 
   @override
+  HomePrestadorState createState() => HomePrestadorState();
+}
+
+// ...
+class  HomePrestadorState extends State< HomePrestador> {
+  FirebaseAuth _auth = FirebaseAuth.instance;
+  List<Servico> servicosDoCliente = [];
+  List<Servico> servicosEmAberto = [];
+  List<Servico> servicosFinalizados = [];
+  bool exibirEmAberto = true; // Variável para controlar a exibição de serviços em aberto ou finalizados
+
+  @override
+  void initState() {
+    super.initState();
+
+    final User? user = _auth.currentUser;
+
+    initializeTimeZones();
+
+    // Obter o fuso horário de Brasília
+    final String brt = 'America/Sao_Paulo';
+    final location = getLocation(brt);
+
+    // Obter a data e hora atual no fuso horário de Brasília
+    var now = DateTime.now().toLocal();
+    now = tz.TZDateTime.from(now, location);
+
+
+    if (user != null) {
+      final firestore = FirebaseFirestore.instance;
+      firestore
+          .collection("Servicos")
+          .where("prestador", isEqualTo: user.uid)
+          .get()
+          .then((querySnapshot) {
+        servicosDoCliente.clear();
+        querySnapshot.docs.forEach((document) {
+          final servico = Servico.fromMap(document.data() as Map<String, dynamic>);
+          final servicoDateTime = parseDateAndTime(servico.data, servico.horaFim);
+
+          // Verificar se o serviço é em aberto (data e horaFim após o momento atual)
+          if (servicoDateTime.isAfter(now)) {
+            servicosEmAberto.add(servico);
+          }
+          // Verificar se o serviço é finalizado (data e horaFim antes do momento atual)
+          else if (servicoDateTime.isBefore(now)) {
+            servicosFinalizados.add(servico);
+          }
+        });
+
+        setState(() {
+          servicosDoCliente = servicosEmAberto;
+        });
+      });
+    }
+  }
+
+  DateTime parseDateAndTime(String date, String hour) {
+    final dateParts = date.split('/');
+    final timeParts = hour.split(':');
+    final day = int.parse(dateParts[0]);
+    final month = int.parse(dateParts[1]);
+    final year = int.parse(dateParts[2]);
+    final hourOfDay = int.parse(timeParts[0]);
+    final minute = int.parse(timeParts[1]);
+    return DateTime(year, month, day, hourOfDay, minute);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    Color buttonBackgroundColor = const Color(0xFF73C9C9).withOpacity(0.8);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF73C9C9),
@@ -17,94 +96,127 @@ class HomePrestador extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () {
-               Navigator.of(context).pushReplacementNamed('/carteira');
+              Navigator.of(context).pushReplacementNamed('/carteira');
             },
-            icon: const Icon(
-                Icons.wallet), // Ícone de notificações à direita
+            icon: const Icon(Icons.wallet),
           ),
           IconButton(
             onPressed: () {
-              // Adicione ação para visualizar perfil do prestador
+              Navigator.of(context).pushReplacementNamed('/perfilPrestador');
             },
-            icon: const Icon(Icons.person), // Ícone de perfil à direita
+            icon: const Icon(Icons.person),
           ),
         ],
       ),
-      body: const Center(
-        child: Padding(
-          padding: EdgeInsets.only(bottom: 175.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+      body: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              CircleAvatar(
-                radius: 80,
-                backgroundColor: Colors.white,
-              ),
-              SizedBox(height: 20),
-              Text(
-                'Bem-vindo(a), Nome do Prestador',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+              Expanded(
+                child: Container(
+                  height: 50,
+                  color: buttonBackgroundColor,
+                  child: TextButton(
+                    onPressed: () {
+                      setState(() {
+                        exibirEmAberto = true;
+                        servicosDoCliente = servicosEmAberto;
+                      });
+                    },
+                    style: TextButton.styleFrom(
+                      primary: exibirEmAberto ? Colors.green : Colors.black,
+                    ),
+                    child: Text('Em Aberto'),
+                  ),
                 ),
               ),
-              SizedBox(height: 40),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  /* _buildSquare(
-                    context,
-                    'Iniciar Serviço',
-                    'Assets/imagens/iniciar_servico.png',
-                    () {
-                      // Adicione ação para iniciar serviço
+              Container(
+                width: 1,
+                height: 50,
+                color: Colors.black, // Linha preta
+              ),
+              Expanded(
+                child: Container(
+                  height: 50,
+                  color: buttonBackgroundColor,
+                  child: TextButton(
+                    onPressed: () {
+                      setState(() {
+                        exibirEmAberto = false;
+                        servicosDoCliente = servicosFinalizados;
+                      });
                     },
-                  ),*/
-                  /*SizedBox(width: 20),
-                  _buildSquare(
-                    context,
-                    'Solicitações',
-                    'Assets/imagens/solicitacoes.png',
-                    () {
-                      // Adicione ação para visualizar solicitações
-                    },
-                  ),*/
-                ],
+                    style: TextButton.styleFrom(
+                      primary: !exibirEmAberto ? Colors.green : Colors.black,
+                    ),
+                    child: Text('Finalizadas'),
+                  ),
+                ),
               ),
             ],
           ),
-        ),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(16.0),
+              children: servicosDoCliente.map((servico) {
+                return _buildServiceItem(servico);
+              }).toList(),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildSquare(BuildContext context, String title, String imagePath,
-      VoidCallback onPressed) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        width: 150,
-        height: 150,
-        color: const Color(0xFF73C9C9),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              imagePath,
-              width: 80,
-              height: 80,
-            ),
-            const SizedBox(height: 10),
-            Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
+  Widget _buildServiceItem(Servico servico) {
+  bool showPlayButton = isShowPlayButton(servico);
+
+  return Card(
+    elevation: 4,
+    margin: const EdgeInsets.only(bottom: 16),
+    child: ListTile(
+      title: Text('Data: ${servico.data}'),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Horário: ${servico.horaInicio} - ${servico.horaFim}'),
+          Text('Endereço: ${servico.endereco}'),
+        ],
       ),
-    );
-  }
+      onTap: servicosEmAberto.contains(servico)
+          ? () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => DetalhesServico2(servico: servico),
+                ),
+              );
+            }
+          : null,
+      trailing: showPlayButton
+          ? IconButton(
+              icon: Icon(
+                Icons.play_circle_fill,
+                color: Colors.green,
+                size: 32,
+              ),
+              onPressed: () {
+                // Adicione ação para iniciar o serviço aqui
+              },
+            )
+          : null,
+    ),
+  );
 }
+
+bool isShowPlayButton(Servico servico) {
+  DateTime now = DateTime.now();
+  DateTime serviceStart = parseDateAndTime(servico.data, servico.horaInicio);
+  DateTime serviceEnd = parseDateAndTime(servico.data, servico.horaFim);
+
+  return (serviceStart.isAtSameMomentAs(now) || serviceStart.isBefore(now))  &&
+      serviceEnd.isAfter(now) &&
+      serviceStart.day == now.day;
+}
+}
+
