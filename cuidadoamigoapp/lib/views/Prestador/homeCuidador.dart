@@ -16,12 +16,13 @@ class HomePrestador extends StatefulWidget {
 }
 
 // ...
-class  HomePrestadorState extends State< HomePrestador> {
+class HomePrestadorState extends State<HomePrestador> {
   FirebaseAuth _auth = FirebaseAuth.instance;
   List<Servico> servicosDoCliente = [];
   List<Servico> servicosEmAberto = [];
   List<Servico> servicosFinalizados = [];
-  bool exibirEmAberto = true; // Variável para controlar a exibição de serviços em aberto ou finalizados
+  bool exibirEmAberto =
+      true; // Variável para controlar a exibição de serviços em aberto ou finalizados
 
   @override
   void initState() {
@@ -39,7 +40,6 @@ class  HomePrestadorState extends State< HomePrestador> {
     var now = DateTime.now().toLocal();
     now = tz.TZDateTime.from(now, location);
 
-
     if (user != null) {
       final firestore = FirebaseFirestore.instance;
       firestore
@@ -49,8 +49,10 @@ class  HomePrestadorState extends State< HomePrestador> {
           .then((querySnapshot) {
         servicosDoCliente.clear();
         querySnapshot.docs.forEach((document) {
-          final servico = Servico.fromMap(document.data() as Map<String, dynamic>);
-          final servicoDateTime = parseDateAndTime(servico.data, servico.horaFim);
+          final servico =
+              Servico.fromMap(document.data() as Map<String, dynamic>);
+          final servicoDateTime =
+              parseDateAndTime(servico.data, servico.horaFim);
 
           // Verificar se o serviço é em aberto (data e horaFim após o momento atual)
           if (servicoDateTime.isAfter(now)) {
@@ -125,7 +127,8 @@ class  HomePrestadorState extends State< HomePrestador> {
                       });
                     },
                     style: TextButton.styleFrom(
-                      primary: exibirEmAberto ? Colors.green : Colors.black,
+                      foregroundColor:
+                          exibirEmAberto ? Colors.green : Colors.black,
                     ),
                     child: Text('Em Aberto'),
                   ),
@@ -148,7 +151,8 @@ class  HomePrestadorState extends State< HomePrestador> {
                       });
                     },
                     style: TextButton.styleFrom(
-                      primary: !exibirEmAberto ? Colors.green : Colors.black,
+                      foregroundColor:
+                          !exibirEmAberto ? Colors.green : Colors.black,
                     ),
                     child: Text('Finalizadas'),
                   ),
@@ -170,53 +174,52 @@ class  HomePrestadorState extends State< HomePrestador> {
   }
 
   Widget _buildServiceItem(Servico servico) {
-  bool showPlayButton = isShowPlayButton(servico);
+    bool showPlayButton = isShowPlayButton(servico);
 
-  return Card(
-    elevation: 4,
-    margin: const EdgeInsets.only(bottom: 16),
-    child: ListTile(
-      title: Text('Data: ${servico.data}'),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Horário: ${servico.horaInicio} - ${servico.horaFim}'),
-          Text('Endereço: ${servico.endereco}'),
-        ],
-      ),
-      onTap: servicosEmAberto.contains(servico)
-          ? () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => DetalhesServico2(servico: servico),
+    return Card(
+      elevation: 4,
+      margin: const EdgeInsets.only(bottom: 16),
+      child: ListTile(
+        title: Text('Data: ${servico.data}'),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Horário: ${servico.horaInicio} - ${servico.horaFim}'),
+            Text('Endereço: ${servico.endereco}'),
+          ],
+        ),
+        onTap: servicosEmAberto.contains(servico)
+            ? () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => DetalhesServico2(servico: servico),
+                  ),
+                );
+              }
+            : null,
+        trailing: showPlayButton
+            ? IconButton(
+                icon: Icon(
+                  Icons.play_circle_fill,
+                  color: Colors.green,
+                  size: 32,
                 ),
-              );
-            }
-          : null,
-      trailing: showPlayButton
-          ? IconButton(
-              icon: Icon(
-                Icons.play_circle_fill,
-                color: Colors.green,
-                size: 32,
-              ),
-              onPressed: () {
-                // Adicione ação para iniciar o serviço aqui
-              },
-            )
-          : null,
-    ),
-  );
-}
+                onPressed: () {
+                  // Adicione ação para iniciar o serviço aqui
+                },
+              )
+            : null,
+      ),
+    );
+  }
 
-bool isShowPlayButton(Servico servico) {
-  DateTime now = DateTime.now();
-  DateTime serviceStart = parseDateAndTime(servico.data, servico.horaInicio);
-  DateTime serviceEnd = parseDateAndTime(servico.data, servico.horaFim);
+  bool isShowPlayButton(Servico servico) {
+    DateTime now = DateTime.now();
+    DateTime serviceStart = parseDateAndTime(servico.data, servico.horaInicio);
+    DateTime serviceEnd = parseDateAndTime(servico.data, servico.horaFim);
 
-  return (serviceStart.isAtSameMomentAs(now) || serviceStart.isBefore(now))  &&
-      serviceEnd.isAfter(now) &&
-      serviceStart.day == now.day;
+    return (serviceStart.isAtSameMomentAs(now) || serviceStart.isBefore(now)) &&
+        serviceEnd.isAfter(now) &&
+        serviceStart.day == now.day;
+  }
 }
-}
-
