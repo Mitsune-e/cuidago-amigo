@@ -27,10 +27,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.macOS:
         return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -44,40 +41,48 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: '',
-    appId: '',
-    messagingSenderId: '',
-    projectId: '',
-    authDomain: '',
-    storageBucket: '',
-    measurementId: '',
+    apiKey: 'AIzaSyCox7ZGwJyoEF9QOTJWMpjDSWkpb9j5qLM',
+    appId: '1:553835935461:web:3e3f3b2d690b8a257d060c',
+    messagingSenderId: '553835935461',
+    projectId: 'cuidado-amigo-7b432',
+    authDomain: 'cuidado-amigo-7b432.firebaseapp.com',
+    storageBucket: 'cuidado-amigo-7b432.appspot.com',
+    measurementId: 'G-WYXSJZXRYL',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: '',
-    appId: '',
-    messagingSenderId: '',
-    projectId: '',
-    storageBucket: '',
+    apiKey: 'AIzaSyBdlFaFEfM-YnygxZWtO3Hh_a9c3EjGpwg',
+    appId: '1:553835935461:android:8fb67cb019704aea7d060c',
+    messagingSenderId: '553835935461',
+    projectId: 'cuidado-amigo-7b432',
+    storageBucket: 'cuidado-amigo-7b432.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: '',
-    appId: '',
-    messagingSenderId: '',
-    projectId: '',
-    storageBucket: '',
-    iosClientId: '',
-    iosBundleId: '',
+    apiKey: 'AIzaSyApgnrBOI5-pR1HKh5JHYJYxfkrEvgorMM',
+    appId: '1:553835935461:ios:23cf2593124e05ba7d060c',
+    messagingSenderId: '553835935461',
+    projectId: 'cuidado-amigo-7b432',
+    storageBucket: 'cuidado-amigo-7b432.appspot.com',
+    iosBundleId: 'com.example.cuidadoamigoapp',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: '',
-    appId: '',
-    messagingSenderId: '',
-    projectId: '',
-    storageBucket: '',
-    iosClientId: '',
-    iosBundleId: '',
+    apiKey: 'AIzaSyApgnrBOI5-pR1HKh5JHYJYxfkrEvgorMM',
+    appId: '1:553835935461:ios:23cf2593124e05ba7d060c',
+    messagingSenderId: '553835935461',
+    projectId: 'cuidado-amigo-7b432',
+    storageBucket: 'cuidado-amigo-7b432.appspot.com',
+    iosBundleId: 'com.example.cuidadoamigoapp',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyCox7ZGwJyoEF9QOTJWMpjDSWkpb9j5qLM',
+    appId: '1:553835935461:web:2fd33d3e3ee36d4e7d060c',
+    messagingSenderId: '553835935461',
+    projectId: 'cuidado-amigo-7b432',
+    authDomain: 'cuidado-amigo-7b432.firebaseapp.com',
+    storageBucket: 'cuidado-amigo-7b432.appspot.com',
+    measurementId: 'G-6FHYBPBN6Q',
   );
 }

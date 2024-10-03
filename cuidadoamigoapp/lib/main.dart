@@ -15,26 +15,25 @@ import 'package:cuidadoamigoapp/views/Prestador/homeCuidador.dart';
 import 'package:cuidadoamigoapp/views/login.dart';
 import 'package:cuidadoamigoapp/views/Cliente/homeIdoso.dart';
 import 'package:flutter/material.dart';
-/* import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
-import 'firebase_options.dart'; */
+import 'firebase_options.dart';
 
 Future main() async {
-/*   WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-); */
-  runApp(
-    /* MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => Clientes()),
-        ChangeNotifierProvider(create: (context) => Enderecos()),
-        ChangeNotifierProvider(create: (context) => Prestadores()),
-        ChangeNotifierProvider(create: (context) => Servicos()),
-        // Outros providers, se houver
-      ], */
-    const MyApp(),
   );
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (context) => Clientes()),
+      ChangeNotifierProvider(create: (context) => Enderecos()),
+      ChangeNotifierProvider(create: (context) => Prestadores()),
+      ChangeNotifierProvider(create: (context) => Servicos()),
+      // Outros providers, se houver
+    ],
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {

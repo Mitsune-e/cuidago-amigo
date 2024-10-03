@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cuidadoamigoapp/models/Prestador.dart';
 import 'package:cuidadoamigoapp/provider/Prestadores.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,8 +17,8 @@ class Carteira extends StatefulWidget {
 
 class _CarteiraState extends State<Carteira> {
   double saldo = 0.0;
-/*   FirebaseFirestore _firestore = FirebaseFirestore.inswtance;
-  FirebaseAuth _auth = FirebaseAuth.instance; */
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   void initState() {
@@ -29,8 +32,8 @@ class _CarteiraState extends State<Carteira> {
           Provider.of<Prestadores>(context, listen: false);
 
       // Verifica se _auth.currentUser não é null antes de acessar uid
-      if (auth.currentUser != null) {
-        String idDoUsuario = _auth.currentUser!.uid;
+      if (_auth.currentUser != null) {
+        String idDoUsuario = ""; //_auth.currentUser!.uid;
         Prestador? prestador =
             await prestadoresProvider.loadClienteById(idDoUsuario);
         print(prestador!.name);
@@ -227,7 +230,7 @@ class _CarteiraState extends State<Carteira> {
                     // Subtrai o valor retirado do saldo atual
                     double novoSaldo = saldoAtual - valorRetirada;
                     // Atualiza o saldo no Firestore
-                    await firebase_firestore
+                    await _firestore
                         .collection("Prestadores")
                         .doc(prestador!.id)
                         .update({

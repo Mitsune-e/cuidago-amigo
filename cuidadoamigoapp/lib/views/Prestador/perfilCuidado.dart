@@ -5,16 +5,10 @@ import 'package:cuidadoamigoapp/models/Prestador.dart';
 import 'package:cuidadoamigoapp/views/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-
-// import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-/* import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:csc_picker/csc_picker.dart';
- */
 class PerfilCuidador extends StatefulWidget {
   const PerfilCuidador({Key? key}) : super(key: key);
 
@@ -23,8 +17,8 @@ class PerfilCuidador extends StatefulWidget {
 }
 
 class _PerfilState extends State<PerfilCuidador> {
-  /* final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance; */
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final TextEditingController _nomeController = TextEditingController();
   final TextEditingController _cpfController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -62,7 +56,8 @@ class _PerfilState extends State<PerfilCuidador> {
 
   Future<void> _loadUserData(String userId) async {
     try {
-      //DocumentSnapshot userDoc = await _firestore.collection('Prestadores').doc(userId).get();
+      DocumentSnapshot userDoc =
+          await _firestore.collection('Prestadores').doc(userId).get();
 
       if (userDoc.exists) {
         Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
@@ -141,7 +136,7 @@ class _PerfilState extends State<PerfilCuidador> {
       // e obter a URL da imagem
 
       // Chame a função _updateUserData para atualizar a URL da imagem no Firestore
-      //User? user = _auth.currentUser;
+      User? user = _auth.currentUser;
 
       await _updateUserData(user!.uid);
     }

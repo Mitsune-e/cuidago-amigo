@@ -57,6 +57,7 @@ dependencies:
   timezone: ^0.9.2
   flutter_rating_bar: ^4.0.1
   flutter_spinkit: ^5.2.0
+  firebase_ui_auth: ^1.16.0
 
 dev_dependencies:
   flutter_test:
