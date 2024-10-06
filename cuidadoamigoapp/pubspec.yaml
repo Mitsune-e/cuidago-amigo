@@ -58,6 +58,7 @@ dependencies:
   flutter_rating_bar: ^4.0.1
   flutter_spinkit: ^5.2.0
   firebase_ui_auth: ^1.16.0
+  flutter_dotenv: ^5.1.0
 
 dev_dependencies:
   flutter_test:
@@ -84,6 +85,7 @@ flutter:
 
   assets:
   - Assets/imagens/
+  - .env
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
