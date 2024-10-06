@@ -43,48 +43,48 @@ class DefaultFirebaseOptions {
   }
 
   static FirebaseOptions web = FirebaseOptions(
-    apiKey: '',
-    appId: '',
-    messagingSenderId: '',
-    projectId: '',
-    authDomain: '',
-    storageBucket: '',
-    measurementId: '',
+    apiKey: '${dotenv.env['WEB_API_KEY']}',
+    appId: '${dotenv.env['WEB_API_ID']}',
+    messagingSenderId: '${dotenv.env['WEB_MESSAGING_SENDERID']}',
+    projectId: '${dotenv.env['WEB_PROJECT_ID']}',
+    authDomain: '${dotenv.env['WEB_AUTH_DOMAIN']}',
+    storageBucket: '${dotenv.env['WEB_STORAGE_BUCKET']}',
+    measurementId: '${dotenv.env['WEB_MEASUREMENTID']}',
   );
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: '',
-    appId: '',
-    messagingSenderId: '',
-    projectId: '',
-    storageBucket: '',
+  static FirebaseOptions android = FirebaseOptions(
+    apiKey: '${dotenv.env['ANDROID_API_KEY']}',
+    appId: '${dotenv.env['ANDROID_APP_ID']}',
+    messagingSenderId: '${dotenv.env['ANDROID_MESSAGING_SENDERID']}',
+    projectId: '${dotenv.env['ANDROID_PROJECT_ID']}',
+    storageBucket: '${dotenv.env['ANDROID_STORAGE_BUCKET']}',
   );
 
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: '',
-    appId: '',
-    messagingSenderId: '',
-    projectId: '',
-    storageBucket: '',
-    iosBundleId: '',
+  static FirebaseOptions ios = FirebaseOptions(
+    apiKey: '${dotenv.env['IOS_API_KEY']}',
+    appId: '${dotenv.env['IOS_APP_ID']}',
+    messagingSenderId: '${dotenv.env['IOS_MESSAGING_SENDERID']}',
+    projectId: '${dotenv.env['IOS_PROJECT_ID']}',
+    storageBucket: '${dotenv.env['IOS_STORAGE_BUCKET']}',
+    iosBundleId: '${dotenv.env['IOS_BUNDLE_ID']}',
   );
 
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: '',
-    appId: '',
-    messagingSenderId: '',
-    projectId: '',
-    storageBucket: '',
-    iosBundleId: '',
+  static FirebaseOptions macos = FirebaseOptions(
+    apiKey: '${dotenv.env['MACOS_API_KEY']}',
+    appId: '${dotenv.env['MACOS_APP_ID']}',
+    messagingSenderId: '${dotenv.env['MACOS_MESSAGING_SENDERI']}',
+    projectId: '${dotenv.env['MACOS_PROJECT_ID']}',
+    storageBucket: '${dotenv.env['MACOS_STORAGE_BUCKET']}',
+    iosBundleId: '${dotenv.env['MACOS_BUNDLE_ID']}',
   );
 
-  static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: '',
-    appId: '',
-    messagingSenderId: '',
-    projectId: '',
-    authDomain: '',
-    storageBucket: '',
-    measurementId: '',
+  static FirebaseOptions windows = FirebaseOptions(
+    apiKey: '${dotenv.env['WINDOWS_API_KEY']}',
+    appId: '${dotenv.env['WINDOWS_APP_ID']}',
+    messagingSenderId: '${dotenv.env['WINDOWS_MESSAGING_SENDERID']}',
+    projectId: '${dotenv.env['WINDOWS_PROJECT_ID']}',
+    authDomain: '${dotenv.env['WINDOWS_AUTH_DOMAIN']}',
+    storageBucket: '${dotenv.env['WINDOWS_STORAGE_BUCKET']}',
+    measurementId: '${dotenv.env['WINDOWS_MEASUREMENT_ID']}',
   );
 }
