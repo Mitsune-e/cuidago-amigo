@@ -1,43 +1,26 @@
 {
   "project_info": {
-    "project_number": "278902939143",
-    "project_id": "cuidadoamigo-f22cd",
-    "storage_bucket": "cuidadoamigo-f22cd.appspot.com"
+    "project_number": "553835935461",
+    "project_id": "cuidado-amigo-7b432",
+    "storage_bucket": "cuidado-amigo-7b432.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:278902939143:android:f61ae6e72542cab6d414a2",
+        "mobilesdk_app_id": "1:553835935461:android:8fb67cb019704aea7d060c",
         "android_client_info": {
           "package_name": "com.example.cuidadoamigoapp"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "278902939143-2cbkovseoskmhltdehr35tckrhaqctfn.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCbD2xTjVNCb6vAoPSwcKeAwknvpjG3z9Y"
+          "current_key": "AIzaSyBdlFaFEfM-YnygxZWtO3Hh_a9c3EjGpwg"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "278902939143-2cbkovseoskmhltdehr35tckrhaqctfn.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "278902939143-4usug0obe7s4s26uvmbjl2oep65kf8r2.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.cuidadoamigoapp"
-              }
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }
