@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class Login extends StatefulWidget {
-  Login({Key? key}) : super(key: key);
+  const Login({super.key});
 
   @override
   State<Login> createState() => _LoginState();
@@ -37,68 +37,80 @@ class _LoginState extends State<Login> {
     });
   }
 
- Future<void> login() async {
-  try {
-    setState(() => loading = true);
+  Future<void> login() async {
+    try {
+      setState(() => loading = true);
 
-    final emailText = email.text;
-    final senhaText = senha.text;
+      final emailText = email.text;
+      final senhaText = senha.text;
 
-    // Verificar se o e-mail está cadastrado como Cliente
-    final clienteSnapshot = await FirebaseFirestore.instance.collection('Clientes').where('email', isEqualTo: emailText).get();
-    
-    // Verificar se o e-mail está cadastrado como Prestador
-    final prestadorSnapshot = await FirebaseFirestore.instance.collection('Prestadores').where('email', isEqualTo: emailText).get();
+      // Verificar se o e-mail está cadastrado como Cliente
+      final clienteSnapshot = await FirebaseFirestore.instance
+          .collection('Clientes')
+          .where('email', isEqualTo: emailText)
+          .get();
 
-    if (clienteSnapshot.docs.isNotEmpty) {
-      // Autenticação com Firebase Authentication
-      final userCredential = await _auth.signInWithEmailAndPassword(
-        email: emailText,
-        password: senhaText,
-      );
+      // Verificar se o e-mail está cadastrado como Prestador
+      final prestadorSnapshot = await FirebaseFirestore.instance
+          .collection('Prestadores')
+          .where('email', isEqualTo: emailText)
+          .get();
 
-      if (userCredential.user != null) {
-        // Autenticação bem-sucedida - redireciona para a próxima tela de cliente
-        Navigator.of(context).pushReplacementNamed('/homeIdoso');
+      if (clienteSnapshot.docs.isNotEmpty) {
+        // Autenticação com Firebase Authentication
+        final userCredential = await _auth.signInWithEmailAndPassword(
+          email: emailText,
+          password: senhaText,
+        );
+
+        if (userCredential.user != null) {
+          // Autenticação bem-sucedida - redireciona para a próxima tela de cliente
+          Navigator.of(context).pushReplacementNamed('/homeIdoso');
+        } else {
+          // Exiba uma mensagem de erro caso a autenticação falhe
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content:
+                    Text('Erro de autenticação. Verifique seu email e senha.')),
+          );
+          setState(() => loading = false);
+        }
+      } else if (prestadorSnapshot.docs.isNotEmpty) {
+        // Autenticação com Firebase Authentication
+        final userCredential = await _auth.signInWithEmailAndPassword(
+          email: emailText,
+          password: senhaText,
+        );
+
+        if (userCredential.user != null) {
+          // Autenticação bem-sucedida - redireciona para a próxima tela de prestador
+          Navigator.of(context).pushReplacementNamed('/homePrestador');
+        } else {
+          // Exiba uma mensagem de erro caso a autenticação falhe
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content:
+                    Text('Erro de autenticação. Verifique seu email e senha.')),
+          );
+          setState(() => loading = false);
+        }
       } else {
-        // Exiba uma mensagem de erro caso a autenticação falhe
+        // Exiba uma mensagem se o e-mail não estiver cadastrado como cliente nem prestador
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro de autenticação. Verifique seu email e senha.')),
+          SnackBar(content: Text('E-mail não cadastrado. Cadastre-se agora.')),
         );
         setState(() => loading = false);
       }
-    } else if (prestadorSnapshot.docs.isNotEmpty) {
-      // Autenticação com Firebase Authentication
-      final userCredential = await _auth.signInWithEmailAndPassword(
-        email: emailText,
-        password: senhaText,
-      );
-
-      if (userCredential.user != null) {
-        // Autenticação bem-sucedida - redireciona para a próxima tela de prestador
-        Navigator.of(context).pushReplacementNamed('/homePrestador');
-      } else {
-        // Exiba uma mensagem de erro caso a autenticação falhe
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro de autenticação. Verifique seu email e senha.')),
-        );
-        setState(() => loading = false);
-      }
-    } else {
-      // Exiba uma mensagem se o e-mail não estiver cadastrado como cliente nem prestador
+    } catch (e) {
+      print('Erro de autenticação com Firebase Authentication: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('E-mail não cadastrado. Cadastre-se agora.')),
+        SnackBar(
+            content:
+                Text('Erro de autenticação. Verifique seu email e senha.')),
       );
       setState(() => loading = false);
     }
-  } catch (e) {
-    print('Erro de autenticação com Firebase Authentication: $e');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Erro de autenticação. Verifique seu email e senha.')),
-    );
-    setState(() => loading = false);
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +124,8 @@ class _LoginState extends State<Login> {
               SizedBox(
                 height: 200,
                 width: 400,
-                child: Image.asset('Assets/imagens/LOGO.png', fit: BoxFit.cover),
+                child:
+                    Image.asset('Assets/imagens/LOGO.png', fit: BoxFit.cover),
               ),
               const SizedBox(height: 20),
               TextFormField(
@@ -210,7 +223,8 @@ class _LoginState extends State<Login> {
                 const SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pushReplacementNamed('/cadastroPrestador');
+                    Navigator.of(context)
+                        .pushReplacementNamed('/cadastroPrestador');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromRGBO(92, 198, 186, 100),

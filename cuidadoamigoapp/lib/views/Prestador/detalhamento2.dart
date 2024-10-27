@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 
 class DetalhesServico2 extends StatefulWidget {
   final Servico servico;
-  DetalhesServico2({required this.servico});
+  const DetalhesServico2({super.key, required this.servico});
 
   @override
   _DetalhesServicoState2 createState() => _DetalhesServicoState2();
@@ -47,7 +47,8 @@ class _DetalhesServicoState2 extends State<DetalhesServico2> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: FutureBuilder<Cliente?>(
-          future: Provider.of<Clientes>(context).loadClienteById(widget.servico.usuario),
+          future: Provider.of<Clientes>(context)
+              .loadClienteById(widget.servico.usuario),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return CircularProgressIndicator(); // Exiba um indicador de carregamento enquanto aguarda.
@@ -96,11 +97,12 @@ class _DetalhesServicoState2 extends State<DetalhesServico2> {
                     ),
                     _buildServiceInfo('Endereço', widget.servico.endereco),
                     _buildServiceInfo('Data', widget.servico.data),
-                    _buildServiceInfo('Valor', 'R\$ ${double.parse(widget.servico.valor).toStringAsFixed(2)}'),
+                    _buildServiceInfo('Valor',
+                        'R\$ ${double.parse(widget.servico.valor).toStringAsFixed(2)}'),
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () {
-                        WidgetsBinding.instance!.addPostFrameCallback((_) {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
                           _mostrarCancelarServicoDialog(context);
                         });
                       },
@@ -177,7 +179,8 @@ class _DetalhesServicoState2 extends State<DetalhesServico2> {
             ),
             TextButton(
               onPressed: () {
-                Provider.of<Servicos>(context, listen: false).remove(widget.servico);
+                Provider.of<Servicos>(context, listen: false)
+                    .remove(widget.servico);
                 Navigator.of(context).pop();
                 Navigator.of(context).pushNamed('/agenda');
               },

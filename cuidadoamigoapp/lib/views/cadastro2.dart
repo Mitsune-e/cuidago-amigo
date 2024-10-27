@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Cadastro2 extends StatefulWidget {
-  const Cadastro2({Key? key}) : super(key: key);
+  const Cadastro2({super.key});
 
   @override
   State<Cadastro2> createState() => _Cadastro2State();

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class HomeIdoso extends StatelessWidget {
-  const HomeIdoso({Key? key});
+  const HomeIdoso({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class HomeIdoso extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-             /* const CircleAvatar(
+              /* const CircleAvatar(
                 radius: 80, // Tamanho do ícone de pessoa
                 backgroundColor: Colors.white, // Fundo branco para o ícone
               ),

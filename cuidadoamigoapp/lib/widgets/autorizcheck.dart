@@ -5,7 +5,7 @@ import 'package:cuidadoamigoapp/servicos/autorizacao.dart';
 import 'package:provider/provider.dart';
 
 class AuthCheck extends StatefulWidget {
-  AuthCheck({Key? key}) : super(key: key);
+  const AuthCheck({super.key});
 
   @override
   _AuthCheckState createState() => _AuthCheckState();

@@ -1,6 +1,6 @@
 class Utils {
   static bool validarCPF(String cpf) {
-    if (cpf == null || cpf.length != 11) {
+    if (cpf.length != 11) {
       return false;
     }
 

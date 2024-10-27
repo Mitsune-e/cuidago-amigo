@@ -10,7 +10,7 @@ import 'package:csc_picker/csc_picker.dart';
 import 'package:provider/provider.dart';
 
 class CadastroCuidado extends StatefulWidget {
-  CadastroCuidado({Key? key}) : super(key: key);
+  const CadastroCuidado({super.key});
 
   @override
   _CadastroPrestadorState createState() => _CadastroPrestadorState();
@@ -38,6 +38,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
   var cidade = '';
   var estado = '';
 
+  @override
   void initState() {
     super.initState();
   }

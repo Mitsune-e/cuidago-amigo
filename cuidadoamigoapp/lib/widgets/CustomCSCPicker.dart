@@ -8,6 +8,7 @@ class CustomCSCPicker extends StatefulWidget {
   final bool disableCountry;
 
   CustomCSCPicker({
+    super.key,
     required this.currentCountry,
     required this.currentState,
     required this.currentCity,
@@ -33,7 +34,7 @@ class _CustomCSCPickerState extends State<CustomCSCPicker> {
     );
   }
 
- void updateData(String newState, String newCity) {
+  void updateData(String newState, String newCity) {
     setState(() {
       widget.currentState = newState;
       widget.currentCity = newCity;

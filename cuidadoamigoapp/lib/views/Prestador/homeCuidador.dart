@@ -9,7 +9,7 @@ import 'package:timezone/timezone.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class HomePrestador extends StatefulWidget {
-  const HomePrestador({Key? key});
+  const HomePrestador({super.key});
 
   @override
   HomePrestadorState createState() => HomePrestadorState();
@@ -17,7 +17,7 @@ class HomePrestador extends StatefulWidget {
 
 // ...
 class HomePrestadorState extends State<HomePrestador> {
-  FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   List<Servico> servicosDoCliente = [];
   List<Servico> servicosEmAberto = [];
   List<Servico> servicosFinalizados = [];
@@ -48,9 +48,8 @@ class HomePrestadorState extends State<HomePrestador> {
           .get()
           .then((querySnapshot) {
         servicosDoCliente.clear();
-        querySnapshot.docs.forEach((document) {
-          final servico =
-              Servico.fromMap(document.data() as Map<String, dynamic>);
+        for (var document in querySnapshot.docs) {
+          final servico = Servico.fromMap(document.data());
           final servicoDateTime =
               parseDateAndTime(servico.data, servico.horaFim);
 
@@ -62,7 +61,7 @@ class HomePrestadorState extends State<HomePrestador> {
           else if (servicoDateTime.isBefore(now)) {
             servicosFinalizados.add(servico);
           }
-        });
+        }
 
         setState(() {
           servicosDoCliente = servicosEmAberto;

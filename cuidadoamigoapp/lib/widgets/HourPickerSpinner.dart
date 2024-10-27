@@ -11,7 +11,7 @@ class HourPickerSpinner extends StatefulWidget {
   final ValueChanged<DateTime>? onTimeChange;
 
   const HourPickerSpinner({
-    Key? key,
+    super.key,
     this.is24HourMode = true,
     this.normalTextStyle,
     this.highlightedTextStyle,
@@ -19,7 +19,7 @@ class HourPickerSpinner extends StatefulWidget {
     this.itemHeight = 80,
     this.isForce2Digits = true,
     this.onTimeChange,
-  }) : super(key: key);
+  });
 
   @override
   _HourPickerSpinnerState createState() => _HourPickerSpinnerState();
@@ -30,7 +30,7 @@ class _HourPickerSpinnerState extends State<HourPickerSpinner> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: widget.itemHeight,
       child: ListWheelScrollView(
         physics: FixedExtentScrollPhysics(),
@@ -56,14 +56,17 @@ class _HourPickerSpinnerState extends State<HourPickerSpinner> {
 
     for (int i = 0; i < hoursInDay; i++) {
       final int displayedHour = widget.is24HourMode ? i : i + 1;
-      final String formattedHour =
-          widget.isForce2Digits ? _formatTwoDigit(displayedHour) : '$displayedHour';
+      final String formattedHour = widget.isForce2Digits
+          ? _formatTwoDigit(displayedHour)
+          : '$displayedHour';
       final TextStyle textStyle = i == _selectedHour
-          ? widget.highlightedTextStyle ?? TextStyle(fontSize: 24, color: Colors.black)
-          : widget.normalTextStyle ?? TextStyle(fontSize: 24, color: Colors.grey);
+          ? widget.highlightedTextStyle ??
+              TextStyle(fontSize: 24, color: Colors.black)
+          : widget.normalTextStyle ??
+              TextStyle(fontSize: 24, color: Colors.grey);
 
       items.add(
-        Container(
+        SizedBox(
           height: widget.itemHeight,
           child: Center(
             child: Text(
@@ -79,7 +82,8 @@ class _HourPickerSpinnerState extends State<HourPickerSpinner> {
   }
 
   void _notifyTimeChange() {
-    final int selectedHour = widget.is24HourMode ? _selectedHour : _selectedHour + 1;
+    final int selectedHour =
+        widget.is24HourMode ? _selectedHour : _selectedHour + 1;
     final DateTime selectedTime = DateTime(2023, 1, 1, selectedHour, 0);
     if (widget.onTimeChange != null) {
       widget.onTimeChange!(selectedTime);

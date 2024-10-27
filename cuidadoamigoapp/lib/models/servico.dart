@@ -48,7 +48,8 @@ class Servico {
         estado = map['estado'] ?? "",
         cidade = map['cidade'] ?? "",
         valor = map['valor'] ?? "",
-        avaliacao = (map['avaliacao'] ?? 0.0).toDouble(), // Convertido para double
+        avaliacao =
+            (map['avaliacao'] ?? 0.0).toDouble(), // Convertido para double
         finalizada = map['finalizada'] ?? false,
         avaliado = map['avaliado'] ?? false,
         destaque = map['destaque'] ?? false;
@@ -81,32 +82,32 @@ class Servico {
     bool? destaque,
   }) {
     return Servico(
-      id: this.id,
-      data: this.data,
-      horaInicio: this.horaInicio,
-      horaFim: this.horaFim,
-      endereco: this.endereco,
-      usuario: this.usuario,
-      prestador: this.prestador,
-      numero: this.numero,
-      complemento: this.complemento,
-      cidade: this.cidade,
-      estado: this.estado,
-      valor: this.valor,
+      id: id,
+      data: data,
+      horaInicio: horaInicio,
+      horaFim: horaFim,
+      endereco: endereco,
+      usuario: usuario,
+      prestador: prestador,
+      numero: numero,
+      complemento: complemento,
+      cidade: cidade,
+      estado: estado,
+      valor: valor,
       avaliacao: avaliacao ?? this.avaliacao, // Atualizado campo avaliacao
       finalizada: finalizada ?? this.finalizada,
       avaliado: avaliado ?? this.avaliado,
       destaque: destaque ?? this.destaque,
     );
   }
-   bool get isEmAberto {
+
+  bool get isEmAberto {
     final now = DateTime.now();
     final servicoDateTime = parseDateAndTime(data, horaFim);
     return servicoDateTime.isAfter(now);
   }
 
-
-DateTime parseDateAndTime(String date, String hour) {
+  DateTime parseDateAndTime(String date, String hour) {
     final dateParts = date.split('/');
     final timeParts = hour.split(':');
     final day = int.parse(dateParts[0]);
@@ -117,7 +118,7 @@ DateTime parseDateAndTime(String date, String hour) {
     return DateTime(year, month, day, hourOfDay, minute);
   }
 
-   bool get isFinalizado {
+  bool get isFinalizado {
     // Substitua esta lógica pela condição que define se o serviço está finalizado
     // Neste exemplo, estamos considerando que um serviço está finalizado se a data/hora atual for após a data/hora de fim do serviço.
     final now = DateTime.now();

@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class PerfilCuidador extends StatefulWidget {
-  const PerfilCuidador({Key? key}) : super(key: key);
+  const PerfilCuidador({super.key});
 
   @override
   _PerfilState createState() => _PerfilState();

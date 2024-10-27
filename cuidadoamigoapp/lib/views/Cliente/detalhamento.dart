@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 
 class DetalhesServico extends StatefulWidget {
   final Servico servico;
-  DetalhesServico({required this.servico});
+  const DetalhesServico({super.key, required this.servico});
 
   @override
   _DetalhesServicoState createState() => _DetalhesServicoState();
@@ -32,18 +32,18 @@ class _DetalhesServicoState extends State<DetalhesServico> {
     serviceDateController.text = widget.servico.data;
   }
 
-void _carregarPrestadorSync() {
-  prestador = Provider.of<Prestadores>(context, listen: false)
-      .loadClienteByIdSync(widget.servico.prestador);
+  void _carregarPrestadorSync() {
+    prestador = Provider.of<Prestadores>(context, listen: false)
+        .loadClienteByIdSync(widget.servico.prestador);
 
-  if (prestador != null) {
-    serviceNameController.text = prestador!.name;
-  } else {
-    print('Cuidador não encontrado');
+    if (prestador != null) {
+      serviceNameController.text = prestador!.name;
+    } else {
+      print('Cuidador não encontrado');
+    }
   }
-}
 
- @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -59,7 +59,8 @@ void _carregarPrestadorSync() {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: FutureBuilder<Prestador?>(
-          future: Provider.of<Prestadores>(context).loadClienteById(widget.servico.prestador),
+          future: Provider.of<Prestadores>(context)
+              .loadClienteById(widget.servico.prestador),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Container();
@@ -69,59 +70,61 @@ void _carregarPrestadorSync() {
               prestador = snapshot.data!;
               serviceNameController.text = prestador!.name;
 
-              DateTime horaFimServico = parseDataHora(widget.servico.data + ' ' + widget.servico.horaFim);
+              DateTime horaFimServico = parseDataHora(
+                  '${widget.servico.data} ${widget.servico.horaFim}');
               DateTime horaAtual = DateTime.now();
 
-              bool podeCancelar = !widget.servico.finalizada && horaFimServico.isAfter(horaAtual);
+              bool podeCancelar = !widget.servico.finalizada &&
+                  horaFimServico.isAfter(horaAtual);
 
               return SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                   const CircleAvatar(
-                backgroundColor: Color(0xFF73C9C9),
-                radius: 60,
-                child: Icon(
-                  Icons.person,
-                  size: 80,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 20),
-               const SizedBox(height: 20),
-              _buildSectionTitle('Informações do Cuidador'),
-              if (prestador != null) ...[
-                _buildPrestadorInfo('Nome', prestador!.name),
-                _buildPrestadorInfo('Email', prestador!.email),
-                // Adicione mais informações do prestador conforme necessário
-              ] else ...[
-                Text('Prestador não encontrado'),
-              ],
-              _buildSectionTitle('Detalhes do Serviço'),
-              Text(
-                'Horario:',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[600],
-                ),
-              ),
-              Text(
-                '${widget.servico.horaInicio} - ${widget.servico.horaFim}',
-                style: TextStyle(
-                  fontSize: 18,
-                ),
-              ),
-              _buildServiceInfo('Endereço', widget.servico.endereco),
-              _buildServiceInfo('Data', widget.servico.data),
-             _buildServiceInfo('Valor', 'R\$ ${double.parse(widget.servico.valor).toStringAsFixed(2)}'),
-              const SizedBox(height: 20),
-
-                  const SizedBox(height: 20),
+                    const CircleAvatar(
+                      backgroundColor: Color(0xFF73C9C9),
+                      radius: 60,
+                      child: Icon(
+                        Icons.person,
+                        size: 80,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const SizedBox(height: 20),
+                    _buildSectionTitle('Informações do Cuidador'),
+                    if (prestador != null) ...[
+                      _buildPrestadorInfo('Nome', prestador!.name),
+                      _buildPrestadorInfo('Email', prestador!.email),
+                      // Adicione mais informações do prestador conforme necessário
+                    ] else ...[
+                      Text('Prestador não encontrado'),
+                    ],
+                    _buildSectionTitle('Detalhes do Serviço'),
+                    Text(
+                      'Horario:',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    Text(
+                      '${widget.servico.horaInicio} - ${widget.servico.horaFim}',
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                    _buildServiceInfo('Endereço', widget.servico.endereco),
+                    _buildServiceInfo('Data', widget.servico.data),
+                    _buildServiceInfo('Valor',
+                        'R\$ ${double.parse(widget.servico.valor).toStringAsFixed(2)}'),
+                    const SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     if (podeCancelar)
                       ElevatedButton(
                         onPressed: () {
-                          WidgetsBinding.instance!.addPostFrameCallback((_) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
                             _mostrarCancelarServicoDialog(context);
                           });
                         },
@@ -144,6 +147,7 @@ void _carregarPrestadorSync() {
       ),
     );
   }
+
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
@@ -197,7 +201,8 @@ void _carregarPrestadorSync() {
             ),
             TextButton(
               onPressed: () {
-                Provider.of<Servicos>(context, listen: false).remove(widget.servico);
+                Provider.of<Servicos>(context, listen: false)
+                    .remove(widget.servico);
                 Navigator.of(context).pop();
                 Navigator.of(context).pushNamed('/agenda');
               },
@@ -208,17 +213,18 @@ void _carregarPrestadorSync() {
       },
     );
   }
-  DateTime parseDataHora(String dataHoraString) {
-  List<String> partes = dataHoraString.split(" ");
-  List<String> partesData = partes[0].split("/");
-  List<String> partesHora = partes[1].split(":");
-  
-  int dia = int.parse(partesData[0]);
-  int mes = int.parse(partesData[1]);
-  int ano = int.parse(partesData[2]);
-  int hora = int.parse(partesHora[0]);
-  int minuto = int.parse(partesHora[1]);
 
-  return DateTime(ano, mes, dia, hora, minuto);
-}
+  DateTime parseDataHora(String dataHoraString) {
+    List<String> partes = dataHoraString.split(" ");
+    List<String> partesData = partes[0].split("/");
+    List<String> partesHora = partes[1].split(":");
+
+    int dia = int.parse(partesData[0]);
+    int mes = int.parse(partesData[1]);
+    int ano = int.parse(partesData[2]);
+    int hora = int.parse(partesHora[0]);
+    int minuto = int.parse(partesHora[1]);
+
+    return DateTime(ano, mes, dia, hora, minuto);
+  }
 }

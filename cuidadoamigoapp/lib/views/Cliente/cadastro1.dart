@@ -11,7 +11,7 @@ import 'package:csc_picker/csc_picker.dart';
 import 'package:provider/provider.dart';
 
 class Cadastro1 extends StatefulWidget {
-  Cadastro1({Key? key}) : super(key: key);
+  const Cadastro1({super.key});
 
   @override
   _Cadastro1State createState() => _Cadastro1State();
@@ -24,7 +24,8 @@ class _Cadastro1State extends State<Cadastro1> {
   final TextEditingController _telefoneController = TextEditingController();
   final TextEditingController _cpfController = TextEditingController();
   final TextEditingController _senhaController = TextEditingController();
-  final TextEditingController _confirmaSenhaController = TextEditingController();
+  final TextEditingController _confirmaSenhaController =
+      TextEditingController();
   final TextEditingController _estadoController = TextEditingController();
   final TextEditingController _cidadeController = TextEditingController();
   final TextEditingController _enderecoController = TextEditingController();
@@ -34,13 +35,15 @@ class _Cadastro1State extends State<Cadastro1> {
   final TextEditingController _imagemController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   bool _possuiCarro = false;
-   bool isNomeValid = false;
+  bool isNomeValid = false;
   var cidade = '';
-  var estado ='';
+  var estado = '';
 
+  @override
   void initState() {
-    super.initState();}
- 
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,17 +104,28 @@ class _Cadastro1State extends State<Cadastro1> {
             const SizedBox(height: 20),
             _buildImagePickerButton(),
             const SizedBox(height: 10),
-            _buildTextField(controller: _nomeController, hintText: 'Nome', label: 'Nome'),
+            _buildTextField(
+                controller: _nomeController, hintText: 'Nome', label: 'Nome'),
             const SizedBox(height: 10),
-            _buildTextField(controller: _emailController, hintText: 'E-mail', label: 'E-mail'),
+            _buildTextField(
+                controller: _emailController,
+                hintText: 'E-mail',
+                label: 'E-mail'),
             const SizedBox(height: 10),
-            _buildPhoneTextField(controller: _telefoneController, label: 'Telefone'),
+            _buildPhoneTextField(
+                controller: _telefoneController, label: 'Telefone'),
             const SizedBox(height: 10),
             _buildCPFTextField(controller: _cpfController, label: 'CPF'),
             const SizedBox(height: 10),
-            _buildPasswordField(controller: _senhaController, hintText: 'Senha', label: 'Senha'),
+            _buildPasswordField(
+                controller: _senhaController,
+                hintText: 'Senha',
+                label: 'Senha'),
             const SizedBox(height: 10),
-            _buildPasswordField(controller: _confirmaSenhaController, hintText: 'Confirmação de Senha', label: 'Confirmação de Senha'),
+            _buildPasswordField(
+                controller: _confirmaSenhaController,
+                hintText: 'Confirmação de Senha',
+                label: 'Confirmação de Senha'),
           ],
         ),
       ),
@@ -134,16 +148,23 @@ class _Cadastro1State extends State<Cadastro1> {
             ),
             const SizedBox(height: 20),
             _buildCSCPicker(),
-            _buildTextField(controller: _enderecoController, hintText: 'Endereço', label: 'Endereço'),
-            _buildTextField(controller: _numeroController, hintText: 'Número', label: 'Número'),
-            _buildTextField(controller: _complementoController, hintText: 'Complemento', label: 'Complemento'),
+            _buildTextField(
+                controller: _enderecoController,
+                hintText: 'Endereço',
+                label: 'Endereço'),
+            _buildTextField(
+                controller: _numeroController,
+                hintText: 'Número',
+                label: 'Número'),
+            _buildTextField(
+                controller: _complementoController,
+                hintText: 'Complemento',
+                label: 'Complemento'),
           ],
         ),
       ),
     );
   }
-
- 
 
   Widget _buildFinalizar() {
     return Padding(
@@ -203,9 +224,9 @@ class _Cadastro1State extends State<Cadastro1> {
           ),
         ),
         TextFormField(
-          onChanged: (Text){setState(() {
-            
-          });},
+          onChanged: (Text) {
+            setState(() {});
+          },
           controller: controller,
           decoration: InputDecoration(
             hintText: hintText,
@@ -222,7 +243,8 @@ class _Cadastro1State extends State<Cadastro1> {
     );
   }
 
-  Widget _buildPhoneTextField({required TextEditingController controller, required String label}) {
+  Widget _buildPhoneTextField(
+      {required TextEditingController controller, required String label}) {
     var maskFormatter = TextInputFormatter.withFunction(
       (oldValue, newValue) {
         if (newValue.text.isEmpty) {
@@ -238,7 +260,8 @@ class _Cadastro1State extends State<Cadastro1> {
           text = text.substring(0, 11);
         }
 
-        var maskedText = '(${text.substring(0, 2)}) ${text.substring(2, 7)}-${text.substring(7)}';
+        var maskedText =
+            '(${text.substring(0, 2)}) ${text.substring(2, 7)}-${text.substring(7)}';
 
         return newValue.copyWith(
           text: maskedText,
@@ -256,9 +279,9 @@ class _Cadastro1State extends State<Cadastro1> {
           ),
         ),
         TextFormField(
-          onChanged: (Text){setState(() {
-            
-          });},
+          onChanged: (Text) {
+            setState(() {});
+          },
           controller: controller,
           keyboardType: TextInputType.phone,
           inputFormatters: [maskFormatter],
@@ -292,9 +315,9 @@ class _Cadastro1State extends State<Cadastro1> {
           ),
         ),
         TextFormField(
-          onChanged: (Text){setState(() {
-            
-          });},
+          onChanged: (Text) {
+            setState(() {});
+          },
           controller: controller,
           keyboardType: TextInputType.text,
           obscureText: true,
@@ -332,7 +355,8 @@ class _Cadastro1State extends State<Cadastro1> {
           text = text.substring(0, 11);
         }
 
-        var maskedText = '${text.substring(0, 3)}.${text.substring(3, 6)}.${text.substring(6, 9)}-${text.substring(9)}';
+        var maskedText =
+            '${text.substring(0, 3)}.${text.substring(3, 6)}.${text.substring(6, 9)}-${text.substring(9)}';
 
         return newValue.copyWith(
           text: maskedText,
@@ -350,9 +374,9 @@ class _Cadastro1State extends State<Cadastro1> {
           ),
         ),
         TextFormField(
-          onChanged: (Text){setState(() {
-            
-          });},
+          onChanged: (Text) {
+            setState(() {});
+          },
           controller: controller,
           keyboardType: TextInputType.number,
           inputFormatters: [maskFormatter],
@@ -441,15 +465,17 @@ class _Cadastro1State extends State<Cadastro1> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Descrição ${ _descricaoController.text.isNotEmpty ? '' : ' (Obrigatório)'}',
+          'Descrição ${_descricaoController.text.isNotEmpty ? '' : ' (Obrigatório)'}',
           style: TextStyle(
-            color:  _descricaoController.text.isNotEmpty ? Colors.black : Colors.red,
+            color: _descricaoController.text.isNotEmpty
+                ? Colors.black
+                : Colors.red,
           ),
         ),
         TextFormField(
-          onChanged: (Text){setState(() {
-            
-          });},
+          onChanged: (Text) {
+            setState(() {});
+          },
           controller: _descricaoController,
           maxLines: 3,
           decoration: InputDecoration(
@@ -517,7 +543,8 @@ class _Cadastro1State extends State<Cadastro1> {
 
     // Validate password match
     if (_senhaController.text != _confirmaSenhaController.text) {
-      _showErrorDialog('Erro', 'A senha e a confirmação de senha devem ser iguais.');
+      _showErrorDialog(
+          'Erro', 'A senha e a confirmação de senha devem ser iguais.');
       return;
     }
 
@@ -560,13 +587,13 @@ class _Cadastro1State extends State<Cadastro1> {
     if (cidade == '') {
       emptyFields.add('Cidade');
     }
-     if (estado == '') {
+    if (estado == '') {
       emptyFields.add('Estado');
     }
-   
 
     if (emptyFields.isNotEmpty) {
-      _showErrorDialog('Campos obrigatórios não preenchidos', 'Preencha os seguintes campos: \n ${emptyFields.join(",\n ")}');
+      _showErrorDialog('Campos obrigatórios não preenchidos',
+          'Preencha os seguintes campos: \n ${emptyFields.join(",\n ")}');
       return false;
     }
 
@@ -614,9 +641,10 @@ class _Cadastro1State extends State<Cadastro1> {
     );
   }
 
- void _registerUser(BuildContext context) async {
+  void _registerUser(BuildContext context) async {
     try {
-      final UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      final UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
         email: _emailController.text,
         password: _senhaController.text,
       );
@@ -637,8 +665,6 @@ class _Cadastro1State extends State<Cadastro1> {
           numero: _numeroController.text,
           complemento: _complementoController.text,
         );
-
-        
 
         Provider.of<Clientes>(context, listen: false).adiciona(cliente);
       }

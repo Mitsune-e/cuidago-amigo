@@ -6,17 +6,16 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:csc_picker/csc_picker.dart';
 
-
-
 class SolicitarCuidado1 extends StatefulWidget {
-  const SolicitarCuidado1({Key? key}) : super(key: key);
+  const SolicitarCuidado1({super.key});
 
   @override
   _SolicitarCuidado1State createState() => _SolicitarCuidado1State();
 }
 
 class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
-  bool _exibirCamposEndereco = true; // Modificado para sempre mostrar os campos de endereço
+  final bool _exibirCamposEndereco =
+      true; // Modificado para sempre mostrar os campos de endereço
 
   TextEditingController dataController = TextEditingController();
   DateTime? selectedTimeInicio;
@@ -29,31 +28,30 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
   double valor = 0.0;
   double valorHoraEnfermeiro = 20.0;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  GlobalKey<CSCPickerState> _cscPickerKey = GlobalKey<CSCPickerState>();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final GlobalKey<CSCPickerState> _cscPickerKey = GlobalKey<CSCPickerState>();
   TextEditingController stateController = TextEditingController();
   TextEditingController cityController = TextEditingController();
 
+  Future<void> _loadUserData(String userId) async {
+    try {
+      DocumentSnapshot userDoc =
+          await _firestore.collection('Clientes').doc(userId).get();
 
-
-Future<void> _loadUserData(String userId) async {
-  try {
-    DocumentSnapshot userDoc =
-        await _firestore.collection('Clientes').doc(userId).get();
-
-    if (userDoc.exists) {
-      setState(() {
-        enderecoController.text = userDoc['endereco'] ?? '';
-        numeroController.text = userDoc['numero'] ?? ''; 
-        complementoController.text = userDoc['complemento'] ?? '';
-        cidade = userDoc['cidade'] ?? '';
-        estado = userDoc['estado'] ?? '';
-      });
+      if (userDoc.exists) {
+        setState(() {
+          enderecoController.text = userDoc['endereco'] ?? '';
+          numeroController.text = userDoc['numero'] ?? '';
+          complementoController.text = userDoc['complemento'] ?? '';
+          cidade = userDoc['cidade'] ?? '';
+          estado = userDoc['estado'] ?? '';
+        });
+      }
+    } catch (e) {
+      print('Erro ao carregar dados do Firestore: $e');
     }
-  } catch (e) {
-    print('Erro ao carregar dados do Firestore: $e');
   }
-}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -123,7 +121,8 @@ Future<void> _loadUserData(String userId) async {
                           selectedTimeInicio != null
                               ? DateFormat('HH:mm').format(selectedTimeInicio!)
                               : 'Início',
-                          style: const TextStyle(color: Colors.white, fontSize: 16),
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 16),
                         ),
                       ),
                     ),
@@ -153,7 +152,8 @@ Future<void> _loadUserData(String userId) async {
                           selectedTimeFim != null
                               ? DateFormat('HH:mm').format(selectedTimeFim!)
                               : 'Fim',
-                          style: const TextStyle(color: Colors.white, fontSize: 16),
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 16),
                         ),
                       ),
                     ),
@@ -183,11 +183,10 @@ Future<void> _loadUserData(String userId) async {
                       onPressed: () async {
                         setState(() {
                           _loadUserData(_auth.currentUser!.uid);
-                                stateController.text = estado;
-                                cityController.text = cidade;
+                          stateController.text = estado;
+                          cityController.text = cidade;
                         });
-                         final cscPickerState = _cscPickerKey.currentState;
-                         
+                        final cscPickerState = _cscPickerKey.currentState;
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF73C9C9),
@@ -241,35 +240,35 @@ Future<void> _loadUserData(String userId) async {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 20),
-                 Row(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Cidade: ${cidade.isNotEmpty ? cidade : 'Nenhuma cidade selecionada'}',
-                        style: const TextStyle(
-                          fontSize: 18,
+                    Row(
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Cidade: ${cidade.isNotEmpty ? cidade : 'Nenhuma cidade selecionada'}',
+                              style: const TextStyle(
+                                fontSize: 18,
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            Text(
+                              'Estado: ${estado.isNotEmpty ? estado : 'Nenhum estado selecionado'}',
+                              style: const TextStyle(
+                                fontSize: 18,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        'Estado: ${estado.isNotEmpty ? estado : 'Nenhum estado selecionado'}',
-                        style: const TextStyle(
-                          fontSize: 18,
+                        SizedBox(width: 10),
+                        IconButton(
+                          icon: const Icon(Icons.edit),
+                          onPressed: () {
+                            _showEditLocationAlert(context);
+                          },
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(width: 10),
-                  IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () {
-                      _showEditLocationAlert(context);
-                    },
-                  ),
-                ],
-              ),
+                      ],
+                    ),
                     const SizedBox(height: 20),
                     TextFormField(
                       // Campo de Número
@@ -306,11 +305,13 @@ Future<void> _loadUserData(String userId) async {
                   onPressed: () {
                     if (selectedTimeInicio != null &&
                         selectedTimeFim != null &&
-                        selectedTimeFim!.isAfter(selectedTimeInicio!.add(Duration(minutes: 30))) &&
+                        selectedTimeFim!.isAfter(
+                            selectedTimeInicio!.add(Duration(minutes: 30))) &&
                         _validateAddress()) {
                       final dataToPass = {
                         'data': dataController.text,
-                        'horaInicio': DateFormat('HH:mm').format(selectedTimeInicio!),
+                        'horaInicio':
+                            DateFormat('HH:mm').format(selectedTimeInicio!),
                         'horaFim': DateFormat('HH:mm').format(selectedTimeFim!),
                         'valor': valor,
                         'cidade': cidade,
@@ -319,12 +320,14 @@ Future<void> _loadUserData(String userId) async {
                         'complemento': complementoController.text,
                         'numero': numeroController.text,
                       };
-                      Navigator.of(context).pushNamed('/solicitarCuidador2', arguments: dataToPass);
+                      Navigator.of(context).pushNamed('/solicitarCuidador2',
+                          arguments: dataToPass);
                     } else {
                       // Mostrar uma mensagem de erro ou fazer alguma outra ação
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('Por favor, verifique as informações e siga as regras.'),
+                          content: Text(
+                              'Por favor, verifique as informações e siga as regras.'),
                         ),
                       );
                     }
@@ -336,7 +339,8 @@ Future<void> _loadUserData(String userId) async {
                     ),
                   ),
                   child: const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 40.0),
+                    padding:
+                        EdgeInsets.symmetric(vertical: 16.0, horizontal: 40.0),
                     child: Text(
                       'Prosseguir',
                       style: TextStyle(
@@ -389,7 +393,8 @@ Future<void> _loadUserData(String userId) async {
                     });
                     Navigator.of(context).pop();
                   } else {
-                    if (selectedTime!.isAfter(selectedTimeInicio!.add(Duration(minutes: 30)))) {
+                    if (selectedTime!.isAfter(
+                        selectedTimeInicio!.add(Duration(minutes: 30)))) {
                       setState(() {
                         selectedTimeFim = selectedTime;
                         _updateValor();
@@ -399,7 +404,8 @@ Future<void> _loadUserData(String userId) async {
                       // Mostrar mensagem de erro
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('O horário de fim deve ser pelo menos 30 minutos após o início.'),
+                          content: Text(
+                              'O horário de fim deve ser pelo menos 30 minutos após o início.'),
                         ),
                       );
                     }
@@ -419,118 +425,126 @@ Future<void> _loadUserData(String userId) async {
         enderecoController.text.isNotEmpty &&
         numeroController.text.isNotEmpty;
   }
-void _updateValor() {
-  if (selectedTimeInicio != null && selectedTimeFim != null) {
-    final timeDifference = selectedTimeFim!.difference(selectedTimeInicio!);
-    if (timeDifference.inMinutes >= 30) {
-      // Lógica para calcular o valor baseado no tempo e outros fatores
-      double valorBase = timeDifference.inMinutes.toDouble() / 60 * valorHoraEnfermeiro;
 
-      // Lógica para adicionar possíveis custos adicionais (exemplo: deslocamento)
-      double custoDeslocamentoPercentual = 0.10; // 10% do valorBase como custo de deslocamento
-      double custoDeslocamento = valorBase * custoDeslocamentoPercentual;
+  void _updateValor() {
+    if (selectedTimeInicio != null && selectedTimeFim != null) {
+      final timeDifference = selectedTimeFim!.difference(selectedTimeInicio!);
+      if (timeDifference.inMinutes >= 30) {
+        // Lógica para calcular o valor baseado no tempo e outros fatores
+        double valorBase =
+            timeDifference.inMinutes.toDouble() / 60 * valorHoraEnfermeiro;
 
-      // Lógica para adicionar margem de lucro
-      double margemLucroPercentual = 0.20; // 20% do valorBase como margem de lucro
-      double margemLucro = valorBase * margemLucroPercentual;
+        // Lógica para adicionar possíveis custos adicionais (exemplo: deslocamento)
+        double custoDeslocamentoPercentual =
+            0.10; // 10% do valorBase como custo de deslocamento
+        double custoDeslocamento = valorBase * custoDeslocamentoPercentual;
 
-      valor = valorBase + custoDeslocamento + margemLucro;
-    } else {
-      // Defina um valor padrão ou mostre uma mensagem de erro
-      // Exemplo:
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('O tempo mínimo é de 30 minutos.'),
-        ),
-      );
-    }
-    setState(() {});
-  }
-}
-Future<void> _showEditLocationAlert(BuildContext context) async {
-  TextEditingController cidadeController = TextEditingController(text: cidade);
-  TextEditingController estadoController = TextEditingController(text: estado);
+        // Lógica para adicionar margem de lucro
+        double margemLucroPercentual =
+            0.20; // 20% do valorBase como margem de lucro
+        double margemLucro = valorBase * margemLucroPercentual;
 
-  return showDialog<void>(
-    context: context,
-    barrierDismissible: false, // Não pode ser fechado ao tocar fora
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Estado e Cidade'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min, 
-          children: [
-           
-            CSCPicker(
-              key: _cscPickerKey,
-              layout: Layout.vertical,
-              stateSearchPlaceholder: "Pesquise pelo nome do estado",
-              citySearchPlaceholder: "Pesquise pelo nome da cidade",
-              currentCountry: "Brazil",
-              defaultCountry: CscCountry.Brazil, 
-              stateDropdownLabel: 'Selecione o estado',
-              cityDropdownLabel: 'Selecione a cidade',
-              currentState: estadoController.text,
-              currentCity: cidadeController.text,
-              disableCountry: true,
-              flagState: CountryFlag.DISABLE,
-              dropdownDecoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                color: Colors.white,
-                border: Border.all(
-                  color: Colors.grey.withOpacity(0.5),
-                  style: BorderStyle.solid,
-                ),
-              ),
-              disabledDropdownDecoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                color: Colors.grey[200],
-                border: Border.all(
-                  color: Colors.grey.withOpacity(0.5),
-                  style: BorderStyle.solid,
-                ),
-              ),
-              selectedItemStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 14,
-              ),
-              dropdownHeadingStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-              ),
-              dropdownItemStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 14,
-              ),
-              dropdownDialogRadius: 10.0,
-              searchBarRadius: 10.0,
-              onCountryChanged: (value) {
-                // Handle country change
-              },
-              onStateChanged: (value) {
-                setState(() {
-                  estadoController.text = value.toString();
-                });
-              },
-              onCityChanged: (value) {
-                setState(() {
-                  cidadeController.text = value.toString();
-                });
-              },
-            ),
-          ],
-        ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Cancelar'),
+        valor = valorBase + custoDeslocamento + margemLucro;
+      } else {
+        // Defina um valor padrão ou mostre uma mensagem de erro
+        // Exemplo:
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('O tempo mínimo é de 30 minutos.'),
           ),
-          TextButton(
+        );
+      }
+      setState(() {});
+    }
+  }
+
+  Future<void> _showEditLocationAlert(BuildContext context) async {
+    TextEditingController cidadeController =
+        TextEditingController(text: cidade);
+    TextEditingController estadoController =
+        TextEditingController(text: estado);
+
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // Não pode ser fechado ao tocar fora
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Estado e Cidade'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CSCPicker(
+                key: _cscPickerKey,
+                layout: Layout.vertical,
+                stateSearchPlaceholder: "Pesquise pelo nome do estado",
+                citySearchPlaceholder: "Pesquise pelo nome da cidade",
+                currentCountry: "Brazil",
+                defaultCountry: CscCountry.Brazil,
+                stateDropdownLabel: 'Selecione o estado',
+                cityDropdownLabel: 'Selecione a cidade',
+                currentState: estadoController.text,
+                currentCity: cidadeController.text,
+                disableCountry: true,
+                flagState: CountryFlag.DISABLE,
+                dropdownDecoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  color: Colors.white,
+                  border: Border.all(
+                    color: Colors.grey.withOpacity(0.5),
+                    style: BorderStyle.solid,
+                  ),
+                ),
+                disabledDropdownDecoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  color: Colors.grey[200],
+                  border: Border.all(
+                    color: Colors.grey.withOpacity(0.5),
+                    style: BorderStyle.solid,
+                  ),
+                ),
+                selectedItemStyle: TextStyle(
+                  color: Colors.black,
+                  fontSize: 14,
+                ),
+                dropdownHeadingStyle: TextStyle(
+                  color: Colors.black,
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                ),
+                dropdownItemStyle: TextStyle(
+                  color: Colors.black,
+                  fontSize: 14,
+                ),
+                dropdownDialogRadius: 10.0,
+                searchBarRadius: 10.0,
+                onCountryChanged: (value) {
+                  // Handle country change
+                },
+                onStateChanged: (value) {
+                  setState(() {
+                    estadoController.text = value.toString();
+                  });
+                },
+                onCityChanged: (value) {
+                  setState(() {
+                    cidadeController.text = value.toString();
+                  });
+                },
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
               onPressed: () {
-                if (cidadeController.text.isNotEmpty && estadoController.text.isNotEmpty && cidadeController.text != 'City') {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () {
+                if (cidadeController.text.isNotEmpty &&
+                    estadoController.text.isNotEmpty &&
+                    cidadeController.text != 'City') {
                   setState(() {
                     cidade = cidadeController.text;
                     estado = estadoController.text;
@@ -547,9 +561,9 @@ Future<void> _showEditLocationAlert(BuildContext context) async {
               },
               child: const Text('Salvar'),
             ),
-        ],
-      );
-    },
-  );
-}
+          ],
+        );
+      },
+    );
+  }
 }
