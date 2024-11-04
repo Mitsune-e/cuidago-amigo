@@ -358,9 +358,55 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
     );
   }
 
-  void _showTimePickerAlert(BuildContext context, bool isStart) {
-    DateTime? selectedTime;
-    showDialog(
+  Future<void> _showTimePickerAlert(BuildContext context, bool isStart) async {
+    final TimeOfDay? selectedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+        builder: (context, child) {
+          return MediaQuery(
+            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+            child: child!,
+          );
+        },
+        cancelText: "Cancelar",
+        confirmText: "Confirmar",
+        helpText: "Selecione o horário. (Minimo 30 Minutos de atendimento)",
+        errorInvalidText: "Error Invalid Text",
+        hourLabelText: 'Hour Label',
+        minuteLabelText: "Minute Label");
+
+    if (selectedTime != null) {
+      final now = DateTime.now();
+      /* print({now}); */
+      final dateTimeSelected = DateTime(
+          now.year, now.month, now.day, selectedTime.hour, selectedTime.minute);
+      /* print({dateTimeSelected});
+      print({isStart}); */
+      if (isStart) {
+        setState(() {
+          selectedTimeInicio = dateTimeSelected;
+        });
+        //Navigator.of(context).pop();
+      } else {
+        if (dateTimeSelected
+            .isAfter(selectedTimeInicio!.add(Duration(minutes: 30)))) {
+          setState(() {
+            selectedTimeFim = dateTimeSelected;
+            _updateValor();
+          });
+          //Navigator.of(context).pop();
+        } else {
+          // Mostrar mensagem de erro
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  'O horário de fim deve ser pelo menos 30 minutos após o início.'),
+            ),
+          );
+        }
+      }
+    }
+    /* showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -416,7 +462,7 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
           ],
         );
       },
-    );
+    ); */
   }
 
   bool _validateAddress() {
