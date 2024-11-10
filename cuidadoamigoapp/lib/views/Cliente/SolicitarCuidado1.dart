@@ -73,27 +73,33 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                 ),
               ),
               TextFormField(
-                controller: dataController,
-                keyboardType: TextInputType.datetime,
-                decoration: const InputDecoration(
-                  hintText: 'Selecione a data',
-                  prefixIcon: Icon(Icons.date_range),
-                ),
-                onTap: () async {
-                  DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2101),
-                  );
-                  if (pickedDate != null) {
-                    setState(() {
-                      dataController.text =
-                          DateFormat('dd/MM/yyyy').format(pickedDate);
-                    });
-                  }
-                },
-              ),
+                  controller: dataController,
+                  keyboardType: TextInputType.datetime,
+                  decoration: const InputDecoration(
+                    hintText: 'Selecione a data',
+                    prefixIcon: Icon(Icons.date_range),
+                  ),
+                  onTap: () async {
+                    DateTime? pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2101),
+                    );
+                    if (pickedDate != null) {
+                      setState(() {
+                        dataController.text =
+                            DateFormat('dd/MM/yyyy').format(pickedDate);
+                      });
+                    } else {
+                      // Mostrar mensagem de erro ou fazer alguma outra ação
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Por favor, selecione uma data.'),
+                        ),
+                      );
+                    }
+                  }),
               const SizedBox(height: 20),
               const Text(
                 'Horário',
@@ -308,6 +314,60 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                         selectedTimeFim!.isAfter(
                             selectedTimeInicio!.add(Duration(minutes: 30))) &&
                         _validateAddress()) {
+                      if (dataController.text.isEmpty ||
+                          dataController.text == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('O campo de Data é obrigatório.'),
+                          ),
+                        );
+                        return;
+                      }
+                      if (selectedTimeInicio == null ||
+                          selectedTimeFim == null ||
+                          selectedTimeFim!.isBefore(selectedTimeInicio!)) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('O campo de Horário é obrigatório.'),
+                          ),
+                        );
+                        return;
+                      }
+                      if (cidade == null || cidade.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('O campo de Cidade é obrigatório.'),
+                          ),
+                        );
+                        return;
+                      }
+                      if (estado == null || estado.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('O campo de Estado é obrigatório.'),
+                          ),
+                        );
+                        return;
+                      }
+                      if (enderecoController.text.isEmpty ||
+                          enderecoController.text == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('O campo de Endereço é obrigatório.'),
+                          ),
+                        );
+                        return;
+                      }
+                      if (numeroController.text.isEmpty ||
+                          numeroController.text == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('O campo de Número é obrigatório.'),
+                          ),
+                        );
+                        return;
+                      }
+
                       final dataToPass = {
                         'data': dataController.text,
                         'horaInicio':
