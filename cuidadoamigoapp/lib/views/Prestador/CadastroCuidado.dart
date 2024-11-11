@@ -107,12 +107,16 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
             _buildImagePickerButton(),
             const SizedBox(height: 10),
             _buildTextField(
-                controller: _nomeController, hintText: 'Nome', label: 'Nome'),
+                controller: _nomeController,
+                hintText: 'Nome',
+                label: 'Nome',
+                mandatory: true),
             const SizedBox(height: 10),
             _buildTextField(
                 controller: _emailController,
                 hintText: 'E-mail',
-                label: 'E-mail'),
+                label: 'E-mail',
+                mandatory: true),
             const SizedBox(height: 10),
             _buildPhoneTextField(
                 controller: _telefoneController, label: 'Telefone'),
@@ -153,15 +157,18 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
             _buildTextField(
                 controller: _enderecoController,
                 hintText: 'Endereço',
-                label: 'Endereço'),
+                label: 'Endereço',
+                mandatory: true),
             _buildTextField(
                 controller: _numeroController,
                 hintText: 'Número',
-                label: 'Número'),
+                label: 'Número',
+                mandatory: true),
             _buildTextField(
                 controller: _complementoController,
                 hintText: 'Complemento',
-                label: 'Complemento'),
+                label: 'Complemento',
+                mandatory: false),
           ],
         ),
       ),
@@ -235,16 +242,16 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String hintText,
-    required String label,
-  }) {
+  Widget _buildTextField(
+      {required TextEditingController controller,
+      required String hintText,
+      required String label,
+      required bool mandatory}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '$label${controller.text.isNotEmpty ? '' : ' (Obrigatório)'}',
+          '$label${controller.text.isNotEmpty ? '' : (mandatory == true ? ' (Obrigatório)' : '')}',
           style: TextStyle(
             color: controller.text.isNotEmpty ? Colors.black : Colors.red,
           ),

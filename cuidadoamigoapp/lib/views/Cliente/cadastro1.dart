@@ -12,8 +12,6 @@ import 'package:flutter/services.dart';
 import 'package:csc_picker/csc_picker.dart';
 import 'package:provider/provider.dart';
 
-import 'package:cuidadoamigoapp/Util/Validacao.dart';
-
 class Cadastro1 extends StatefulWidget {
   const Cadastro1({super.key});
 
@@ -30,8 +28,6 @@ class _Cadastro1State extends State<Cadastro1> {
   final TextEditingController _senhaController = TextEditingController();
   final TextEditingController _confirmaSenhaController =
       TextEditingController();
-  final TextEditingController _estadoController = TextEditingController();
-  final TextEditingController _cidadeController = TextEditingController();
   final TextEditingController _enderecoController = TextEditingController();
   final TextEditingController _numeroController = TextEditingController();
   final TextEditingController _complementoController = TextEditingController();
@@ -109,15 +105,21 @@ class _Cadastro1State extends State<Cadastro1> {
             _buildImagePickerButton(),
             const SizedBox(height: 10),
             _buildTextField(
-                controller: _nomeController, hintText: 'Nome', label: 'Nome'),
+                controller: _nomeController,
+                hintText: 'Nome',
+                label: 'Nome',
+                mandatory: true),
             const SizedBox(height: 10),
             _buildTextField(
                 controller: _emailController,
                 hintText: 'E-mail',
-                label: 'E-mail'),
+                label: 'E-mail',
+                mandatory: true),
             const SizedBox(height: 10),
             _buildPhoneTextField(
-                controller: _telefoneController, label: 'Telefone'),
+              controller: _telefoneController,
+              label: 'Telefone',
+            ),
             const SizedBox(height: 10),
             _buildCPFTextField(controller: _cpfController, label: 'CPF'),
             const SizedBox(height: 10),
@@ -155,15 +157,18 @@ class _Cadastro1State extends State<Cadastro1> {
             _buildTextField(
                 controller: _enderecoController,
                 hintText: 'Endereço',
-                label: 'Endereço'),
+                label: 'Endereço',
+                mandatory: true),
             _buildTextField(
                 controller: _numeroController,
                 hintText: 'Número',
-                label: 'Número'),
+                label: 'Número',
+                mandatory: true),
             _buildTextField(
                 controller: _complementoController,
                 hintText: 'Complemento',
-                label: 'Complemento'),
+                label: 'Complemento',
+                mandatory: false),
           ],
         ),
       ),
@@ -213,16 +218,16 @@ class _Cadastro1State extends State<Cadastro1> {
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String hintText,
-    required String label,
-  }) {
+  Widget _buildTextField(
+      {required TextEditingController controller,
+      required String hintText,
+      required String label,
+      required bool mandatory}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '$label${controller.text.isNotEmpty ? '' : ' (Obrigatório)'}',
+          '$label${controller.text.isNotEmpty ? '' : (mandatory == true ? ' (Obrigatório)' : '')}',
           style: TextStyle(
             color: controller.text.isNotEmpty ? Colors.black : Colors.red,
           ),
@@ -237,7 +242,7 @@ class _Cadastro1State extends State<Cadastro1> {
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
           ),
           validator: (value) {
-            if (value == null || value.isEmpty) {
+            if (mandatory == true && (value == null || value.isEmpty)) {
               return 'Campo obrigatório';
             }
             return null;
