@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:cuidadoamigoapp/Util/Mascaras.dart';
+import 'package:cuidadoamigoapp/Util/Validacao.dart';
 import 'package:cuidadoamigoapp/models/cliente.dart';
 import 'package:cuidadoamigoapp/provider/Clientes.dart';
 
@@ -9,6 +11,8 @@ import 'package:flutter/services.dart';
 
 import 'package:csc_picker/csc_picker.dart';
 import 'package:provider/provider.dart';
+
+import 'package:cuidadoamigoapp/Util/Validacao.dart';
 
 class Cadastro1 extends StatefulWidget {
   const Cadastro1({super.key});
@@ -254,19 +258,7 @@ class _Cadastro1State extends State<Cadastro1> {
           );
         }
 
-        var text = newValue.text;
-
-        text = text.replaceAll(RegExp(r'\(+|\)+| +|\-+'), '');
-
-        if (text.length > 10) {
-          text = text.substring(0, 10);
-        }
-
-        text = text.replaceAll(RegExp(r'[^0-9]+'), '');
-
-        var maskedText = text.length == 10
-            ? '(${text.substring(0, 2)}) ${text.substring(2, 7)}-${text.substring(7)}'
-            : text;
+        String maskedText = Mascaras.aplicarMascara('telefone', newValue.text);
 
         return newValue.copyWith(
           text: maskedText,
@@ -354,17 +346,7 @@ class _Cadastro1State extends State<Cadastro1> {
           );
         }
 
-        var text = newValue.text.replaceAll(RegExp(r'\-+|\.+'), "");
-
-        if (text.length > 11) {
-          text = text.substring(0, 11);
-        }
-
-        text = text.replaceAll(RegExp(r'[^0-9]'), '');
-
-        var maskedText = text.length == 11
-            ? '${text.substring(0, 3)}.${text.substring(3, 6)}.${text.substring(6, 9)}-${text.substring(9)}'
-            : text;
+        var maskedText = Mascaras.aplicarMascara("cpf", newValue.text);
 
         return newValue.copyWith(
           text: maskedText,
@@ -550,16 +532,15 @@ class _Cadastro1State extends State<Cadastro1> {
     }
 
     // Validate password match
-    if (_senhaController.text != _confirmaSenhaController.text) {
+    if (!Validacao.validarSenha(
+        _senhaController.text, _confirmaSenhaController.text)) {
       _showErrorDialog(
           'Erro', 'A senha e a confirmação de senha devem ser iguais.');
       return;
     }
 
     // Validade email
-    var emailRegexPattern = RegExp(
-        r'^((?:[A-Za-z0-9!#$%&*+\-\/=?^_`{|}~]|(?<=^|\.)"|"(?=$|\.|@)|(?<=".*)[ .](?=.*")|(?<!\.)\.){1,64})(@)((?:[A-Za-z0-9.\-])*(?:[A-Za-z0-9])\.(?:[A-Za-z0-9]){2,})$');
-    if (!emailRegexPattern.hasMatch(_emailController.text)) {
+    if (!Validacao.validar("email", _emailController.text)) {
       _showErrorDialog('Erro', 'E-mail inválido.');
       return;
     }

@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:cuidadoamigoapp/Util/Mascaras.dart';
+import 'package:cuidadoamigoapp/Util/Validacao.dart';
 import 'package:cuidadoamigoapp/models/Prestador.dart';
 import 'package:cuidadoamigoapp/provider/Prestadores.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -278,14 +280,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
           );
         }
 
-        var text = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
-
-        if (text.length > 10) {
-          text = text.substring(0, 11);
-        }
-
-        var maskedText =
-            '(${text.substring(0, 2)}) ${text.substring(2, 7)}-${text.substring(7)}';
+        String maskedText = Mascaras.aplicarMascara('telefone', newValue.text);
 
         return newValue.copyWith(
           text: maskedText,
@@ -373,14 +368,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
           );
         }
 
-        var text = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
-
-        if (text.length > 11) {
-          text = text.substring(0, 11);
-        }
-
-        var maskedText =
-            '${text.substring(0, 3)}.${text.substring(3, 6)}.${text.substring(6, 9)}-${text.substring(9)}';
+        var maskedText = Mascaras.aplicarMascara("cpf", newValue.text);
 
         return newValue.copyWith(
           text: maskedText,
@@ -566,9 +554,16 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
     }
 
     // Validate password match
-    if (_senhaController.text != _confirmaSenhaController.text) {
+    if (!Validacao.validarSenha(
+        _senhaController.text, _confirmaSenhaController.text)) {
       _showErrorDialog(
           'Erro', 'A senha e a confirmação de senha devem ser iguais.');
+      return;
+    }
+
+    // Validade email
+    if (!Validacao.validar("email", _emailController.text)) {
+      _showErrorDialog('Erro', 'E-mail inválido.');
       return;
     }
 
