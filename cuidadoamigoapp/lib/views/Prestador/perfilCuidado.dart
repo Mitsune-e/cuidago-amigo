@@ -6,6 +6,7 @@ import 'package:cuidadoamigoapp/views/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -65,24 +66,32 @@ class _PerfilState extends State<PerfilCuidador> {
         Prestador prestador = Prestador.fromMap(userData);
 
         setState(() {
-          _nomeController.text = prestador.name ?? '';
-          _cpfController.text = prestador.cpf ?? '';
-          _emailController.text = prestador.email ?? '';
-          _telefoneController.text = prestador.telefone ?? '';
-          estado = prestador.estado ?? '';
-          cidade = prestador.cidade ?? '';
-          _enderecoController.text = prestador.endereco ?? '';
-          _numeroController.text = prestador.numero ?? '';
-          _complementoController.text = prestador.complemento ?? '';
-          imageUrl = prestador.imagem ?? '';
-          _descricaoController.text = prestador.descricao ?? '';
+          _nomeController.text = prestador.name;
+          _cpfController.text = prestador.cpf;
+          _emailController.text = prestador.email;
+          _telefoneController.text = prestador.telefone;
+          estado = prestador.estado;
+          cidade = prestador.cidade;
+          _enderecoController.text = prestador.endereco;
+          _numeroController.text = prestador.numero;
+          _complementoController.text = prestador.complemento;
+          imageUrl = prestador.imagem;
+          _descricaoController.text = prestador.descricao;
           _possuiCarro = prestador.carro;
 
           _isLoadingImage = false;
         });
       }
     } catch (e) {
-      print('Erro ao carregar dados do Firestore: $e');
+      if (kDebugMode) {
+        print('Erro ao carregar dados do Firestore: $e');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao processar retirada via Pix: $e'),
+          ),
+        );
+      }
       // Em caso de erro, marque que a imagem não está mais carregando
       setState(() {
         _isLoadingImage = false;

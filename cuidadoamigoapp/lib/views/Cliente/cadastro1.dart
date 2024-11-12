@@ -1,11 +1,10 @@
-import 'dart:io';
-
 import 'package:cuidadoamigoapp/Util/Mascaras.dart';
 import 'package:cuidadoamigoapp/Util/Validacao.dart';
 import 'package:cuidadoamigoapp/models/cliente.dart';
 import 'package:cuidadoamigoapp/provider/Clientes.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -31,11 +30,8 @@ class _Cadastro1State extends State<Cadastro1> {
   final TextEditingController _enderecoController = TextEditingController();
   final TextEditingController _numeroController = TextEditingController();
   final TextEditingController _complementoController = TextEditingController();
-  final TextEditingController _descricaoController = TextEditingController();
   final TextEditingController _imagemController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  bool _possuiCarro = false;
-  bool isNomeValid = false;
   var cidade = '';
   var estado = '';
 
@@ -102,8 +98,9 @@ class _Cadastro1State extends State<Cadastro1> {
               ),
             ),
             const SizedBox(height: 20),
-            _buildImagePickerButton(),
-            const SizedBox(height: 10),
+            // Image Picker
+            /* _buildImagePickerButton(),
+            const SizedBox(height: 10), */
             _buildTextField(
                 controller: _nomeController,
                 hintText: 'Nome',
@@ -195,7 +192,8 @@ class _Cadastro1State extends State<Cadastro1> {
     );
   }
 
-  Widget _buildImagePickerButton() {
+  // buildar imagem escolhida
+  /*  Widget _buildImagePickerButton() {
     return Column(
       children: [
         ElevatedButton(
@@ -217,7 +215,7 @@ class _Cadastro1State extends State<Cadastro1> {
       ],
     );
   }
-
+ */
   Widget _buildTextField(
       {required TextEditingController controller,
       required String hintText,
@@ -233,7 +231,7 @@ class _Cadastro1State extends State<Cadastro1> {
           ),
         ),
         TextFormField(
-          onChanged: (Text) {
+          onChanged: (text) {
             setState(() {});
           },
           controller: controller,
@@ -281,7 +279,7 @@ class _Cadastro1State extends State<Cadastro1> {
           ),
         ),
         TextFormField(
-          onChanged: (Text) {
+          onChanged: (text) {
             setState(() {});
           },
           controller: controller,
@@ -317,7 +315,7 @@ class _Cadastro1State extends State<Cadastro1> {
           ),
         ),
         TextFormField(
-          onChanged: (Text) {
+          onChanged: (text) {
             setState(() {});
           },
           controller: controller,
@@ -369,7 +367,7 @@ class _Cadastro1State extends State<Cadastro1> {
           ),
         ),
         TextFormField(
-          onChanged: (Text) {
+          onChanged: (text) {
             setState(() {});
           },
           controller: controller,
@@ -399,7 +397,11 @@ class _Cadastro1State extends State<Cadastro1> {
       defaultCountry: CscCountry.Brazil,
       disableCountry: true,
       flagState: CountryFlag.DISABLE,
-      onCountryChanged: (Country) {},
+      countryDropdownLabel: "Pais",
+      stateDropdownLabel: "Estado",
+      cityDropdownLabel: "Cidade",
+      dropdownDialogRadius: 30,
+      onCountryChanged: (country) {},
       onStateChanged: (value) {
         setState(() {
           estado = value.toString();
@@ -410,75 +412,6 @@ class _Cadastro1State extends State<Cadastro1> {
           cidade = value.toString();
         });
       },
-      countryDropdownLabel: "Pais",
-      stateDropdownLabel: "Estado",
-      cityDropdownLabel: "Cidade",
-      dropdownDialogRadius: 30,
-    );
-  }
-
-  Widget _buildCarroCheckbox() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Possui Carro',
-          style: TextStyle(
-            fontSize: 16,
-          ),
-        ),
-        Row(
-          children: [
-            Radio(
-              value: true,
-              groupValue: _possuiCarro,
-              onChanged: (value) {
-                setState(() {
-                  _possuiCarro = value as bool;
-                });
-              },
-            ),
-            Text('Sim'),
-            Radio(
-              value: false,
-              groupValue: _possuiCarro,
-              onChanged: (value) {
-                setState(() {
-                  _possuiCarro = value as bool;
-                });
-              },
-            ),
-            Text('Não'),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDescricaoTextField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Descrição ${_descricaoController.text.isNotEmpty ? '' : ' (Obrigatório)'}',
-          style: TextStyle(
-            color: _descricaoController.text.isNotEmpty
-                ? Colors.black
-                : Colors.red,
-          ),
-        ),
-        TextFormField(
-          onChanged: (Text) {
-            setState(() {});
-          },
-          controller: _descricaoController,
-          maxLines: 3,
-          decoration: InputDecoration(
-            hintText: 'Digite uma descrição',
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-          ),
-        ),
-      ],
     );
   }
 
@@ -583,9 +516,6 @@ class _Cadastro1State extends State<Cadastro1> {
     if (_numeroController.text.isEmpty) {
       emptyFields.add('Número');
     }
-    if (_complementoController.text.isEmpty) {
-      emptyFields.add('Complemento');
-    }
     if (cidade == '') {
       emptyFields.add('Cidade');
     }
@@ -660,7 +590,7 @@ class _Cadastro1State extends State<Cadastro1> {
           telefone: _telefoneController.text,
           senha: _senhaController.text,
           cpf: _cpfController.text,
-          imagem: _imagemController.text ?? '',
+          imagem: _imagemController.text,
           estado: estado,
           cidade: cidade,
           endereco: _enderecoController.text,
@@ -671,12 +601,11 @@ class _Cadastro1State extends State<Cadastro1> {
         Provider.of<Clientes>(context, listen: false).adiciona(cliente);
       }
     } catch (e) {
-      print('Erro de criação de usuário no Firebase Authentication: $e');
+      if (kDebugMode) {
+        print('Erro de criação de usuário no Firebase Authentication: $e');
+      } else {
+        _showErrorDialog('Erro', 'Erro ao criar usuário no banco de dados.');
+      }
     }
-  }
-
-  Future<void> _getImage() async {
-    // Implement your image picking logic here
-    // Use _imagemController to store the path to the selected image
   }
 }

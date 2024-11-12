@@ -2,6 +2,7 @@ import 'package:cuidadoamigoapp/provider/Clientes.dart';
 import 'package:cuidadoamigoapp/provider/Prestadores.dart';
 import 'package:cuidadoamigoapp/provider/servicos.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cuidadoamigoapp/models/Servico.dart';
@@ -309,7 +310,18 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
                                     qrCodeData = 'ServiçoID:${servico.id}';
                                     _mostrarQRCodeDialog(context);
                                     // Adicione código para lidar com o sucesso do agendamento aqui
-                                    print('Serviço agendado com sucesso');
+                                    if (kDebugMode) {
+                                      print('Serviço agendado com sucesso');
+                                    } else {
+                                      // Mostrar mensagem de erro ou fazer alguma outra ação
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                              'Serviço agendado com sucesso.'),
+                                        ),
+                                      );
+                                    }
                                     //Navigator.of(context).pushNamed('/homeIdoso');
 
                                     // Adicione a concatenação ao atributo datas
@@ -400,7 +412,7 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
             width: 200.0, // Set a fixed width
             height: 200.0, // Set a fixed height
             child: QrImageView(
-              data: qrCodeData ?? '', // Ensure qrCodeData is not null
+              data: qrCodeData, // Ensure qrCodeData is not null
               version: QrVersions.auto,
             ),
           ),
