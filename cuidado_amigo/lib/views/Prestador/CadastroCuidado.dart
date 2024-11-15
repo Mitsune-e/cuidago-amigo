@@ -1,10 +1,9 @@
 import 'dart:io';
 
-import 'package:cuidadoamigoapp/Util/Mascaras.dart';
-import 'package:cuidadoamigoapp/Util/Validacao.dart';
-import 'package:cuidadoamigoapp/models/cliente.dart';
-import 'package:cuidadoamigoapp/provider/Clientes.dart';
-
+import 'package:cuidado_amigo/Util/Mascaras.dart';
+import 'package:cuidado_amigo/Util/Validacao.dart';
+import 'package:cuidado_amigo/models/Prestador.dart';
+import 'package:cuidado_amigo/provider/Prestadores.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,14 +11,14 @@ import 'package:flutter/services.dart';
 import 'package:csc_picker/csc_picker.dart';
 import 'package:provider/provider.dart';
 
-class Cadastro1 extends StatefulWidget {
-  const Cadastro1({super.key});
+class CadastroCuidado extends StatefulWidget {
+  const CadastroCuidado({super.key});
 
   @override
-  _Cadastro1State createState() => _Cadastro1State();
+  _CadastroPrestadorState createState() => _CadastroPrestadorState();
 }
 
-class _Cadastro1State extends State<Cadastro1> {
+class _CadastroPrestadorState extends State<CadastroCuidado> {
   final PageController _pageController = PageController();
   final TextEditingController _nomeController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -28,6 +27,8 @@ class _Cadastro1State extends State<Cadastro1> {
   final TextEditingController _senhaController = TextEditingController();
   final TextEditingController _confirmaSenhaController =
       TextEditingController();
+  final TextEditingController _estadoController = TextEditingController();
+  final TextEditingController _cidadeController = TextEditingController();
   final TextEditingController _enderecoController = TextEditingController();
   final TextEditingController _numeroController = TextEditingController();
   final TextEditingController _complementoController = TextEditingController();
@@ -48,7 +49,7 @@ class _Cadastro1State extends State<Cadastro1> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Cadastra-se como Cliente'),
+        title: const Text('Cadastra-se como Cuidador'),
       ),
       body: GestureDetector(
         onHorizontalDragEnd: (details) {
@@ -67,6 +68,7 @@ class _Cadastro1State extends State<Cadastro1> {
                 children: [
                   _buildDadosPessoais(),
                   _buildEndereco(),
+                  _buildDadosProfissionais(),
                   _buildFinalizar(),
                 ],
               ),
@@ -94,7 +96,7 @@ class _Cadastro1State extends State<Cadastro1> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Dados Pessoais',
               style: TextStyle(
                 fontSize: 20,
@@ -117,9 +119,7 @@ class _Cadastro1State extends State<Cadastro1> {
                 mandatory: true),
             const SizedBox(height: 10),
             _buildPhoneTextField(
-              controller: _telefoneController,
-              label: 'Telefone',
-            ),
+                controller: _telefoneController, label: 'Telefone'),
             const SizedBox(height: 10),
             _buildCPFTextField(controller: _cpfController, label: 'CPF'),
             const SizedBox(height: 10),
@@ -145,7 +145,7 @@ class _Cadastro1State extends State<Cadastro1> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Endereço',
               style: TextStyle(
                 fontSize: 20,
@@ -175,13 +175,37 @@ class _Cadastro1State extends State<Cadastro1> {
     );
   }
 
+  Widget _buildDadosProfissionais() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Dados Profissionais',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            _buildCarroCheckbox(),
+            const SizedBox(height: 10),
+            _buildDescricaoTextField(),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildFinalizar() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Finalizar Cadastro',
             style: TextStyle(
               fontSize: 20,
@@ -242,7 +266,7 @@ class _Cadastro1State extends State<Cadastro1> {
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
           ),
           validator: (value) {
-            if (mandatory == true && (value == null || value.isEmpty)) {
+            if (value == null || value.isEmpty) {
               return 'Campo obrigatório';
             }
             return null;
@@ -259,7 +283,7 @@ class _Cadastro1State extends State<Cadastro1> {
         if (newValue.text.isEmpty) {
           return newValue.copyWith(
             text: '',
-            selection: TextSelection.collapsed(offset: 0),
+            selection: const TextSelection.collapsed(offset: 0),
           );
         }
 
@@ -347,7 +371,7 @@ class _Cadastro1State extends State<Cadastro1> {
         if (newValue.text.isEmpty) {
           return newValue.copyWith(
             text: '',
-            selection: TextSelection.collapsed(offset: 0),
+            selection: const TextSelection.collapsed(offset: 0),
           );
         }
 
@@ -421,7 +445,7 @@ class _Cadastro1State extends State<Cadastro1> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Possui Carro',
           style: TextStyle(
             fontSize: 16,
@@ -438,7 +462,7 @@ class _Cadastro1State extends State<Cadastro1> {
                 });
               },
             ),
-            Text('Sim'),
+            const Text('Sim'),
             Radio(
               value: false,
               groupValue: _possuiCarro,
@@ -448,7 +472,7 @@ class _Cadastro1State extends State<Cadastro1> {
                 });
               },
             ),
-            Text('Não'),
+            const Text('Não'),
           ],
         ),
       ],
@@ -502,11 +526,11 @@ class _Cadastro1State extends State<Cadastro1> {
       children: [
         IconButton(
           onPressed: _previousPage,
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
         ),
         IconButton(
           onPressed: _nextPage,
-          icon: Icon(Icons.arrow_forward),
+          icon: const Icon(Icons.arrow_forward),
         ),
       ],
     );
@@ -592,6 +616,9 @@ class _Cadastro1State extends State<Cadastro1> {
     if (estado == '') {
       emptyFields.add('Estado');
     }
+    if (_descricaoController.text.isEmpty) {
+      emptyFields.add('Descrição');
+    }
 
     if (emptyFields.isNotEmpty) {
       _showErrorDialog('Campos obrigatórios não preenchidos',
@@ -608,14 +635,14 @@ class _Cadastro1State extends State<Cadastro1> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Cadastro Finalizado'),
-          content: Text('Seu cadastro foi concluído com sucesso!'),
+          title: const Text('Cadastro Finalizado'),
+          content: const Text('Seu cadastro foi concluído com sucesso!'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.of(context).pushReplacementNamed('/login');
               },
-              child: Text('OK'),
+              child: const Text('OK'),
             ),
           ],
         );
@@ -635,7 +662,7 @@ class _Cadastro1State extends State<Cadastro1> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text('OK'),
+              child: const Text('OK'),
             ),
           ],
         );
@@ -653,22 +680,23 @@ class _Cadastro1State extends State<Cadastro1> {
 
       final User? user = userCredential.user;
       if (user != null) {
-        final cliente = Cliente(
-          id: user.uid,
-          name: _nomeController.text,
-          email: _emailController.text,
-          telefone: _telefoneController.text,
-          senha: _senhaController.text,
-          cpf: _cpfController.text,
-          imagem: _imagemController.text ?? '',
-          estado: estado,
-          cidade: cidade,
-          endereco: _enderecoController.text,
-          numero: _numeroController.text,
-          complemento: _complementoController.text,
-        );
+        final prestador = Prestador(
+            id: user.uid,
+            name: _nomeController.text,
+            email: _emailController.text,
+            telefone: _telefoneController.text,
+            senha: _senhaController.text,
+            cpf: _cpfController.text,
+            imagem: _imagemController.text ?? '',
+            estado: estado,
+            cidade: cidade,
+            endereco: _enderecoController.text,
+            numero: _numeroController.text,
+            complemento: _complementoController.text,
+            carro: _possuiCarro,
+            descricao: _descricaoController.text);
 
-        Provider.of<Clientes>(context, listen: false).adiciona(cliente);
+        Provider.of<Prestadores>(context, listen: false).adiciona(prestador);
       }
     } catch (e) {
       print('Erro de criação de usuário no Firebase Authentication: $e');

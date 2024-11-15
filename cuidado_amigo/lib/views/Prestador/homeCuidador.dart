@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cuidadoamigoapp/models/Servico.dart';
-import 'package:cuidadoamigoapp/views/Prestador/detalhamento2.dart';
+import 'package:cuidado_amigo/models/Servico.dart';
+import 'package:cuidado_amigo/views/Prestador/detalhamento2.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

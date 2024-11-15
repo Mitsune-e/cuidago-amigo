@@ -1,7 +1,7 @@
-import 'package:cuidadoamigoapp/views/Cliente/homeIdoso.dart';
+import 'package:cuidado_amigo/views/Cliente/homeIdoso.dart';
 import 'package:flutter/material.dart';
-import 'package:cuidadoamigoapp/views/login.dart';
-import 'package:cuidadoamigoapp/servicos/autorizacao.dart';
+import 'package:cuidado_amigo/views/login.dart';
+import 'package:cuidado_amigo/servicos/autorizacao.dart';
 import 'package:provider/provider.dart';
 
 class AuthCheck extends StatefulWidget {

@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cuidadoamigoapp/models/cliente.dart';
+import 'package:cuidado_amigo/models/cliente.dart';
 import 'package:flutter/material.dart';
 
 class Clientes with ChangeNotifier {

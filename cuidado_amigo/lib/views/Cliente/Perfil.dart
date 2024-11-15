@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:cuidadoamigoapp/models/cliente.dart';
-import 'package:cuidadoamigoapp/views/login.dart';
+import 'package:cuidado_amigo/models/cliente.dart';
+import 'package:cuidado_amigo/views/login.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';

@@ -1,21 +1,21 @@
-import 'package:cuidadoamigoapp/models/cliente.dart';
-import 'package:cuidadoamigoapp/models/Servico.dart';
-import 'package:cuidadoamigoapp/provider/Clientes.dart';
-import 'package:cuidadoamigoapp/provider/servicos.dart';
+import 'package:cuidado_amigo/models/Prestador.dart';
+import 'package:cuidado_amigo/models/Servico.dart';
+import 'package:cuidado_amigo/provider/Prestadores.dart';
+import 'package:cuidado_amigo/provider/servicos.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class DetalhesServico2 extends StatefulWidget {
+class DetalhesServico extends StatefulWidget {
   final Servico servico;
-  const DetalhesServico2({super.key, required this.servico});
+  const DetalhesServico({super.key, required this.servico});
 
   @override
-  _DetalhesServicoState2 createState() => _DetalhesServicoState2();
+  _DetalhesServicoState createState() => _DetalhesServicoState();
 }
 
-class _DetalhesServicoState2 extends State<DetalhesServico2> {
+class _DetalhesServicoState extends State<DetalhesServico> {
   late String servicoId;
-  Cliente? cliente;
+  Prestador? prestador;
   TextEditingController serviceNameController = TextEditingController();
   TextEditingController serviceDescriptionController = TextEditingController();
   TextEditingController serviceTimeController = TextEditingController();
@@ -26,9 +26,21 @@ class _DetalhesServicoState2 extends State<DetalhesServico2> {
   void initState() {
     super.initState();
     servicoId = widget.servico.id;
+    _carregarPrestadorSync();
     serviceTimeController.text = widget.servico.horaInicio;
     serviceAddressController.text = widget.servico.endereco;
     serviceDateController.text = widget.servico.data;
+  }
+
+  void _carregarPrestadorSync() {
+    prestador = Provider.of<Prestadores>(context, listen: false)
+        .loadClienteByIdSync(widget.servico.prestador);
+
+    if (prestador != null) {
+      serviceNameController.text = prestador!.name;
+    } else {
+      print('Cuidador não encontrado');
+    }
   }
 
   @override
@@ -40,23 +52,30 @@ class _DetalhesServicoState2 extends State<DetalhesServico2> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.of(context).pushNamed("/homePrestador");
+            Navigator.of(context).pushNamed("/agenda");
           },
         ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: FutureBuilder<Cliente?>(
-          future: Provider.of<Clientes>(context)
-              .loadClienteById(widget.servico.usuario),
+        child: FutureBuilder<Prestador?>(
+          future: Provider.of<Prestadores>(context)
+              .loadClienteById(widget.servico.prestador),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator(); // Exiba um indicador de carregamento enquanto aguarda.
+              return Container();
             } else if (snapshot.hasError) {
               return Text('Erro: ${snapshot.error}');
             } else if (snapshot.hasData) {
-              cliente = snapshot.data!;
-              serviceNameController.text = cliente!.name;
+              prestador = snapshot.data!;
+              serviceNameController.text = prestador!.name;
+
+              DateTime horaFimServico = parseDataHora(
+                  '${widget.servico.data} ${widget.servico.horaFim}');
+              DateTime horaAtual = DateTime.now();
+
+              bool podeCancelar = !widget.servico.finalizada &&
+                  horaFimServico.isAfter(horaAtual);
 
               return SingleChildScrollView(
                 child: Column(
@@ -72,13 +91,14 @@ class _DetalhesServicoState2 extends State<DetalhesServico2> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    _buildSectionTitle('Informações do Cliente'),
-                    if (cliente != null) ...[
-                      _buildPrestadorInfo('Nome', cliente!.name),
-                      _buildPrestadorInfo('Email', cliente!.email),
-                      // Adicione mais informações do cliente conforme necessário
+                    const SizedBox(height: 20),
+                    _buildSectionTitle('Informações do Cuidador'),
+                    if (prestador != null) ...[
+                      _buildPrestadorInfo('Nome', prestador!.name),
+                      _buildPrestadorInfo('Email', prestador!.email),
+                      // Adicione mais informações do prestador conforme necessário
                     ] else ...[
-                      Text('Cliente não encontrado'),
+                      Text('Prestador não encontrado'),
                     ],
                     _buildSectionTitle('Detalhes do Serviço'),
                     Text(
@@ -100,25 +120,27 @@ class _DetalhesServicoState2 extends State<DetalhesServico2> {
                     _buildServiceInfo('Valor',
                         'R\$ ${double.parse(widget.servico.valor).toStringAsFixed(2)}'),
                     const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          _mostrarCancelarServicoDialog(context);
-                        });
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF73C9C9),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0),
+                    const SizedBox(height: 20),
+                    if (podeCancelar)
+                      ElevatedButton(
+                        onPressed: () {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            _mostrarCancelarServicoDialog(context);
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF73C9C9),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30.0),
+                          ),
                         ),
+                        child: const Text('Cancelar Serviço'),
                       ),
-                      child: const Text('Cancelar Serviço'),
-                    ),
                   ],
                 ),
               );
             } else {
-              return Text('Cliente não encontrado');
+              return Text('Cuidador não encontrado');
             }
           },
         ),
@@ -190,5 +212,19 @@ class _DetalhesServicoState2 extends State<DetalhesServico2> {
         );
       },
     );
+  }
+
+  DateTime parseDataHora(String dataHoraString) {
+    List<String> partes = dataHoraString.split(" ");
+    List<String> partesData = partes[0].split("/");
+    List<String> partesHora = partes[1].split(":");
+
+    int dia = int.parse(partesData[0]);
+    int mes = int.parse(partesData[1]);
+    int ano = int.parse(partesData[2]);
+    int hora = int.parse(partesHora[0]);
+    int minuto = int.parse(partesHora[1]);
+
+    return DateTime(ano, mes, dia, hora, minuto);
   }
 }

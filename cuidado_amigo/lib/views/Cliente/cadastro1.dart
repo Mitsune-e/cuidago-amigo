@@ -1,9 +1,10 @@
 import 'dart:io';
 
-import 'package:cuidadoamigoapp/Util/Mascaras.dart';
-import 'package:cuidadoamigoapp/Util/Validacao.dart';
-import 'package:cuidadoamigoapp/models/Prestador.dart';
-import 'package:cuidadoamigoapp/provider/Prestadores.dart';
+import 'package:cuidado_amigo/Util/Mascaras.dart';
+import 'package:cuidado_amigo/Util/Validacao.dart';
+import 'package:cuidado_amigo/models/cliente.dart';
+import 'package:cuidado_amigo/provider/Clientes.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,14 +12,14 @@ import 'package:flutter/services.dart';
 import 'package:csc_picker/csc_picker.dart';
 import 'package:provider/provider.dart';
 
-class CadastroCuidado extends StatefulWidget {
-  const CadastroCuidado({super.key});
+class Cadastro1 extends StatefulWidget {
+  const Cadastro1({super.key});
 
   @override
-  _CadastroPrestadorState createState() => _CadastroPrestadorState();
+  _Cadastro1State createState() => _Cadastro1State();
 }
 
-class _CadastroPrestadorState extends State<CadastroCuidado> {
+class _Cadastro1State extends State<Cadastro1> {
   final PageController _pageController = PageController();
   final TextEditingController _nomeController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -27,8 +28,6 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
   final TextEditingController _senhaController = TextEditingController();
   final TextEditingController _confirmaSenhaController =
       TextEditingController();
-  final TextEditingController _estadoController = TextEditingController();
-  final TextEditingController _cidadeController = TextEditingController();
   final TextEditingController _enderecoController = TextEditingController();
   final TextEditingController _numeroController = TextEditingController();
   final TextEditingController _complementoController = TextEditingController();
@@ -49,7 +48,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cadastra-se como Cuidador'),
+        title: Text('Cadastra-se como Cliente'),
       ),
       body: GestureDetector(
         onHorizontalDragEnd: (details) {
@@ -68,7 +67,6 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
                 children: [
                   _buildDadosPessoais(),
                   _buildEndereco(),
-                  _buildDadosProfissionais(),
                   _buildFinalizar(),
                 ],
               ),
@@ -96,7 +94,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Dados Pessoais',
               style: TextStyle(
                 fontSize: 20,
@@ -119,7 +117,9 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
                 mandatory: true),
             const SizedBox(height: 10),
             _buildPhoneTextField(
-                controller: _telefoneController, label: 'Telefone'),
+              controller: _telefoneController,
+              label: 'Telefone',
+            ),
             const SizedBox(height: 10),
             _buildCPFTextField(controller: _cpfController, label: 'CPF'),
             const SizedBox(height: 10),
@@ -145,7 +145,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Endereço',
               style: TextStyle(
                 fontSize: 20,
@@ -175,37 +175,13 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
     );
   }
 
-  Widget _buildDadosProfissionais() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Dados Profissionais',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 20),
-            _buildCarroCheckbox(),
-            const SizedBox(height: 10),
-            _buildDescricaoTextField(),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildFinalizar() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Finalizar Cadastro',
             style: TextStyle(
               fontSize: 20,
@@ -266,7 +242,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
           ),
           validator: (value) {
-            if (value == null || value.isEmpty) {
+            if (mandatory == true && (value == null || value.isEmpty)) {
               return 'Campo obrigatório';
             }
             return null;
@@ -283,7 +259,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
         if (newValue.text.isEmpty) {
           return newValue.copyWith(
             text: '',
-            selection: const TextSelection.collapsed(offset: 0),
+            selection: TextSelection.collapsed(offset: 0),
           );
         }
 
@@ -371,7 +347,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
         if (newValue.text.isEmpty) {
           return newValue.copyWith(
             text: '',
-            selection: const TextSelection.collapsed(offset: 0),
+            selection: TextSelection.collapsed(offset: 0),
           );
         }
 
@@ -445,7 +421,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Possui Carro',
           style: TextStyle(
             fontSize: 16,
@@ -462,7 +438,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
                 });
               },
             ),
-            const Text('Sim'),
+            Text('Sim'),
             Radio(
               value: false,
               groupValue: _possuiCarro,
@@ -472,7 +448,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
                 });
               },
             ),
-            const Text('Não'),
+            Text('Não'),
           ],
         ),
       ],
@@ -526,11 +502,11 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
       children: [
         IconButton(
           onPressed: _previousPage,
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back),
         ),
         IconButton(
           onPressed: _nextPage,
-          icon: const Icon(Icons.arrow_forward),
+          icon: Icon(Icons.arrow_forward),
         ),
       ],
     );
@@ -616,9 +592,6 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
     if (estado == '') {
       emptyFields.add('Estado');
     }
-    if (_descricaoController.text.isEmpty) {
-      emptyFields.add('Descrição');
-    }
 
     if (emptyFields.isNotEmpty) {
       _showErrorDialog('Campos obrigatórios não preenchidos',
@@ -635,14 +608,14 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Cadastro Finalizado'),
-          content: const Text('Seu cadastro foi concluído com sucesso!'),
+          title: Text('Cadastro Finalizado'),
+          content: Text('Seu cadastro foi concluído com sucesso!'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.of(context).pushReplacementNamed('/login');
               },
-              child: const Text('OK'),
+              child: Text('OK'),
             ),
           ],
         );
@@ -662,7 +635,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text('OK'),
+              child: Text('OK'),
             ),
           ],
         );
@@ -680,23 +653,22 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
 
       final User? user = userCredential.user;
       if (user != null) {
-        final prestador = Prestador(
-            id: user.uid,
-            name: _nomeController.text,
-            email: _emailController.text,
-            telefone: _telefoneController.text,
-            senha: _senhaController.text,
-            cpf: _cpfController.text,
-            imagem: _imagemController.text ?? '',
-            estado: estado,
-            cidade: cidade,
-            endereco: _enderecoController.text,
-            numero: _numeroController.text,
-            complemento: _complementoController.text,
-            carro: _possuiCarro,
-            descricao: _descricaoController.text);
+        final cliente = Cliente(
+          id: user.uid,
+          name: _nomeController.text,
+          email: _emailController.text,
+          telefone: _telefoneController.text,
+          senha: _senhaController.text,
+          cpf: _cpfController.text,
+          imagem: _imagemController.text ?? '',
+          estado: estado,
+          cidade: cidade,
+          endereco: _enderecoController.text,
+          numero: _numeroController.text,
+          complemento: _complementoController.text,
+        );
 
-        Provider.of<Prestadores>(context, listen: false).adiciona(prestador);
+        Provider.of<Clientes>(context, listen: false).adiciona(cliente);
       }
     } catch (e) {
       print('Erro de criação de usuário no Firebase Authentication: $e');

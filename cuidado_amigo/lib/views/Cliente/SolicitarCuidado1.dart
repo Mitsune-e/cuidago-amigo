@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:csc_picker/model/select_status_model.dart';
-import 'package:cuidadoamigoapp/widgets/HourPickerSpinner.dart';
+import 'package:cuidado_amigo/widgets/HourPickerSpinner.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';

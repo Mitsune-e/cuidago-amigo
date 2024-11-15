@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:csc_picker/csc_picker.dart';
-import 'package:cuidadoamigoapp/models/Prestador.dart';
-import 'package:cuidadoamigoapp/views/login.dart';
+import 'package:cuidado_amigo/models/Prestador.dart';
+import 'package:cuidado_amigo/views/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
