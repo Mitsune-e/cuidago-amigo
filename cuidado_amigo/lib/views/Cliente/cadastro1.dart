@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import 'package:cuidado_amigo/Util/BuscarCEP.dart';
 import 'package:cuidado_amigo/Util/Mascaras.dart';
 import 'package:cuidado_amigo/Util/Validacao.dart';
 import 'package:cuidado_amigo/models/cliente.dart';
 import 'package:cuidado_amigo/provider/Clientes.dart';
+import 'package:cuidado_amigo/widgets/TextFieldComponent.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +13,7 @@ import 'package:flutter/services.dart';
 
 import 'package:csc_picker/csc_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:search_cep/search_cep.dart';
 
 class Cadastro1 extends StatefulWidget {
   const Cadastro1({super.key});
@@ -28,16 +31,15 @@ class _Cadastro1State extends State<Cadastro1> {
   final TextEditingController _senhaController = TextEditingController();
   final TextEditingController _confirmaSenhaController =
       TextEditingController();
+  final TextEditingController _cepController = TextEditingController();
+  final TextEditingController _estadoController = TextEditingController();
+  final TextEditingController _cidadeController = TextEditingController();
   final TextEditingController _enderecoController = TextEditingController();
   final TextEditingController _numeroController = TextEditingController();
   final TextEditingController _complementoController = TextEditingController();
-  final TextEditingController _descricaoController = TextEditingController();
   final TextEditingController _imagemController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  bool _possuiCarro = false;
   bool isNomeValid = false;
-  var cidade = '';
-  var estado = '';
 
   @override
   void initState() {
@@ -104,17 +106,25 @@ class _Cadastro1State extends State<Cadastro1> {
             const SizedBox(height: 20),
             _buildImagePickerButton(),
             const SizedBox(height: 10),
-            _buildTextField(
-                controller: _nomeController,
-                hintText: 'Nome',
-                label: 'Nome',
-                mandatory: true),
+            TextFieldComponent(
+              controller: _nomeController,
+              hintText: 'Nome',
+              label: 'Nome',
+              mandatory: true,
+              onChanged: (text) {
+                setState(() {});
+              },
+            ),
             const SizedBox(height: 10),
-            _buildTextField(
-                controller: _emailController,
-                hintText: 'E-mail',
-                label: 'E-mail',
-                mandatory: true),
+            TextFieldComponent(
+              controller: _emailController,
+              hintText: 'E-mail',
+              label: 'E-mail',
+              mandatory: true,
+              onChanged: (text) {
+                setState(() {});
+              },
+            ),
             const SizedBox(height: 10),
             _buildPhoneTextField(
               controller: _telefoneController,
@@ -153,22 +163,77 @@ class _Cadastro1State extends State<Cadastro1> {
               ),
             ),
             const SizedBox(height: 20),
-            _buildCSCPicker(),
-            _buildTextField(
-                controller: _enderecoController,
-                hintText: 'Endereço',
-                label: 'Endereço',
-                mandatory: true),
-            _buildTextField(
-                controller: _numeroController,
-                hintText: 'Número',
-                label: 'Número',
-                mandatory: true),
-            _buildTextField(
-                controller: _complementoController,
-                hintText: 'Complemento',
-                label: 'Complemento',
-                mandatory: false),
+            Row(children: [
+              Expanded(
+                child: TextFieldComponent(
+                    controller: _cepController,
+                    hintText: 'Digite o seu CEP',
+                    label: 'CEP',
+                    mandatory: true,
+                    onChanged: (text) {
+                      setState(() {});
+                    }),
+              ),
+              TextButton(
+                style: TextButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      side: BorderSide(
+                        color: Colors.grey,
+                      )),
+                ),
+                onPressed: () {
+                  _buscarCep(_cepController.text);
+                },
+                child: const Text('Buscar Endereço'),
+              ),
+            ]),
+
+            TextFieldComponent(
+                controller: _estadoController,
+                hintText: 'Digite o seu estado',
+                label: 'Estado',
+                mandatory: true,
+                onChanged: (text) {
+                  setState(() {});
+                }),
+            TextFieldComponent(
+              controller: _cidadeController,
+              hintText: 'Digite a sua cidade',
+              label: 'Cidade',
+              mandatory: true,
+              onChanged: (text) {
+                setState(() {});
+              },
+            ),
+            //_buildCSCPicker(),
+            TextFieldComponent(
+              controller: _enderecoController,
+              hintText: 'Endereço',
+              label: 'Endereço',
+              mandatory: true,
+              onChanged: (text) {
+                setState(() {});
+              },
+            ),
+            TextFieldComponent(
+              controller: _numeroController,
+              hintText: 'Número',
+              label: 'Número',
+              mandatory: true,
+              onChanged: (text) {
+                setState(() {});
+              },
+            ),
+            TextFieldComponent(
+              controller: _complementoController,
+              hintText: 'Complemento',
+              label: 'Complemento',
+              mandatory: false,
+              onChanged: (text) {
+                setState(() {});
+              },
+            ),
           ],
         ),
       ),
@@ -390,7 +455,7 @@ class _Cadastro1State extends State<Cadastro1> {
     );
   }
 
-  Widget _buildCSCPicker() {
+/*   Widget _buildCSCPicker() {
     return CSCPicker(
       layout: Layout.vertical,
       currentCountry: "Brazil",
@@ -416,71 +481,7 @@ class _Cadastro1State extends State<Cadastro1> {
       dropdownDialogRadius: 30,
     );
   }
-
-  Widget _buildCarroCheckbox() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Possui Carro',
-          style: TextStyle(
-            fontSize: 16,
-          ),
-        ),
-        Row(
-          children: [
-            Radio(
-              value: true,
-              groupValue: _possuiCarro,
-              onChanged: (value) {
-                setState(() {
-                  _possuiCarro = value as bool;
-                });
-              },
-            ),
-            Text('Sim'),
-            Radio(
-              value: false,
-              groupValue: _possuiCarro,
-              onChanged: (value) {
-                setState(() {
-                  _possuiCarro = value as bool;
-                });
-              },
-            ),
-            Text('Não'),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDescricaoTextField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Descrição ${_descricaoController.text.isNotEmpty ? '' : ' (Obrigatório)'}',
-          style: TextStyle(
-            color: _descricaoController.text.isNotEmpty
-                ? Colors.black
-                : Colors.red,
-          ),
-        ),
-        TextFormField(
-          onChanged: (Text) {
-            setState(() {});
-          },
-          controller: _descricaoController,
-          maxLines: 3,
-          decoration: InputDecoration(
-            hintText: 'Digite uma descrição',
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-          ),
-        ),
-      ],
-    );
-  }
+ */
 
   Widget _buildFinalizarButton() {
     return ElevatedButton(
@@ -527,6 +528,23 @@ class _Cadastro1State extends State<Cadastro1> {
         duration: const Duration(milliseconds: 500),
         curve: Curves.ease,
       );
+    }
+  }
+
+  void _buscarCep(String Cep) async {
+    try {
+      final result = await buscarCEP(Cep);
+      print(result);
+
+      _estadoController.text = result.uf ?? "";
+      _cidadeController.text = result.logradouro ?? "";
+      _enderecoController.text = result.localidade ?? "";
+      _numeroController.text = result.unidade ?? "";
+      setState(() {});
+    } on Exception catch (e) {
+      _showErrorDialog('Erro', 'Erro ao buscar o CEP: $e');
+    } catch (e) {
+      _showErrorDialog('Erro', 'Erro desconhecido ao buscar o CEP: $e');
     }
   }
 
@@ -586,11 +604,14 @@ class _Cadastro1State extends State<Cadastro1> {
     if (_complementoController.text.isEmpty) {
       emptyFields.add('Complemento');
     }
-    if (cidade == '') {
+    if (_cidadeController.text.isEmpty) {
       emptyFields.add('Cidade');
     }
-    if (estado == '') {
+    if (_estadoController.text.isEmpty) {
       emptyFields.add('Estado');
+    }
+    if (_cepController.text.isEmpty) {
+      emptyFields.add('CEP');
     }
 
     if (emptyFields.isNotEmpty) {
@@ -661,8 +682,9 @@ class _Cadastro1State extends State<Cadastro1> {
           senha: _senhaController.text,
           cpf: _cpfController.text,
           imagem: _imagemController.text ?? '',
-          estado: estado,
-          cidade: cidade,
+          estado: _estadoController.text,
+          cidade: _cidadeController.text,
+          cep: _cepController.text,
           endereco: _enderecoController.text,
           numero: _numeroController.text,
           complemento: _complementoController.text,

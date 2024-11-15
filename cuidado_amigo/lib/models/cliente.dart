@@ -1,5 +1,3 @@
-
-
 class Cliente {
   final String id;
   final String name;
@@ -8,6 +6,7 @@ class Cliente {
   final String cpf;
   final String telefone;
   final String senha;
+  final String cep;
   final String estado;
   final String cidade;
   final String endereco;
@@ -23,14 +22,14 @@ class Cliente {
     required this.email,
     required this.senha,
     required this.telefone,
+    required this.cep,
     required this.estado,
     required this.cidade,
     required this.endereco,
     required this.numero,
     required this.complemento,
     List<String>? servicos,
-  })   : 
-        this.servicos = servicos ?? [];
+  }) : this.servicos = servicos ?? [];
 
   Cliente.fromMap(Map<String, dynamic> map)
       : id = map["id"],
@@ -41,8 +40,9 @@ class Cliente {
         senha = map["senha"],
         cpf = map["cpf"],
         endereco = map["endereco"],
+        cep = map["cep"],
         estado = map['estado'],
-        cidade =map['cidade'],
+        cidade = map['cidade'],
         numero = map['numero'],
         complemento = map['complemento'],
         servicos = List<String>.from(map["servicos"] ?? []);
@@ -57,6 +57,7 @@ class Cliente {
       "telefone": telefone,
       "senha": senha,
       "servicos": servicos,
+      "cep": cep,
       "endereco": endereco,
       'estado': estado,
       'cidade': cidade,
