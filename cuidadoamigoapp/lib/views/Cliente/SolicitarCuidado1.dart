@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:csc_picker/model/select_status_model.dart';
+import 'package:cuidadoamigoapp/widgets/HourPickerSpinner.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:csc_picker/csc_picker.dart';
@@ -47,16 +48,7 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
         });
       }
     } catch (e) {
-      if (kDebugMode) {
-        print('Erro ao carregar dados do Firestore: $e');
-      } else {
-        // Mostrar mensagem de erro ou fazer alguma outra ação
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro ao carregar dados do Firestore.'),
-          ),
-        );
-      }
+      print('Erro ao carregar dados do Firestore: $e');
     }
   }
 
@@ -200,6 +192,7 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                           stateController.text = estado;
                           cityController.text = cidade;
                         });
+                        final cscPickerState = _cscPickerKey.currentState;
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF73C9C9),
@@ -473,6 +466,63 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
         }
       }
     }
+    /* showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(isStart ? 'Horário de Início' : 'Horário de Fim'),
+          content: HourPickerSpinner(
+            is24HourMode: true,
+            normalTextStyle: TextStyle(fontSize: 24, color: Colors.grey),
+            highlightedTextStyle: TextStyle(fontSize: 24, color: Colors.black),
+            spacing: 50,
+            itemHeight: 80,
+            isForce2Digits: true,
+            onTimeChange: (time) {
+              selectedTime = time;
+            },
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancelar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Confirmar'),
+              onPressed: () {
+                if (selectedTime != null) {
+                  if (isStart) {
+                    setState(() {
+                      selectedTimeInicio = selectedTime;
+                    });
+                    Navigator.of(context).pop();
+                  } else {
+                    if (selectedTime!.isAfter(
+                        selectedTimeInicio!.add(Duration(minutes: 30)))) {
+                      setState(() {
+                        selectedTimeFim = selectedTime;
+                        _updateValor();
+                      });
+                      Navigator.of(context).pop();
+                    } else {
+                      // Mostrar mensagem de erro
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              'O horário de fim deve ser pelo menos 30 minutos após o início.'),
+                        ),
+                      );
+                    }
+                  }
+                }
+              },
+            ),
+          ],
+        );
+      },
+    ); */
   }
 
   bool _validateAddress() {

@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:cuidadoamigoapp/models/cliente.dart';
 import 'package:cuidadoamigoapp/views/login.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:csc_picker/csc_picker.dart';
 
 class Perfil extends StatefulWidget {
@@ -63,31 +63,22 @@ class _PerfilState extends State<Perfil> {
         Cliente cliente = Cliente.fromMap(userData);
 
         setState(() {
-          _nomeController.text = cliente.name;
-          _cpfController.text = cliente.cpf;
-          _emailController.text = cliente.email;
-          _telefoneController.text = cliente.telefone;
-          estado = cliente.estado;
-          cidade = cliente.cidade;
-          _enderecoController.text = cliente.endereco;
-          _numeroController.text = cliente.numero;
-          _complementoController.text = cliente.complemento;
-          imageUrl = cliente.imagem;
+          _nomeController.text = cliente.name ?? '';
+          _cpfController.text = cliente.cpf ?? '';
+          _emailController.text = cliente.email ?? '';
+          _telefoneController.text = cliente.telefone ?? '';
+          estado = cliente.estado ?? '';
+          cidade = cliente.cidade ?? '';
+          _enderecoController.text = cliente.endereco ?? '';
+          _numeroController.text = cliente.numero ?? '';
+          _complementoController.text = cliente.complemento ?? '';
+          imageUrl = cliente.imagem ?? '';
 
           _isLoadingImage = false;
         });
       }
     } catch (e) {
-      if (kDebugMode) {
-        print('Erro ao carregar dados do Firestore: $e');
-      } else {
-        // Mostrar mensagem de erro ou fazer alguma outra ação
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro ao carregar dados do Firestore.'),
-          ),
-        );
-      }
+      print('Erro ao carregar dados do Firestore: $e');
       // Em caso de erro, marque que a imagem não está mais carregando
       setState(() {
         _isLoadingImage = false;
@@ -95,7 +86,58 @@ class _PerfilState extends State<Perfil> {
     }
   }
 
-  /* Future<String> fazerUploadEObterUrl(String imagePath) async {
+  Future<void> _mostrarOpcoesImagem() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Escolher Imagem'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                ListTile(
+                  leading: const Icon(Icons.photo),
+                  title: const Text('Galeria'),
+                  onTap: () {
+                    _escolherImagem(ImageSource.gallery);
+                    Navigator.of(context).pop();
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.camera),
+                  title: const Text('Câmera'),
+                  onTap: () {
+                    _escolherImagem(ImageSource.camera);
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _escolherImagem(ImageSource source) async {
+    final pickedFile = await ImagePicker().pickImage(source: source);
+
+    if (pickedFile != null) {
+      // Aqui você pode lidar com a imagem selecionada
+      // Por exemplo, você pode carregar a imagem para o Firebase Storage
+      // e atualizar a referência no Firestore
+      // A propriedade pickedFile.path contém o caminho local da imagem selecionada
+
+      // Implemente a lógica para fazer upload da imagem para o Firebase Storage
+      // e obter a URL da imagem
+
+      // Chame a função _updateUserData para atualizar a URL da imagem no Firestore
+      User? user = _auth.currentUser;
+      await _updateUserData(user!.uid);
+    }
+  }
+
+  Future<String> fazerUploadEObterUrl(String imagePath) async {
     // Lógica para fazer o upload da imagem e obter a URL
     // Substitua este código pela implementação real do upload
 
@@ -116,7 +158,7 @@ class _PerfilState extends State<Perfil> {
     final String imageUrl = await storageReference.getDownloadURL();
 
     return imageUrl;
-  } */
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -361,16 +403,7 @@ class _PerfilState extends State<Perfil> {
       });
       await _loadData();
     } catch (e) {
-      if (kDebugMode) {
-        print('Erro ao atualizar dados do usuário no Firestore: $e');
-      } else {
-        // Mostrar mensagem de erro ou fazer alguma outra ação
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro ao carregar dados do Firestore.'),
-          ),
-        );
-      }
+      print('Erro ao atualizar dados do usuário no Firestore: $e');
     }
   }
 
@@ -613,16 +646,7 @@ class _PerfilState extends State<Perfil> {
         ),
       );
     } catch (e) {
-      if (kDebugMode) {
-        print('Erro ao excluir perfil: $e');
-      } else {
-        // Mostrar mensagem de erro ou fazer alguma outra ação
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro ao excluir o perfil.'),
-          ),
-        );
-      }
+      print('Erro ao excluir perfil: $e');
       // Lide com erros aqui, se necessário
     }
   }

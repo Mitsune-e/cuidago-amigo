@@ -3,7 +3,8 @@ import 'package:cuidadoamigoapp/models/Prestador.dart';
 import 'package:cuidadoamigoapp/provider/Prestadores.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
-import 'package:flutter/foundation.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -16,8 +17,8 @@ class Carteira extends StatefulWidget {
 
 class _CarteiraState extends State<Carteira> {
   double saldo = 0.0;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   void initState() {
@@ -35,43 +36,20 @@ class _CarteiraState extends State<Carteira> {
         String idDoUsuario = ""; //_auth.currentUser!.uid;
         Prestador? prestador =
             await prestadoresProvider.loadClienteById(idDoUsuario);
-        if (kDebugMode) {
-          print(prestador!.name);
-        }
+        print(prestador!.name);
 
         if (prestador != null) {
           setState(() {
             saldo = prestador.saldo;
           });
         } else {
-          if (kDebugMode) {
-            print('Cuidador não encontrado para o ID do usuário: $idDoUsuario');
-          } else {
-            // Mostrar mensagem de erro ou fazer alguma outra ação
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                    'Cuidador não encontrado para o ID do usuário: $idDoUsuario'),
-              ),
-            );
-          }
+          print('Cuidador não encontrado para o ID do usuário: $idDoUsuario');
         }
       } else {
-        if (kDebugMode) {
-          print('_auth.currentUser é null');
-        }
+        print('_auth.currentUser é null');
       }
     } catch (e) {
-      if (kDebugMode) {
-        print('Erro ao carregar saldo: $e');
-      } else {
-        // Mostrar mensagem de erro ou fazer alguma outra ação
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro ao carregar: $e'),
-          ),
-        );
-      }
+      print('Erro ao carregar saldo: $e');
     }
   }
 
@@ -280,17 +258,8 @@ class _CarteiraState extends State<Carteira> {
                     Navigator.pop(currentContext); // Fecha o diálogo atual
                     Navigator.pop(currentContext); // Fecha o diálogo anterior
                   } catch (e) {
-                    if (kDebugMode) {
-                      print('Erro ao processar retirada via Pix: $e');
-                    } else {
-                      // Mostrar mensagem de erro ou fazer alguma outra ação
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content:
-                              Text('Erro ao processar retirada via Pix: $e'),
-                        ),
-                      );
-                    }
+                    print('Erro ao processar retirada via Pix: $e');
+                    // Trate o erro conforme necessário
                   }
                 },
                 style: ElevatedButton.styleFrom(

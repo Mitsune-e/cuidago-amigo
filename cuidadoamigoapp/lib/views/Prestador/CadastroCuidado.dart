@@ -5,7 +5,6 @@ import 'package:cuidadoamigoapp/Util/Validacao.dart';
 import 'package:cuidadoamigoapp/models/Prestador.dart';
 import 'package:cuidadoamigoapp/provider/Prestadores.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -28,6 +27,8 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
   final TextEditingController _senhaController = TextEditingController();
   final TextEditingController _confirmaSenhaController =
       TextEditingController();
+  final TextEditingController _estadoController = TextEditingController();
+  final TextEditingController _cidadeController = TextEditingController();
   final TextEditingController _enderecoController = TextEditingController();
   final TextEditingController _numeroController = TextEditingController();
   final TextEditingController _complementoController = TextEditingController();
@@ -256,7 +257,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
           ),
         ),
         TextFormField(
-          onChanged: (text) {
+          onChanged: (Text) {
             setState(() {});
           },
           controller: controller,
@@ -304,7 +305,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
           ),
         ),
         TextFormField(
-          onChanged: (text) {
+          onChanged: (Text) {
             setState(() {});
           },
           controller: controller,
@@ -340,7 +341,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
           ),
         ),
         TextFormField(
-          onChanged: (text) {
+          onChanged: (Text) {
             setState(() {});
           },
           controller: controller,
@@ -392,7 +393,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
           ),
         ),
         TextFormField(
-          onChanged: (text) {
+          onChanged: (Text) {
             setState(() {});
           },
           controller: controller,
@@ -422,7 +423,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
       defaultCountry: CscCountry.Brazil,
       disableCountry: true,
       flagState: CountryFlag.DISABLE,
-      onCountryChanged: (country) {},
+      onCountryChanged: (Country) {},
       onStateChanged: (value) {
         setState(() {
           estado = value.toString();
@@ -491,7 +492,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
           ),
         ),
         TextFormField(
-          onChanged: (text) {
+          onChanged: (Text) {
             setState(() {});
           },
           controller: _descricaoController,
@@ -686,7 +687,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
             telefone: _telefoneController.text,
             senha: _senhaController.text,
             cpf: _cpfController.text,
-            imagem: _imagemController.text,
+            imagem: _imagemController.text ?? '',
             estado: estado,
             cidade: cidade,
             endereco: _enderecoController.text,
@@ -698,17 +699,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
         Provider.of<Prestadores>(context, listen: false).adiciona(prestador);
       }
     } catch (e) {
-      if (kDebugMode) {
-        print('Erro de criação de usuário no Firebase Authentication: $e');
-      } else {
-        // Mostrar mensagem de erro ou fazer alguma outra ação
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Erro de criação de usuário no Firebase Authentication: $e'),
-          ),
-        );
-      }
+      print('Erro de criação de usuário no Firebase Authentication: $e');
     }
   }
 
