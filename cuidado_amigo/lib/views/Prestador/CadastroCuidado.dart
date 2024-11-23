@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import 'package:cuidado_amigo/Util/BuscarCEP.dart';
 import 'package:cuidado_amigo/Util/Mascaras.dart';
 import 'package:cuidado_amigo/Util/Validacao.dart';
 import 'package:cuidado_amigo/models/Prestador.dart';
 import 'package:cuidado_amigo/provider/Prestadores.dart';
+import 'package:cuidado_amigo/widgets/TextFieldComponent.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -29,6 +31,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
       TextEditingController();
   final TextEditingController _estadoController = TextEditingController();
   final TextEditingController _cidadeController = TextEditingController();
+  final TextEditingController _cepController = TextEditingController();
   final TextEditingController _enderecoController = TextEditingController();
   final TextEditingController _numeroController = TextEditingController();
   final TextEditingController _complementoController = TextEditingController();
@@ -145,7 +148,7 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Endereço',
               style: TextStyle(
                 fontSize: 20,
@@ -153,22 +156,77 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
               ),
             ),
             const SizedBox(height: 20),
-            _buildCSCPicker(),
-            _buildTextField(
-                controller: _enderecoController,
-                hintText: 'Endereço',
-                label: 'Endereço',
-                mandatory: true),
-            _buildTextField(
-                controller: _numeroController,
-                hintText: 'Número',
-                label: 'Número',
-                mandatory: true),
-            _buildTextField(
-                controller: _complementoController,
-                hintText: 'Complemento',
-                label: 'Complemento',
-                mandatory: false),
+            Row(children: [
+              Expanded(
+                child: TextFieldComponent(
+                    controller: _cepController,
+                    hintText: 'Digite o seu CEP',
+                    label: 'CEP',
+                    mandatory: true,
+                    onChanged: (text) {
+                      setState(() {});
+                    }),
+              ),
+              TextButton(
+                style: TextButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      side: BorderSide(
+                        color: Colors.grey,
+                      )),
+                ),
+                onPressed: () {
+                  _buscarCep(_cepController.text);
+                },
+                child: const Text('Buscar Endereço'),
+              ),
+            ]),
+
+            TextFieldComponent(
+                controller: _estadoController,
+                hintText: 'Digite o seu estado',
+                label: 'Estado',
+                mandatory: true,
+                onChanged: (text) {
+                  setState(() {});
+                }),
+            TextFieldComponent(
+              controller: _cidadeController,
+              hintText: 'Digite a sua cidade',
+              label: 'Cidade',
+              mandatory: true,
+              onChanged: (text) {
+                setState(() {});
+              },
+            ),
+            //_buildCSCPicker(),
+            TextFieldComponent(
+              controller: _enderecoController,
+              hintText: 'Endereço',
+              label: 'Endereço',
+              mandatory: true,
+              onChanged: (text) {
+                setState(() {});
+              },
+            ),
+            TextFieldComponent(
+              controller: _numeroController,
+              hintText: 'Número',
+              label: 'Número',
+              mandatory: true,
+              onChanged: (text) {
+                setState(() {});
+              },
+            ),
+            TextFieldComponent(
+              controller: _complementoController,
+              hintText: 'Complemento',
+              label: 'Complemento',
+              mandatory: false,
+              onChanged: (text) {
+                setState(() {});
+              },
+            ),
           ],
         ),
       ),
@@ -610,10 +668,10 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
     if (_complementoController.text.isEmpty) {
       emptyFields.add('Complemento');
     }
-    if (cidade == '') {
+    if (_cidadeController.text.isEmpty) {
       emptyFields.add('Cidade');
     }
-    if (estado == '') {
+    if (_estadoController.text.isEmpty) {
       emptyFields.add('Estado');
     }
     if (_descricaoController.text.isEmpty) {
@@ -670,6 +728,24 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
     );
   }
 
+  void _buscarCep(String Cep) async {
+    try {
+      //Writes what Cep returns and write in the input fields
+      final result = await buscarCEP(Cep);
+      print(result);
+
+      _estadoController.text = result.uf ?? "";
+      _cidadeController.text = result.logradouro ?? "";
+      _enderecoController.text = result.localidade ?? "";
+      _numeroController.text = result.unidade ?? "";
+      setState(() {});
+    } on Exception catch (e) {
+      _showErrorDialog('Erro', 'Erro ao buscar o CEP: $e');
+    } catch (e) {
+      _showErrorDialog('Erro', 'Erro desconhecido ao buscar o CEP: $e');
+    }
+  }
+
   void _registerUser(BuildContext context) async {
     try {
       final UserCredential userCredential =
@@ -688,8 +764,9 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
             senha: _senhaController.text,
             cpf: _cpfController.text,
             imagem: _imagemController.text ?? '',
-            estado: estado,
-            cidade: cidade,
+            estado: _estadoController.text,
+            cidade: _cidadeController.text,
+            cep: _cepController.text,
             endereco: _enderecoController.text,
             numero: _numeroController.text,
             complemento: _complementoController.text,

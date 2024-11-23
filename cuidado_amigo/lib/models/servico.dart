@@ -6,6 +6,7 @@ class Servico {
   final String usuario;
   final String prestador;
   final String endereco;
+  final String cep;
   final String numero;
   final String complemento;
   final String cidade;
@@ -24,6 +25,7 @@ class Servico {
     required this.endereco,
     required this.usuario,
     required this.prestador,
+    required this.cep,
     required this.numero,
     required this.complemento,
     required this.cidade,
@@ -43,6 +45,7 @@ class Servico {
         endereco = map["endereco"] ?? "",
         usuario = map["usuario"] ?? "",
         prestador = map["prestador"] ?? "",
+        cep = map["cep"] ?? "",
         numero = map['numero'] ?? "",
         complemento = map['complemento'] ?? "",
         estado = map['estado'] ?? "",
@@ -64,6 +67,7 @@ class Servico {
       "usuario": usuario,
       "prestador": prestador,
       "numero": numero,
+      "cep": cep,
       "Complemento": complemento,
       "cidade": cidade,
       "estado": estado,
@@ -89,6 +93,7 @@ class Servico {
       endereco: endereco,
       usuario: usuario,
       prestador: prestador,
+      cep: cep,
       numero: numero,
       complemento: complemento,
       cidade: cidade,

@@ -1,4 +1,3 @@
-
 class Prestador {
   final String id;
   final String name;
@@ -6,6 +5,7 @@ class Prestador {
   final String email;
   final String cpf;
   final String telefone;
+  final String cep;
   final String senha;
   final String estado;
   final String cidade;
@@ -19,7 +19,6 @@ class Prestador {
   List<String>? servicos;
   List<String>? Datas;
 
-
   Prestador({
     required this.id,
     required this.name,
@@ -28,6 +27,7 @@ class Prestador {
     required this.email,
     required this.senha,
     required this.telefone,
+    required this.cep,
     required this.estado,
     required this.endereco,
     required this.cidade,
@@ -36,11 +36,11 @@ class Prestador {
     required this.descricao,
     required this.carro,
     double saldo = 0.0,
-    double avaliacao = 5.0, 
+    double avaliacao = 5.0,
     List<String>? servicos,
-  })   : this.servicos = servicos ?? [],
+  })  : this.servicos = servicos ?? [],
         this.Datas = servicos ?? [],
-          this.avaliacao = avaliacao,
+        this.avaliacao = avaliacao,
         this.saldo = saldo; // Corrigido aqui
 
   Prestador.fromMap(Map<String, dynamic> map)
@@ -52,8 +52,9 @@ class Prestador {
         senha = map["senha"],
         cpf = map["cpf"],
         endereco = map["endereco"],
+        cep = map["cep"],
         estado = map['estado'],
-        cidade =map['cidade'],
+        cidade = map['cidade'],
         numero = map['numero'],
         complemento = map['complemento'],
         carro = map['carro'],
@@ -62,8 +63,6 @@ class Prestador {
         avaliacao = (map['avaliacao'] as num?)?.toDouble() ?? 5.0,
         Datas = List<String>.from(map["Datas"] ?? []),
         servicos = List<String>.from(map["servicos"] ?? []);
-   
-        
 
   Map<String, dynamic> toMap() {
     return {
@@ -75,14 +74,15 @@ class Prestador {
       "telefone": telefone,
       "senha": senha,
       "endereco": endereco,
+      "cep": cep,
       'estado': estado,
       'cidade': cidade,
       'numero': numero,
       'complemento': complemento,
       "servicos": servicos,
-      "carro" : carro,
+      "carro": carro,
       'saldo': saldo,
-      'avaliacao':avaliacao,
+      'avaliacao': avaliacao,
       "descricao": descricao,
       "Datas": Datas,
     };
