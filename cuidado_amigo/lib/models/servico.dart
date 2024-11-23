@@ -13,29 +13,28 @@ class Servico {
   final String estado;
   final String valor;
   double avaliacao; // Novo campo
-  bool finalizada;
   bool avaliado;
   bool destaque;
+  String status;
 
-  Servico({
-    required this.id,
-    required this.data,
-    required this.horaInicio,
-    required this.horaFim,
-    required this.endereco,
-    required this.usuario,
-    required this.prestador,
-    required this.cep,
-    required this.numero,
-    required this.complemento,
-    required this.cidade,
-    required this.estado,
-    required this.valor,
-    this.avaliacao = 0.0, // Valor padrão
-    this.finalizada = false,
-    this.avaliado = false,
-    this.destaque = false,
-  });
+  Servico(
+      {required this.id,
+      required this.data,
+      required this.horaInicio,
+      required this.horaFim,
+      required this.endereco,
+      required this.usuario,
+      required this.prestador,
+      required this.cep,
+      required this.numero,
+      required this.complemento,
+      required this.cidade,
+      required this.estado,
+      required this.valor,
+      this.avaliacao = 0.0, // Valor padrão
+      this.avaliado = false,
+      this.destaque = false,
+      this.status = ''});
 
   Servico.fromMap(Map<String, dynamic> map)
       : id = map["id"] ?? "",
@@ -53,9 +52,9 @@ class Servico {
         valor = map['valor'] ?? "",
         avaliacao =
             (map['avaliacao'] ?? 0.0).toDouble(), // Convertido para double
-        finalizada = map['finalizada'] ?? false,
         avaliado = map['avaliado'] ?? false,
-        destaque = map['destaque'] ?? false;
+        destaque = map['destaque'] ?? false,
+        status = map['status'] ?? '';
 
   Map<String, dynamic> toMap() {
     return {
@@ -73,43 +72,52 @@ class Servico {
       "estado": estado,
       "valor": valor,
       "avaliacao": avaliacao, // Adicionado campo avaliacao
-      "finalizada": finalizada,
       "avaliado": avaliado,
       "destaque": destaque,
+      "status": status,
     };
   }
 
   Servico copyWith({
     double? avaliacao, // Adicionado parâmetro avaliacao
-    bool? finalizada,
     bool? avaliado,
     bool? destaque,
+    String? status,
   }) {
     return Servico(
-      id: id,
-      data: data,
-      horaInicio: horaInicio,
-      horaFim: horaFim,
-      endereco: endereco,
-      usuario: usuario,
-      prestador: prestador,
-      cep: cep,
-      numero: numero,
-      complemento: complemento,
-      cidade: cidade,
-      estado: estado,
-      valor: valor,
-      avaliacao: avaliacao ?? this.avaliacao, // Atualizado campo avaliacao
-      finalizada: finalizada ?? this.finalizada,
-      avaliado: avaliado ?? this.avaliado,
-      destaque: destaque ?? this.destaque,
-    );
+        id: id,
+        data: data,
+        horaInicio: horaInicio,
+        horaFim: horaFim,
+        endereco: endereco,
+        usuario: usuario,
+        prestador: prestador,
+        cep: cep,
+        numero: numero,
+        complemento: complemento,
+        cidade: cidade,
+        estado: estado,
+        valor: valor,
+        avaliacao: avaliacao ?? this.avaliacao, // Atualizado campo avaliacao
+        avaliado: avaliado ?? this.avaliado,
+        destaque: destaque ?? this.destaque,
+        status: status ?? this.status);
+  }
+
+  static const String solicitado = "Solicitado";
+
+  static const String emAndamento = "Em Andamento";
+
+  static const String cancelado = "Cancelado";
+
+  static const String finalizado = "Finalizado";
+
+  static List<String> get statusFinalizado {
+    return [cancelado, finalizado];
   }
 
   bool get isEmAberto {
-    final now = DateTime.now();
-    final servicoDateTime = parseDateAndTime(data, horaFim);
-    return servicoDateTime.isAfter(now);
+    return status == solicitado;
   }
 
   DateTime parseDateAndTime(String date, String hour) {
@@ -124,10 +132,6 @@ class Servico {
   }
 
   bool get isFinalizado {
-    // Substitua esta lógica pela condição que define se o serviço está finalizado
-    // Neste exemplo, estamos considerando que um serviço está finalizado se a data/hora atual for após a data/hora de fim do serviço.
-    final now = DateTime.now();
-    final servicoDateTime = parseDateAndTime(data, horaFim);
-    return now.isAfter(servicoDateTime);
+    return statusFinalizado.any((statusItem) => statusItem == status);
   }
 }

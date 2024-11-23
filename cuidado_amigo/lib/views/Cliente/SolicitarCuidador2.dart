@@ -267,6 +267,7 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
                                       estado: dataToPass['estado'],
                                       cidade: dataToPass['cidade'],
                                       valor: dataToPass['valor'].toString(),
+                                      status: Servico.solicitado,
                                     );
 
                                     // Use o provider para adicionar o serviço ao banco de dados

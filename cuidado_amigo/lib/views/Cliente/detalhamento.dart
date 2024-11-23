@@ -74,7 +74,7 @@ class _DetalhesServicoState extends State<DetalhesServico> {
                   '${widget.servico.data} ${widget.servico.horaFim}');
               DateTime horaAtual = DateTime.now();
 
-              bool podeCancelar = !widget.servico.finalizada &&
+              bool podeCancelar = !widget.servico.isFinalizado &&
                   horaFimServico.isAfter(horaAtual);
 
               return SingleChildScrollView(
@@ -201,8 +201,10 @@ class _DetalhesServicoState extends State<DetalhesServico> {
             ),
             TextButton(
               onPressed: () {
+                widget.servico.status = Servico.cancelado;
+
                 Provider.of<Servicos>(context, listen: false)
-                    .remove(widget.servico);
+                    .editar(widget.servico);
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
                 Navigator.of(context).pushNamed('/agenda');

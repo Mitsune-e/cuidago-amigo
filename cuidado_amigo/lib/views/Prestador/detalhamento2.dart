@@ -40,7 +40,7 @@ class _DetalhesServicoState2 extends State<DetalhesServico2> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.of(context).pushNamed("/homePrestador");
+            Navigator.of(context).pushNamed("/homeCuidador");
           },
         ),
       ),
@@ -179,10 +179,12 @@ class _DetalhesServicoState2 extends State<DetalhesServico2> {
             ),
             TextButton(
               onPressed: () {
+                widget.servico.status = Servico.cancelado;
+
                 Provider.of<Servicos>(context, listen: false)
-                    .remove(widget.servico);
+                    .editar(widget.servico);
                 Navigator.of(context).pop();
-                Navigator.of(context).pushNamed('/homePrestador');
+                Navigator.of(context).pushNamed('/homeCuidador');
               },
               child: const Text('Sim'),
             ),

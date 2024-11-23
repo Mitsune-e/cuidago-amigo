@@ -31,6 +31,13 @@ class Servicos with ChangeNotifier {
     }
   }
 
+  void editar(Servico servico) {
+    // Atualiza os dados no Firestore
+    _firestore.collection("Servicos").doc(servico.id).set(servico.toMap());
+
+    notifyListeners();
+  }
+
   void adiciona(Servico servico) {
     _firestore.collection("Servicos").doc(servico.id).set(servico.toMap());
   }
