@@ -253,7 +253,6 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
                                   if (cuidadores.isNotEmpty &&
                                       currentIndex < cuidadores.length) {
                                     // Crie o serviço
-                                    print(dataToPass);
                                     final servico = Servico(
                                       id: Uuid().v1(),
                                       data: dataToPass['data'],

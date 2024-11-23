@@ -204,6 +204,7 @@ class _DetalhesServicoState extends State<DetalhesServico> {
                 Provider.of<Servicos>(context, listen: false)
                     .remove(widget.servico);
                 Navigator.of(context).pop();
+                Navigator.of(context).pop();
                 Navigator.of(context).pushNamed('/agenda');
               },
               child: const Text('Sim'),
