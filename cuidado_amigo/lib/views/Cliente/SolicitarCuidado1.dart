@@ -24,6 +24,7 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
   TextEditingController complementoController = TextEditingController();
   String estado = '';
   String cidade = '';
+  String cep = '';
   TextEditingController enderecoController = TextEditingController();
   double valor = 0.0;
   double valorHoraEnfermeiro = 20.0;
@@ -45,6 +46,7 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
           complementoController.text = userDoc['complemento'] ?? '';
           cidade = userDoc['cidade'] ?? '';
           estado = userDoc['estado'] ?? '';
+          cep = userDoc['cep'] ?? '';
         });
       }
     } catch (e) {
@@ -252,6 +254,12 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
+                              'CEP: ${cep.isNotEmpty ? cep : 'Nenhum CEP selecionado'}',
+                              style: const TextStyle(
+                                fontSize: 18,
+                              ),
+                            ),
+                            Text(
                               'Cidade: ${cidade.isNotEmpty ? cidade : 'Nenhuma cidade selecionada'}',
                               style: const TextStyle(
                                 fontSize: 18,
@@ -376,6 +384,7 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                         'valor': valor,
                         'cidade': cidade,
                         'estado': estado,
+                        'cep': cep,
                         'endereco': enderecoController.text,
                         'complemento': complementoController.text,
                         'numero': numeroController.text,

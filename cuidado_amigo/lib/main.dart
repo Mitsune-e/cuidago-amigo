@@ -63,7 +63,7 @@ class MyApp extends StatelessWidget {
         '/cadastroPrestador': (context) => CadastroCuidado(),
         '/perfil': (context) => const Perfil(),
         '/agenda': (context) => Agenda(),
-        "/homePrestador": (context) => HomePrestador(),
+        "/homeCuidador": (context) => HomeCuidador(),
         '/solicitarCuidador1': (context) => SolicitarCuidado1(),
         '/solicitarCuidador2': (context) => CuidadorInfoPage(),
         '/carteira': (context) => Carteira(),

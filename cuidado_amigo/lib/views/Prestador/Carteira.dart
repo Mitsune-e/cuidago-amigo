@@ -61,7 +61,7 @@ class _CarteiraState extends State<Carteira> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.of(context).popAndPushNamed('/homePrestador');
+            Navigator.of(context).popAndPushNamed('/homeCuidador');
           },
         ),
         title: const Text('Minha Carteira'),

@@ -84,7 +84,7 @@ class _LoginState extends State<Login> {
 
         if (userCredential.user != null) {
           // Autenticação bem-sucedida - redireciona para a próxima tela de prestador
-          Navigator.of(context).pushReplacementNamed('/homePrestador');
+          Navigator.of(context).pushReplacementNamed('/homeCuidador');
         } else {
           // Exiba uma mensagem de erro caso a autenticação falhe
           ScaffoldMessenger.of(context).showSnackBar(

@@ -22,8 +22,9 @@ class _AgendaState extends State<Agenda> {
   FirebaseAuth _auth = FirebaseAuth.instance;
   List<Servico> servicosDoCliente = [];
   List<Servico> servicosEmAberto = [];
+  List<Servico> servicosEmAndamento = [];
   List<Servico> servicosFinalizados = [];
-  bool exibirEmAberto = true;
+  String exibirStatus = Servico.solicitado;
   TextEditingController nomePrestador = TextEditingController();
   double novaAvaliacao = 0.0;
 
@@ -48,6 +49,7 @@ class _AgendaState extends State<Agenda> {
           .then((querySnapshot) async {
         servicosDoCliente.clear();
         servicosEmAberto.clear();
+        servicosEmAndamento.clear();
         servicosFinalizados.clear();
 
         for (var document in querySnapshot.docs) {
@@ -63,10 +65,12 @@ class _AgendaState extends State<Agenda> {
           /* final servicoDateTime =
               parseDateAndTime(servico.data, servico.horaFim); */
 
-          if (!servico.finalizada) {
+          if (servico.isEmAberto) {
             servicosEmAberto.add(servico.copyWith(destaque: true));
-          } else if (servico.finalizada) {
+          } else if (servico.isFinalizado) {
             servicosFinalizados.add(servico.copyWith(destaque: true));
+          } else if (servico.status == Servico.emAndamento) {
+            servicosEmAndamento.add(servico.copyWith(destaque: true));
           }
         }
 
@@ -95,8 +99,7 @@ class _AgendaState extends State<Agenda> {
         servicosEmAberto = servicosEmAberto.reversed.toList();
 
         setState(() {
-          servicosDoCliente =
-              exibirEmAberto ? servicosEmAberto : servicosFinalizados;
+          servicosDoCliente = servicosEmAberto;
         });
       });
     }
@@ -153,26 +156,45 @@ class _AgendaState extends State<Agenda> {
               ElevatedButton(
                 onPressed: () {
                   setState(() {
-                    exibirEmAberto = true;
+                    exibirStatus = Servico.solicitado;
                     servicosDoCliente = servicosEmAberto;
                     novaAvaliacao = 0.0; // Reinicialize novaAvaliacao
                   });
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: exibirEmAberto ? Colors.blue : Colors.grey,
+                  backgroundColor: exibirStatus == Servico.solicitado
+                      ? Colors.blue
+                      : Colors.grey,
                 ),
                 child: Text('Em Aberto'),
               ),
               ElevatedButton(
                 onPressed: () {
                   setState(() {
-                    exibirEmAberto = false;
+                    exibirStatus = Servico.emAndamento;
+                    servicosDoCliente = servicosEmAndamento;
+                    novaAvaliacao = 0.0; // Reinicialize novaAvaliacao
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: exibirStatus == Servico.emAndamento
+                      ? Colors.green
+                      : Colors.white,
+                ),
+                child: Text('Em Andamento'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    exibirStatus = Servico.finalizado;
                     servicosDoCliente = servicosFinalizados;
                     novaAvaliacao = 0.0; // Reinicialize novaAvaliacao
                   });
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: !exibirEmAberto ? Colors.blue : Colors.grey,
+                  backgroundColor: exibirStatus == Servico.finalizado
+                      ? Colors.blue
+                      : Colors.grey,
                 ),
                 child: Text('Finalizadas'),
               ),
@@ -245,6 +267,7 @@ class _AgendaState extends State<Agenda> {
               children: [
                 Text('Horário: ${servico.horaInicio} - ${servico.horaFim}'),
                 Text('Endereço: ${servico.endereco}'),
+                Text('Status: ${servico.status}')
               ],
             ),
             onTap: () {
@@ -312,8 +335,7 @@ class _AgendaState extends State<Agenda> {
                         'avaliacao': novaAvaliacaoPonderada,
                       });
 
-                      // Alterar o atributo finalizada para true e avaliado para true
-                      servico.finalizada = true;
+                      // Alterar o atributo avaliado para true
                       servico.avaliado = true;
 
                       // Atualizar o documento no Firestore
@@ -321,15 +343,14 @@ class _AgendaState extends State<Agenda> {
                           .collection('Servicos')
                           .doc(servico.id)
                           .update({
-                        'finalizada': servico.finalizada,
                         'avaliado': servico.avaliado,
                       });
 
                       // Atualizar a lista servicosEmAberto
-                      if (exibirEmAberto) {
+                      if (exibirStatus == Servico.solicitado) {
                         setState(() {
                           servicosEmAberto = servicosEmAberto
-                              .where((s) => !s.finalizada)
+                              .where((s) => !s.isFinalizado)
                               .toList();
                           servicosDoCliente = servicosEmAberto.map((servico) {
                             return servico.copyWith(destaque: false);
@@ -339,7 +360,7 @@ class _AgendaState extends State<Agenda> {
                         // Atualizar a lista servicosFinalizados
                         setState(() {
                           servicosFinalizados = servicosFinalizados
-                              .where((s) => !s.finalizada)
+                              .where((s) => !s.isFinalizado)
                               .toList();
                           servicosDoCliente =
                               servicosFinalizados.map((servico) {
@@ -359,7 +380,7 @@ class _AgendaState extends State<Agenda> {
   }
 
   bool _showRedBorderAndStars(Servico servico, DateTime now) {
-    return !servico.finalizada &&
+    return !servico.isFinalizado &&
         parseDateAndTime(servico.data, servico.horaFim).isBefore(now);
   }
 

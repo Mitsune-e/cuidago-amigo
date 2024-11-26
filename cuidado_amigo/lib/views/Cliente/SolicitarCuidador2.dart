@@ -1,6 +1,7 @@
 import 'package:cuidado_amigo/provider/Clientes.dart';
 import 'package:cuidado_amigo/provider/Prestadores.dart';
 import 'package:cuidado_amigo/provider/servicos.dart';
+import 'package:cuidado_amigo/Util/BuscarCEP.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -231,6 +232,7 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
                                 onRatingUpdate: (rating) {
                                   // Trate a atualização da avaliação, se necessário
                                 },
+                                ignoreGestures: true,
                               ),
                               const SizedBox(height: 20),
                               if (cuidadores[currentIndex]['topicos']
@@ -257,6 +259,7 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
                                       horaInicio: dataToPass['horaInicio'],
                                       horaFim: dataToPass['horaFim'],
                                       endereco: dataToPass['endereco'],
+                                      cep: dataToPass['cep'],
                                       usuario: user!.uid,
                                       prestador: prestadorID,
                                       numero: dataToPass['numero'],
@@ -264,6 +267,7 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
                                       estado: dataToPass['estado'],
                                       cidade: dataToPass['cidade'],
                                       valor: dataToPass['valor'].toString(),
+                                      status: Servico.solicitado,
                                     );
 
                                     // Use o provider para adicionar o serviço ao banco de dados

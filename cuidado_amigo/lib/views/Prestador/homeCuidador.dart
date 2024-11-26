@@ -7,22 +7,25 @@ import 'package:flutter/material.dart';
 import 'package:timezone/data/latest.dart';
 import 'package:timezone/timezone.dart';
 import 'package:timezone/timezone.dart' as tz;
+import 'package:provider/provider.dart';
+import 'package:cuidado_amigo/provider/servicos.dart';
 
-class HomePrestador extends StatefulWidget {
-  const HomePrestador({super.key});
+class HomeCuidador extends StatefulWidget {
+  const HomeCuidador({super.key});
 
   @override
-  HomePrestadorState createState() => HomePrestadorState();
+  HomeCuidadorState createState() => HomeCuidadorState();
 }
 
 // ...
-class HomePrestadorState extends State<HomePrestador> {
+class HomeCuidadorState extends State<HomeCuidador> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   List<Servico> servicosDoCliente = [];
   List<Servico> servicosEmAberto = [];
+  List<Servico> servicosEmAndamento = [];
   List<Servico> servicosFinalizados = [];
-  bool exibirEmAberto =
-      true; // Variável para controlar a exibição de serviços em aberto ou finalizados
+  String exibirStatus = Servico.solicitado;
+  String userId = "";
 
   @override
   void initState() {
@@ -41,33 +44,45 @@ class HomePrestadorState extends State<HomePrestador> {
     now = tz.TZDateTime.from(now, location);
 
     if (user != null) {
-      final firestore = FirebaseFirestore.instance;
-      firestore
-          .collection("Servicos")
-          .where("prestador", isEqualTo: user.uid)
-          .get()
-          .then((querySnapshot) {
-        servicosDoCliente.clear();
-        for (var document in querySnapshot.docs) {
-          final servico = Servico.fromMap(document.data());
-          final servicoDateTime =
-              parseDateAndTime(servico.data, servico.horaFim);
-
-          // Verificar se o serviço é em aberto (data e horaFim após o momento atual)
-          if (servicoDateTime.isAfter(now)) {
-            servicosEmAberto.add(servico);
-          }
-          // Verificar se o serviço é finalizado (data e horaFim antes do momento atual)
-          else if (servicoDateTime.isBefore(now)) {
-            servicosFinalizados.add(servico);
-          }
-        }
-
-        setState(() {
-          servicosDoCliente = servicosEmAberto;
-        });
-      });
+      _reloadServicosDoCliente(user.uid, Servico.solicitado);
+      userId = user.uid;
     }
+  }
+
+  void _reloadServicosDoCliente(String id, String aba) {
+    final firestore = FirebaseFirestore.instance;
+    firestore
+        .collection("Servicos")
+        .where("prestador", isEqualTo: id)
+        .get()
+        .then((querySnapshot) {
+      servicosDoCliente.clear();
+      servicosEmAberto.clear();
+      servicosFinalizados.clear();
+      servicosEmAndamento.clear();
+
+      for (var document in querySnapshot.docs) {
+        final servico = Servico.fromMap(document.data());
+
+        if (servico.isEmAberto) {
+          servicosEmAberto.add(servico);
+        } else if (servico.isFinalizado) {
+          servicosFinalizados.add(servico);
+        } else if (servico.status == Servico.emAndamento) {
+          servicosEmAndamento.add(servico);
+        }
+      }
+
+      setState(() {
+        servicosDoCliente = switch (aba) {
+          Servico.solicitado => servicosEmAberto,
+          Servico.emAndamento => servicosEmAndamento,
+          Servico.finalizado => servicosFinalizados,
+          _ => []
+        };
+        exibirStatus = aba;
+      });
+    });
   }
 
   DateTime parseDateAndTime(String date, String hour) {
@@ -121,13 +136,14 @@ class HomePrestadorState extends State<HomePrestador> {
                   child: TextButton(
                     onPressed: () {
                       setState(() {
-                        exibirEmAberto = true;
+                        exibirStatus = Servico.solicitado;
                         servicosDoCliente = servicosEmAberto;
                       });
                     },
                     style: TextButton.styleFrom(
-                      foregroundColor:
-                          exibirEmAberto ? Colors.green : Colors.black,
+                      foregroundColor: exibirStatus == Servico.solicitado
+                          ? Colors.green
+                          : Colors.black,
                     ),
                     child: Text('Em Aberto'),
                   ),
@@ -145,13 +161,39 @@ class HomePrestadorState extends State<HomePrestador> {
                   child: TextButton(
                     onPressed: () {
                       setState(() {
-                        exibirEmAberto = false;
+                        exibirStatus = Servico.emAndamento;
+                        servicosDoCliente = servicosEmAndamento;
+                      });
+                    },
+                    style: TextButton.styleFrom(
+                      foregroundColor: exibirStatus == Servico.emAndamento
+                          ? Colors.green
+                          : Colors.black,
+                    ),
+                    child: Text('Em Andamento'),
+                  ),
+                ),
+              ),
+              Container(
+                width: 1,
+                height: 50,
+                color: Colors.black, // Linha preta
+              ),
+              Expanded(
+                child: Container(
+                  height: 50,
+                  color: buttonBackgroundColor,
+                  child: TextButton(
+                    onPressed: () {
+                      setState(() {
+                        exibirStatus = Servico.finalizado;
                         servicosDoCliente = servicosFinalizados;
                       });
                     },
                     style: TextButton.styleFrom(
-                      foregroundColor:
-                          !exibirEmAberto ? Colors.green : Colors.black,
+                      foregroundColor: exibirStatus == Servico.finalizado
+                          ? Colors.green
+                          : Colors.black,
                     ),
                     child: Text('Finalizadas'),
                   ),
@@ -179,46 +221,63 @@ class HomePrestadorState extends State<HomePrestador> {
       elevation: 4,
       margin: const EdgeInsets.only(bottom: 16),
       child: ListTile(
-        title: Text('Data: ${servico.data}'),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Horário: ${servico.horaInicio} - ${servico.horaFim}'),
-            Text('Endereço: ${servico.endereco}'),
-          ],
-        ),
-        onTap: servicosEmAberto.contains(servico)
-            ? () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => DetalhesServico2(servico: servico),
-                  ),
-                );
-              }
-            : null,
-        trailing: showPlayButton
-            ? IconButton(
-                icon: Icon(
-                  Icons.play_circle_fill,
-                  color: Colors.green,
-                  size: 32,
-                ),
-                onPressed: () {
-                  // Adicione ação para iniciar o serviço aqui
-                },
-              )
-            : null,
-      ),
+          title: Text('Data: ${servico.data}'),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Horário: ${servico.horaInicio} - ${servico.horaFim}'),
+              Text('Endereço: ${servico.endereco}'),
+              Text('Status: ${servico.status}')
+            ],
+          ),
+          onTap: servicosEmAberto.contains(servico)
+              ? () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => DetalhesServico2(servico: servico),
+                    ),
+                  );
+                }
+              : null,
+          trailing: _pickButtonToShow(servico)),
     );
   }
 
-  bool isShowPlayButton(Servico servico) {
-    DateTime now = DateTime.now();
-    DateTime serviceStart = parseDateAndTime(servico.data, servico.horaInicio);
-    DateTime serviceEnd = parseDateAndTime(servico.data, servico.horaFim);
+  _pickButtonToShow(Servico servico) {
+    if (servico.status == Servico.solicitado) {
+      return IconButton(
+        icon: Icon(
+          Icons.play_circle_fill,
+          color: Colors.green,
+          size: 32,
+        ),
+        onPressed: () {
+          servico.status = Servico.emAndamento;
 
-    return (serviceStart.isAtSameMomentAs(now) || serviceStart.isBefore(now)) &&
-        serviceEnd.isAfter(now) &&
-        serviceStart.day == now.day;
+          Provider.of<Servicos>(context, listen: false).editar(servico);
+          _reloadServicosDoCliente(userId, Servico.emAndamento);
+        },
+      );
+    }
+    if (servico.status == Servico.emAndamento) {
+      return IconButton(
+        icon: Icon(
+          Icons.play_circle_fill,
+          color: Colors.blue,
+          size: 32,
+        ),
+        onPressed: () {
+          servico.status = Servico.finalizado;
+
+          Provider.of<Servicos>(context, listen: false).editar(servico);
+          _reloadServicosDoCliente(userId, Servico.finalizado);
+        },
+      );
+    }
+    return null;
+  }
+
+  bool isShowPlayButton(Servico servico) {
+    return servico.status == Servico.solicitado;
   }
 }

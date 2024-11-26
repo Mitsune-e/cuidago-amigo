@@ -172,7 +172,7 @@ class _PerfilState extends State<PerfilCuidador> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.of(context).popAndPushNamed('/homePrestador');
+            Navigator.of(context).popAndPushNamed('/homeCuidador');
           },
         ),
         title: const Text('Minha Conta'),

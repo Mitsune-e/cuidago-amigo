@@ -533,6 +533,7 @@ class _Cadastro1State extends State<Cadastro1> {
 
   void _buscarCep(String Cep) async {
     try {
+      //Writes what Cep returns and write in the input fields
       final result = await buscarCEP(Cep);
       print(result);
 
