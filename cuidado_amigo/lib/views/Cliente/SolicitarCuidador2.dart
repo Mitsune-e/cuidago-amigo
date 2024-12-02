@@ -1,7 +1,6 @@
 import 'package:cuidado_amigo/provider/Clientes.dart';
 import 'package:cuidado_amigo/provider/Prestadores.dart';
 import 'package:cuidado_amigo/provider/servicos.dart';
-import 'package:cuidado_amigo/Util/BuscarCEP.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -311,7 +310,7 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
                                     print(prestador.id);
 
                                     qrCodeData = 'ServiçoID:${servico.id}';
-                                    _mostrarQRCodeDialog(context);
+                                    //_mostrarQRCodeDialog(context);
                                     // Adicione código para lidar com o sucesso do agendamento aqui
                                     print('Serviço agendado com sucesso');
                                     //Navigator.of(context).pushNamed('/homeIdoso');

@@ -283,40 +283,6 @@ class _Cadastro1State extends State<Cadastro1> {
     );
   }
 
-  Widget _buildTextField(
-      {required TextEditingController controller,
-      required String hintText,
-      required String label,
-      required bool mandatory}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '$label${controller.text.isNotEmpty ? '' : (mandatory == true ? ' (Obrigatório)' : '')}',
-          style: TextStyle(
-            color: controller.text.isNotEmpty ? Colors.black : Colors.red,
-          ),
-        ),
-        TextFormField(
-          onChanged: (Text) {
-            setState(() {});
-          },
-          controller: controller,
-          decoration: InputDecoration(
-            hintText: hintText,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-          ),
-          validator: (value) {
-            if (mandatory == true && (value == null || value.isEmpty)) {
-              return 'Campo obrigatório';
-            }
-            return null;
-          },
-        ),
-      ],
-    );
-  }
-
   Widget _buildPhoneTextField(
       {required TextEditingController controller, required String label}) {
     var maskFormatter = TextInputFormatter.withFunction(
@@ -346,7 +312,7 @@ class _Cadastro1State extends State<Cadastro1> {
           ),
         ),
         TextFormField(
-          onChanged: (Text) {
+          onChanged: (text) {
             setState(() {});
           },
           controller: controller,
@@ -382,7 +348,7 @@ class _Cadastro1State extends State<Cadastro1> {
           ),
         ),
         TextFormField(
-          onChanged: (Text) {
+          onChanged: (text) {
             setState(() {});
           },
           controller: controller,
@@ -434,7 +400,7 @@ class _Cadastro1State extends State<Cadastro1> {
           ),
         ),
         TextFormField(
-          onChanged: (Text) {
+          onChanged: (text) {
             setState(() {});
           },
           controller: controller,

@@ -1,4 +1,4 @@
-# cuidado_amigo
+# Cuidado Amigo
 
 A new Flutter project.
 

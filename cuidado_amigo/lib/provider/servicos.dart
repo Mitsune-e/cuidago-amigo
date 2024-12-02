@@ -46,51 +46,52 @@ class Servicos with ChangeNotifier {
     _firestore.collection('Servicos').doc(servico.id).delete();
     notifyListeners();
   }
+
   Future<Servico?> data(String data) async {
-  try {
-    DocumentSnapshot<Map<String, dynamic>> snapshot =
-        await _firestore.collection('Prestadores').doc(data).get();
+    try {
+      DocumentSnapshot<Map<String, dynamic>> snapshot =
+          await _firestore.collection('Prestadores').doc(data).get();
 
-    if (snapshot.exists) {
-      return Servico.fromMap(snapshot.data()!);
-    } else {
+      if (snapshot.exists) {
+        return Servico.fromMap(snapshot.data()!);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print('Erro ao carregar cliente: $e');
       return null;
     }
-  } catch (e) {
-    print('Erro ao carregar cliente: $e');
-    return null;
   }
-}
 
-Future<Servico?> horainicio(String horaInicio) async {
-  try {
-    DocumentSnapshot<Map<String, dynamic>> snapshot =
-        await _firestore.collection('Prestadores').doc(horaInicio).get();
+  Future<Servico?> horainicio(String horaInicio) async {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> snapshot =
+          await _firestore.collection('Prestadores').doc(horaInicio).get();
 
-    if (snapshot.exists) {
-      return Servico.fromMap(snapshot.data()!);
-    } else {
+      if (snapshot.exists) {
+        return Servico.fromMap(snapshot.data()!);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print('Erro ao carregar cliente: $e');
       return null;
     }
-  } catch (e) {
-    print('Erro ao carregar cliente: $e');
-    return null;
   }
-}
 
-Future<Servico?> horaFim(String horaFim) async {
-  try {
-    DocumentSnapshot<Map<String, dynamic>> snapshot =
-        await _firestore.collection('Prestadores').doc(horaFim).get();
+  Future<Servico?> horaFim(String horaFim) async {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> snapshot =
+          await _firestore.collection('Prestadores').doc(horaFim).get();
 
-    if (snapshot.exists) {
-      return Servico.fromMap(snapshot.data()!);
-    } else {
+      if (snapshot.exists) {
+        return Servico.fromMap(snapshot.data()!);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print('Erro ao carregar cliente: $e');
       return null;
     }
-  } catch (e) {
-    print('Erro ao carregar cliente: $e');
-    return null;
   }
-}
 }
