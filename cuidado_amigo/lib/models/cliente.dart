@@ -12,6 +12,9 @@ class Cliente {
   final String endereco;
   final String numero;
   final String complemento;
+  final String movimentacao;
+  final String alimentacao;
+  final String doencaCronica;
   List<String>? servicos;
 
   Cliente({
@@ -28,6 +31,9 @@ class Cliente {
     required this.endereco,
     required this.numero,
     required this.complemento,
+    required this.movimentacao,
+    required this.alimentacao,
+    required this.doencaCronica,
     List<String>? servicos,
   }) : this.servicos = servicos ?? [];
 
@@ -45,6 +51,9 @@ class Cliente {
         cidade = map['cidade'],
         numero = map['numero'],
         complemento = map['complemento'],
+        movimentacao = map['movimentacao'],
+        alimentacao = map['alimentacao'],
+        doencaCronica = map['doencaCronica'],
         servicos = List<String>.from(map["servicos"] ?? []);
 
   Map<String, dynamic> toMap() {
@@ -63,6 +72,9 @@ class Cliente {
       'cidade': cidade,
       'numero': numero,
       'complemento': complemento,
+      'movimentacao': movimentacao,
+      'alimentacao': alimentacao,
+      'doencaCronica': doencaCronica
     };
   }
 }

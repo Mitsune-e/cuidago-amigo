@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cuidado_amigo/models/Servico.dart';
+import 'package:cuidado_amigo/provider/Prestadores.dart';
 import 'package:cuidado_amigo/views/Prestador/detalhamento2.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -49,27 +50,35 @@ class HomeCuidadorState extends State<HomeCuidador> {
     }
   }
 
-  void _reloadServicosDoCliente(String id, String aba) {
+  void _reloadServicosDoCliente(String id, String aba) async {
     final firestore = FirebaseFirestore.instance;
     firestore
         .collection("Servicos")
         .where("prestador", isEqualTo: id)
         .get()
-        .then((querySnapshot) {
+        .then((querySnapshot) async {
       servicosDoCliente.clear();
       servicosEmAberto.clear();
       servicosFinalizados.clear();
       servicosEmAndamento.clear();
 
+      final prestadoresProvider = Prestadores();
+
+      final prestadorId = _auth.currentUser!.uid;
+      final prestador = await prestadoresProvider.carregarById(prestadorId);
+      final servicoesId = prestador.servicos;
+
       for (var document in querySnapshot.docs) {
         final servico = Servico.fromMap(document.data());
 
-        if (servico.isEmAberto) {
-          servicosEmAberto.add(servico);
-        } else if (servico.isFinalizado) {
-          servicosFinalizados.add(servico);
-        } else if (servico.status == Servico.emAndamento) {
-          servicosEmAndamento.add(servico);
+        if (servicoesId!.any((id) => id == servico.id)) {
+          if (servico.isEmAberto) {
+            servicosEmAberto.add(servico);
+          } else if (servico.isFinalizado) {
+            servicosFinalizados.add(servico);
+          } else if (servico.status == Servico.emAndamento) {
+            servicosEmAndamento.add(servico);
+          }
         }
       }
 

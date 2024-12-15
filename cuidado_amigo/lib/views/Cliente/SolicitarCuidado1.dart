@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cuidado_amigo/models/cliente.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -23,7 +24,12 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
   String estado = '';
   String cidade = '';
   String cep = '';
+  String clienteId = '';
   TextEditingController enderecoController = TextEditingController();
+  final TextEditingController _movimentacaoController = TextEditingController();
+  final TextEditingController _alimentacaoController = TextEditingController();
+  final TextEditingController _doencaCronicaController =
+      TextEditingController();
   double valor = 0.0;
   double valorHoraEnfermeiro = 20.0;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -45,6 +51,10 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
           cidade = userDoc['cidade'] ?? '';
           estado = userDoc['estado'] ?? '';
           cep = userDoc['cep'] ?? '';
+          _movimentacaoController.text = userDoc['movimentacao'] ?? '';
+          _alimentacaoController.text = userDoc['alimentacao'] ?? '';
+          _doencaCronicaController.text = userDoc['doencaCronica'] ?? '';
+          clienteId = userDoc['id'];
         });
       }
     } catch (e) {
@@ -311,6 +321,41 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                   ],
                 ),
               const SizedBox(height: 20),
+              const Text(
+                'Especificações',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+              Row(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Movimentação: ${_movimentacaoController.text.isNotEmpty ? _movimentacaoController.text : 'Nenhum dado informado'}',
+                        style: const TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
+                      Text(
+                        'Alimentação: ${_alimentacaoController.text.isNotEmpty ? _alimentacaoController.text : 'Nenhum dado informado'}',
+                        style: const TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
+                      Text(
+                        'Doença Cronica: ${_doencaCronicaController.text.isNotEmpty ? _doencaCronicaController.text : 'Nenhum dado informado'}',
+                        style: const TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
               Align(
                 alignment: Alignment.bottomCenter,
                 child: ElevatedButton(
@@ -386,7 +431,12 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                         'endereco': enderecoController.text,
                         'complemento': complementoController.text,
                         'numero': numeroController.text,
+                        'movimentacao': _movimentacaoController.text,
+                        'alimentacao': _alimentacaoController.text,
+                        'doencaCronica': _doencaCronicaController.text,
+                        'clienteId': clienteId
                       };
+
                       Navigator.of(context).pushNamed('/solicitarCuidador2',
                           arguments: dataToPass);
                     } else {

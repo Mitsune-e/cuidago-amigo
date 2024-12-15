@@ -38,6 +38,10 @@ class _Cadastro1State extends State<Cadastro1> {
   final TextEditingController _numeroController = TextEditingController();
   final TextEditingController _complementoController = TextEditingController();
   final TextEditingController _imagemController = TextEditingController();
+
+  String movimentacao = "";
+  String alimentacao = "";
+  String doencaCronica = "";
   final FirebaseAuth _auth = FirebaseAuth.instance;
   bool isNomeValid = false;
 
@@ -69,6 +73,7 @@ class _Cadastro1State extends State<Cadastro1> {
                 children: [
                   _buildDadosPessoais(),
                   _buildEndereco(),
+                  _buildQuestionario(),
                   _buildFinalizar(),
                 ],
               ),
@@ -142,6 +147,148 @@ class _Cadastro1State extends State<Cadastro1> {
                 controller: _confirmaSenhaController,
                 hintText: 'Confirmação de Senha',
                 label: 'Confirmação de Senha'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuestionario() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Questionario',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 20),
+                const Text(
+                  "Como é sua Movimentação?",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                Column(
+                  children: [
+                    RadioListTile<String>(
+                      title: const Text("Não necessito de Ajuda"),
+                      value: "Não necessito de Ajuda",
+                      groupValue: movimentacao,
+                      onChanged: (value) {
+                        setState(() {
+                          movimentacao = value ?? "";
+                        });
+                      },
+                    ),
+                    RadioListTile<String>(
+                      title: const Text("Necessito de Ajuda"),
+                      value: "Necessito de Ajuda",
+                      groupValue: movimentacao,
+                      onChanged: (value) {
+                        setState(() {
+                          movimentacao = value ?? "";
+                        });
+                      },
+                    ),
+                    RadioListTile<String>(
+                      title: const Text("Utilizo andador"),
+                      value: "Utilizo andador",
+                      groupValue: movimentacao,
+                      onChanged: (value) {
+                        setState(() {
+                          movimentacao = value ?? "";
+                        });
+                      },
+                    ),
+                    RadioListTile<String>(
+                      title: const Text("Utilizo Cadeira de Rodas"),
+                      value: "Utilizo Cadeira de Rodas",
+                      groupValue: movimentacao,
+                      onChanged: (value) {
+                        setState(() {
+                          movimentacao = value ?? "";
+                        });
+                      },
+                    ),
+                    RadioListTile<String>(
+                      title: const Text("Acamado"),
+                      value: "Acamado",
+                      groupValue: movimentacao,
+                      onChanged: (value) {
+                        setState(() {
+                          movimentacao = value ?? "";
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  "Como é sua Alimentação?",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                Column(
+                  children: [
+                    RadioListTile<String>(
+                      title: const Text("Via Oral"),
+                      value: "Via Oral",
+                      groupValue: alimentacao,
+                      onChanged: (value) {
+                        setState(() {
+                          alimentacao = value ?? "";
+                        });
+                      },
+                    ),
+                    RadioListTile<String>(
+                      title: const Text("Via Sonda"),
+                      value: "Via Sonda",
+                      groupValue: alimentacao,
+                      onChanged: (value) {
+                        setState(() {
+                          alimentacao = value ?? "";
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  "Existe alguma doença crônica?",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                Column(
+                  children: [
+                    RadioListTile<String>(
+                      title: const Text("Sim"),
+                      value: "Sim",
+                      groupValue: doencaCronica,
+                      onChanged: (value) {
+                        setState(() {
+                          doencaCronica = value ?? "";
+                        });
+                      },
+                    ),
+                    RadioListTile<String>(
+                      title: const Text("Não"),
+                      value: "Não",
+                      groupValue: doencaCronica,
+                      onChanged: (value) {
+                        setState(() {
+                          doencaCronica = value ?? "";
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            )
           ],
         ),
       ),
@@ -457,7 +604,7 @@ class _Cadastro1State extends State<Cadastro1> {
         shape: const StadiumBorder(),
       ),
       child: const Text(
-        'Finalizar',
+        'Continuar',
         style: TextStyle(color: Colors.white),
       ),
     );
@@ -489,7 +636,7 @@ class _Cadastro1State extends State<Cadastro1> {
   }
 
   void _nextPage() {
-    if (_pageController.page! < 3) {
+    if (_pageController.page! < 4) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 500),
         curve: Curves.ease,
@@ -515,7 +662,7 @@ class _Cadastro1State extends State<Cadastro1> {
     }
   }
 
-  void _validateAndRegister() {
+  void _validateAndRegister() async {
     // Validate required fields
     if (!_validateFields()) {
       return;
@@ -580,6 +727,15 @@ class _Cadastro1State extends State<Cadastro1> {
     if (_cepController.text.isEmpty) {
       emptyFields.add('CEP');
     }
+    if (movimentacao.isEmpty) {
+      emptyFields.add("Como é sua Movimentação?");
+    }
+    if (alimentacao.isEmpty) {
+      emptyFields.add("Como é sua Alimentação?");
+    }
+    if (doencaCronica.isEmpty) {
+      emptyFields.add("Existe alguma doença crônica?");
+    }
 
     if (emptyFields.isNotEmpty) {
       _showErrorDialog('Campos obrigatórios não preenchidos',
@@ -601,7 +757,7 @@ class _Cadastro1State extends State<Cadastro1> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pushReplacementNamed('/login');
+                Navigator.of(context).pushReplacementNamed('/homeIdoso');
               },
               child: Text('OK'),
             ),
@@ -642,20 +798,22 @@ class _Cadastro1State extends State<Cadastro1> {
       final User? user = userCredential.user;
       if (user != null) {
         final cliente = Cliente(
-          id: user.uid,
-          name: _nomeController.text,
-          email: _emailController.text,
-          telefone: _telefoneController.text,
-          senha: _senhaController.text,
-          cpf: _cpfController.text,
-          imagem: _imagemController.text ?? '',
-          estado: _estadoController.text,
-          cidade: _cidadeController.text,
-          cep: _cepController.text,
-          endereco: _enderecoController.text,
-          numero: _numeroController.text,
-          complemento: _complementoController.text,
-        );
+            id: user.uid,
+            name: _nomeController.text,
+            email: _emailController.text,
+            telefone: _telefoneController.text,
+            senha: _senhaController.text,
+            cpf: _cpfController.text,
+            imagem: _imagemController.text ?? '',
+            estado: _estadoController.text,
+            cidade: _cidadeController.text,
+            cep: _cepController.text,
+            endereco: _enderecoController.text,
+            numero: _numeroController.text,
+            complemento: _complementoController.text,
+            movimentacao: movimentacao,
+            alimentacao: alimentacao,
+            doencaCronica: doencaCronica);
 
         Provider.of<Clientes>(context, listen: false).adiciona(cliente);
       }

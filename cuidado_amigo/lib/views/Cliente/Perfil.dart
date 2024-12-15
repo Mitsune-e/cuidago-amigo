@@ -26,6 +26,10 @@ class _PerfilState extends State<Perfil> {
   final TextEditingController _enderecoController = TextEditingController();
   final TextEditingController _numeroController = TextEditingController();
   final TextEditingController _complementoController = TextEditingController();
+  final TextEditingController _movimentacaoController = TextEditingController();
+  final TextEditingController _alimentacaoController = TextEditingController();
+  final TextEditingController _doencaCronicaController =
+      TextEditingController();
   String? imageUrl;
   var cidade = "";
   var estado = '';
@@ -73,6 +77,9 @@ class _PerfilState extends State<Perfil> {
           _numeroController.text = cliente.numero ?? '';
           _complementoController.text = cliente.complemento ?? '';
           imageUrl = cliente.imagem ?? '';
+          _movimentacaoController.text = cliente.movimentacao;
+          _alimentacaoController.text = cliente.alimentacao;
+          _doencaCronicaController.text = cliente.doencaCronica;
 
           _isLoadingImage = false;
         });
@@ -223,18 +230,6 @@ class _PerfilState extends State<Perfil> {
             const SizedBox(height: 20),
             _buildInfoBox(
               title: 'Dados Pessoais',
-              buttonText: 'Editar',
-              onButtonPressed: () {
-                _mostrarEditarDialog(
-                  'Dados Pessoais',
-                  [
-                    _nomeController,
-                    _cpfController,
-                    _emailController,
-                    _telefoneController,
-                  ],
-                );
-              },
               children: [
                 _buildInfoRow('Nome', _nomeController.text),
                 _buildInfoRow('CPF', _cpfController.text),
@@ -243,7 +238,19 @@ class _PerfilState extends State<Perfil> {
               ],
             ),
             const SizedBox(height: 20),
-            _buildEnderecoBox()
+            _buildInfoBox(title: 'Endereço', children: [
+              _buildInfoRow('Estado', estado),
+              _buildInfoRow('Cidade', cidade),
+              _buildInfoRow('Endereço', _enderecoController.text),
+              _buildInfoRow('Número', _numeroController.text),
+              _buildInfoRow('Complemento', _complementoController.text)
+            ]),
+            const SizedBox(height: 20),
+            _buildInfoBox(title: 'Especificações', children: [
+              _buildInfoRow('Movimentação', _movimentacaoController.text),
+              _buildInfoRow('Alimentação', _alimentacaoController.text),
+              _buildInfoRow('Doença Cronica', _doencaCronicaController.text),
+            ])
           ],
         ),
       ),
@@ -252,8 +259,6 @@ class _PerfilState extends State<Perfil> {
 
   Widget _buildInfoBox({
     required String title,
-    required String buttonText,
-    required VoidCallback onButtonPressed,
     required List<Widget> children,
   }) {
     return Container(
@@ -283,16 +288,6 @@ class _PerfilState extends State<Perfil> {
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF73C9C9),
-                ),
-              ),
-              TextButton(
-                onPressed: onButtonPressed,
-                child: Text(
-                  buttonText,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF73C9C9),
-                  ),
                 ),
               ),
             ],
@@ -405,65 +400,6 @@ class _PerfilState extends State<Perfil> {
     } catch (e) {
       print('Erro ao atualizar dados do usuário no Firestore: $e');
     }
-  }
-
-  Widget _buildEnderecoBox() {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 20),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 1,
-            blurRadius: 4,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Endereço',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF73C9C9),
-                ),
-              ),
-              Row(
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      _mostrarEditarEnderecoDialog();
-                    },
-                    child: const Text(
-                      'Editar',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Color(0xFF73C9C9),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          _buildInfoRow('Estado', estado),
-          _buildInfoRow('Cidade', cidade),
-          _buildInfoRow('Endereço', _enderecoController.text),
-          _buildInfoRow('Número', _numeroController.text),
-          _buildInfoRow('Complemento', _complementoController.text),
-        ],
-      ),
-    );
   }
 
   void _mostrarEditarEnderecoDialog() {

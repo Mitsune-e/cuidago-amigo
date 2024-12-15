@@ -2,6 +2,7 @@ import 'package:cuidado_amigo/provider/Clientes.dart';
 import 'package:cuidado_amigo/provider/Enderecos.dart';
 import 'package:cuidado_amigo/provider/Prestadores.dart';
 import 'package:cuidado_amigo/provider/servicos.dart';
+//import 'package:cuidado_amigo/views/Cliente/cadastro2.dart';
 import 'package:cuidado_amigo/views/Prestador/CadastroCuidado.dart';
 import 'package:cuidado_amigo/views/Cliente/Perfil.dart';
 import 'package:cuidado_amigo/views/Prestador/Carteira.dart';
@@ -58,6 +59,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => Login(),
         '/cadastro1': (context) => Cadastro1(),
+        //'/cadastro2': (context) => Cadastro2(),
         '/recuperarSenha': (context) => const RecuperarSenha(),
         '/homeIdoso': (context) => const HomeIdoso(),
         '/cadastroPrestador': (context) => CadastroCuidado(),

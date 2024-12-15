@@ -251,41 +251,55 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
 
                                   if (cuidadores.isNotEmpty &&
                                       currentIndex < cuidadores.length) {
+                                    print(dataToPass);
                                     // Crie o serviço
                                     final servico = Servico(
-                                      id: Uuid().v1(),
-                                      data: dataToPass['data'],
-                                      horaInicio: dataToPass['horaInicio'],
-                                      horaFim: dataToPass['horaFim'],
-                                      endereco: dataToPass['endereco'],
-                                      cep: dataToPass['cep'],
-                                      usuario: user!.uid,
-                                      prestador: prestadorID,
-                                      numero: dataToPass['numero'],
-                                      complemento: dataToPass['complemento'],
-                                      estado: dataToPass['estado'],
-                                      cidade: dataToPass['cidade'],
-                                      valor: dataToPass['valor'].toString(),
-                                      status: Servico.solicitado,
-                                    );
+                                        id: Uuid().v1(),
+                                        data: dataToPass['data'],
+                                        horaInicio: dataToPass['horaInicio'],
+                                        horaFim: dataToPass['horaFim'],
+                                        endereco: dataToPass['endereco'],
+                                        cep: dataToPass['cep'],
+                                        usuario: user!.uid,
+                                        prestador: prestadorID,
+                                        numero: dataToPass['numero'],
+                                        complemento: dataToPass['complemento'],
+                                        estado: dataToPass['estado'],
+                                        cidade: dataToPass['cidade'],
+                                        valor: dataToPass['valor'].toString(),
+                                        status: Servico.solicitado,
+                                        movimentacao:
+                                            dataToPass['movimentacao'],
+                                        alimentacao: dataToPass['alimentacao'],
+                                        doencaCronica:
+                                            dataToPass['doencaCronica']);
 
                                     // Use o provider para adicionar o serviço ao banco de dados
                                     final servicosProvider = Servicos();
                                     servicosProvider.adiciona(servico);
 
                                     // Atualize a lista de serviços do cliente
+
                                     final clientesProvider = Clientes();
-                                    final clientes =
-                                        await clientesProvider.caregar();
-                                    final clienteIndex = clientes
-                                        .indexWhere((c) => c.id == user.uid);
+
+                                    final clienteIndex =
+                                        dataToPass['clienteId'];
+
+                                    final clienteSelecionado =
+                                        await clientesProvider
+                                            .caregarById(clienteIndex);
+
+                                    clienteSelecionado.servicos!
+                                        .add(servico.id);
+
+                                    clientesProvider.editar(clienteSelecionado);
 
                                     if (clienteIndex != -1) {
-                                      clientes[clienteIndex]
+                                      /*clientes[clienteIndex]
                                           .servicos
                                           .add(servico.id);
                                       await clientesProvider
-                                          .adiciona(clientes[clienteIndex]);
+                                          .adiciona(clientes[clienteIndex]);*/
                                     } else {
                                       // Trate o caso em que o cliente não é encontrado (por exemplo, exibindo um erro)
                                       ScaffoldMessenger.of(context)
@@ -302,18 +316,16 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
                                     final prestadoresProvider = Prestadores();
                                     final prestador = await prestadoresProvider
                                         .loadClienteById(prestadorID);
+
                                     prestador!.servicos!.add(servico.id);
                                     prestador.saldo += dataToPass['valor'];
 
-                                    await prestadoresProvider
-                                        .adiciona(prestador);
-                                    print(prestador.id);
-
-                                    qrCodeData = 'ServiçoID:${servico.id}';
+                                    prestadoresProvider.adiciona(prestador);
                                     //_mostrarQRCodeDialog(context);
                                     // Adicione código para lidar com o sucesso do agendamento aqui
                                     print('Serviço agendado com sucesso');
-                                    //Navigator.of(context).pushNamed('/homeIdoso');
+                                    Navigator.of(context)
+                                        .pushNamed('/homeIdoso');
 
                                     // Adicione a concatenação ao atributo datas
                                   }
@@ -393,7 +405,7 @@ class _CuidadorInfoPageState extends State<CuidadorInfoPage> {
     );
   }
 
-  void _mostrarQRCodeDialog(BuildContext context) {
+  void _mostrarSuccessDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {

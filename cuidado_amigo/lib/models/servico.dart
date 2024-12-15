@@ -12,6 +12,9 @@ class Servico {
   final String cidade;
   final String estado;
   final String valor;
+  final String movimentacao;
+  final String alimentacao;
+  final String doencaCronica;
   double avaliacao; // Novo campo
   bool avaliado;
   bool destaque;
@@ -31,6 +34,9 @@ class Servico {
       required this.cidade,
       required this.estado,
       required this.valor,
+      required this.movimentacao,
+      required this.alimentacao,
+      required this.doencaCronica,
       this.avaliacao = 0.0, // Valor padrão
       this.avaliado = false,
       this.destaque = false,
@@ -50,6 +56,9 @@ class Servico {
         estado = map['estado'] ?? "",
         cidade = map['cidade'] ?? "",
         valor = map['valor'] ?? "",
+        movimentacao = map['movimentacao'],
+        alimentacao = map['alimentacao'],
+        doencaCronica = map['doencaCronica'],
         avaliacao =
             (map['avaliacao'] ?? 0.0).toDouble(), // Convertido para double
         avaliado = map['avaliado'] ?? false,
@@ -75,6 +84,9 @@ class Servico {
       "avaliado": avaliado,
       "destaque": destaque,
       "status": status,
+      'movimentacao': movimentacao,
+      'alimentacao': alimentacao,
+      'doencaCronica': doencaCronica
     };
   }
 
@@ -98,6 +110,9 @@ class Servico {
         cidade: cidade,
         estado: estado,
         valor: valor,
+        movimentacao: movimentacao,
+        alimentacao: alimentacao,
+        doencaCronica: doencaCronica,
         avaliacao: avaliacao ?? this.avaliacao, // Atualizado campo avaliacao
         avaliado: avaliado ?? this.avaliado,
         destaque: destaque ?? this.destaque,
