@@ -6,26 +6,26 @@ class Clientes with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<Cliente> listEvento = [];
 
-  adiciona(Cliente cliente) {
+  void adiciona(Cliente cliente) {
     _firestore.collection("Clientes").doc(cliente.id).set(cliente.toMap());
   }
 
-  editar(Cliente cliente) {
+  void editar(Cliente cliente) {
     // Certifique-se de que o endereço já existe na lista
-    int index = listEvento.indexWhere((e) => e.id == cliente.id);
+    //int index = listEvento.indexWhere((e) => e.id == cliente.id);
 
-    if (index != -1) {
-      // Atualiza a lista local
-      listEvento[index] = cliente;
+    //if (index != -1) {
+    // Atualiza a lista local
+    //listEvento[index] = cliente;
 
-      // Atualiza os dados no Firestore
-      _firestore.collection("Clientes").doc(cliente.id).set(cliente.toMap());
+    // Atualiza os dados no Firestore
+    _firestore.collection("Clientes").doc(cliente.id).set(cliente.toMap());
 
-      notifyListeners();
-    }
+    notifyListeners();
+    //}
   }
 
-  caregar() async {
+  Future<List<Cliente>> caregar() async {
     List<Cliente> temp = [];
     QuerySnapshot<Map<String, dynamic>> snapshot =
         await _firestore.collection('Clientes').get();
@@ -33,6 +33,16 @@ class Clientes with ChangeNotifier {
       temp.add(Cliente.fromMap(element.data()));
     }
     return temp;
+  }
+
+  Future<Cliente> caregarById(String id) async {
+    QuerySnapshot<Map<String, dynamic>> snapshot =
+        await _firestore.collection('Clientes').get();
+
+    final dadosCliente = snapshot.docs.firstWhere((item) => item.id == id);
+
+    final clienteSelecionado = Cliente.fromMap(dadosCliente.data());
+    return clienteSelecionado;
   }
 
   void remove(Cliente cliente) {

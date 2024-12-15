@@ -97,6 +97,12 @@ class _DetalhesServicoState2 extends State<DetalhesServico2> {
                     ),
                     _buildServiceInfo('Endereço', widget.servico.endereco),
                     _buildServiceInfo('Data', widget.servico.data),
+                    _buildServiceInfo(
+                        "Movimentação", widget.servico.movimentacao),
+                    _buildServiceInfo(
+                        "Alimentação", widget.servico.alimentacao),
+                    _buildServiceInfo(
+                        "Doença Crônica?", widget.servico.doencaCronica),
                     _buildServiceInfo('Valor',
                         'R\$ ${double.parse(widget.servico.valor).toStringAsFixed(2)}'),
                     const SizedBox(height: 20),

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cuidado_amigo/models/Prestador.dart';
 import 'package:cuidado_amigo/models/Servico.dart';
+import 'package:cuidado_amigo/provider/Clientes.dart';
 import 'package:cuidado_amigo/views/Cliente/detalhamento.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -52,25 +53,33 @@ class _AgendaState extends State<Agenda> {
         servicosEmAndamento.clear();
         servicosFinalizados.clear();
 
+        final clientesProvider = Clientes();
+
+        final clienteId = _auth.currentUser!.uid;
+        final cliente = await clientesProvider.caregarById(clienteId);
+        final servicosDoClienteByIds = cliente.servicos;
+
         for (var document in querySnapshot.docs) {
           final servico =
               Servico.fromMap(document.data() as Map<String, dynamic>);
 
-          final prestador = await loadPrestadorById(servico.prestador);
+          if (servicosDoClienteByIds!.any((id) => id == servico.id)) {
+            final prestador = await loadPrestadorById(servico.prestador);
 
-          if (prestador != null) {
-            nomePrestador.text = prestador.name;
-          }
+            if (prestador != null) {
+              nomePrestador.text = prestador.name;
+            }
 
-          /* final servicoDateTime =
+            /* final servicoDateTime =
               parseDateAndTime(servico.data, servico.horaFim); */
 
-          if (servico.isEmAberto) {
-            servicosEmAberto.add(servico.copyWith(destaque: true));
-          } else if (servico.isFinalizado) {
-            servicosFinalizados.add(servico.copyWith(destaque: true));
-          } else if (servico.status == Servico.emAndamento) {
-            servicosEmAndamento.add(servico.copyWith(destaque: true));
+            if (servico.isEmAberto) {
+              servicosEmAberto.add(servico.copyWith(destaque: true));
+            } else if (servico.isFinalizado) {
+              servicosFinalizados.add(servico.copyWith(destaque: true));
+            } else if (servico.status == Servico.emAndamento) {
+              servicosEmAndamento.add(servico.copyWith(destaque: true));
+            }
           }
         }
 

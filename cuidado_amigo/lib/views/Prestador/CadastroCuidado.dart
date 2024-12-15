@@ -472,33 +472,6 @@ class _CadastroPrestadorState extends State<CadastroCuidado> {
     );
   }
 
-  Widget _buildCSCPicker() {
-    return CSCPicker(
-      layout: Layout.vertical,
-      currentCountry: "Brazil",
-      currentState: estado,
-      currentCity: cidade,
-      defaultCountry: CscCountry.Brazil,
-      disableCountry: true,
-      flagState: CountryFlag.DISABLE,
-      onCountryChanged: (Country) {},
-      onStateChanged: (value) {
-        setState(() {
-          estado = value.toString();
-        });
-      },
-      onCityChanged: (value) {
-        setState(() {
-          cidade = value.toString();
-        });
-      },
-      countryDropdownLabel: "Pais",
-      stateDropdownLabel: "Estado",
-      cityDropdownLabel: "Cidade",
-      dropdownDialogRadius: 30,
-    );
-  }
-
   Widget _buildCarroCheckbox() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

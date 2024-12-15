@@ -6,14 +6,14 @@ class Prestadores with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<Prestador> listEvento = [];
 
-  adiciona(Prestador prestador) {
+  void adiciona(Prestador prestador) {
     _firestore
         .collection("Prestadores")
         .doc(prestador.id)
         .set(prestador.toMap());
   }
 
-  caregar() async {
+  Future<List<Prestador>> caregar() async {
     List<Prestador> temp = [];
     QuerySnapshot<Map<String, dynamic>> snapshot =
         await _firestore.collection('Clientes').get();
@@ -21,6 +21,16 @@ class Prestadores with ChangeNotifier {
       temp.add(Prestador.fromMap(element.data()));
     }
     return temp;
+  }
+
+  Future<Prestador> carregarById(String id) async {
+    QuerySnapshot<Map<String, dynamic>> snapshot =
+        await _firestore.collection('Prestadores').get();
+
+    final dadosPrestador = snapshot.docs.firstWhere((item) => item.id == id);
+
+    final prestadorSelecionado = Prestador.fromMap(dadosPrestador.data());
+    return prestadorSelecionado;
   }
 
   void remove(Prestador prestador) {
