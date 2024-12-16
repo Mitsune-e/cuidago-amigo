@@ -38,8 +38,8 @@ class Prestador {
     double saldo = 0.0,
     double avaliacao = 5.0,
     List<String>? servicos,
-  })  : this.servicos = servicos ?? [],
-        this.Datas = servicos ?? [],
+  })  : servicos = servicos ?? [],
+        Datas = servicos ?? [],
         this.avaliacao = avaliacao,
         this.saldo = saldo; // Corrigido aqui
 

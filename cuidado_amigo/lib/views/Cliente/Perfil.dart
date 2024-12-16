@@ -221,11 +221,11 @@ class _PerfilState extends State<Perfil> {
                   ),
 
             // Botão para deletar perfil
-            ElevatedButton(
+            /* ElevatedButton(
                 onPressed: () {
                   _mostrarConfirmacaoExclusaoDialog();
                 },
-                child: const Text('Deletar Perfil')),
+                child: const Text('Deletar Perfil')), */
 
             const SizedBox(height: 20),
             _buildInfoBox(

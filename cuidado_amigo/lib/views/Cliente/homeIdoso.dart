@@ -51,7 +51,7 @@ class HomeIdoso extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildSquare(
+                  /* buildSquare(
                     context,
                     'Enfermeira(o)',
                     'Assets/imagens/enfermeira.png',
@@ -59,7 +59,7 @@ class HomeIdoso extends StatelessWidget {
                       //Navigator.of(context).pushNamed('/pedirEnfermeiro');
                     },
                   ),
-                  const SizedBox(width: 20),
+                  const SizedBox(width: 20), */
                   _buildSquare(
                     context,
                     'Cuidador ou Passeador',

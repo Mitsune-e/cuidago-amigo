@@ -651,8 +651,8 @@ class _Cadastro1State extends State<Cadastro1> {
       print(result);
 
       _estadoController.text = result.uf ?? "";
-      _cidadeController.text = result.logradouro ?? "";
-      _enderecoController.text = result.localidade ?? "";
+      _cidadeController.text = result.localidade ?? "";
+      _enderecoController.text = result.logradouro ?? "";
       _numeroController.text = result.unidade ?? "";
       setState(() {});
     } on Exception catch (e) {
