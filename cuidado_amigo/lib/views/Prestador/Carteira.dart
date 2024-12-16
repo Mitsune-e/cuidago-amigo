@@ -33,7 +33,7 @@ class _CarteiraState extends State<Carteira> {
 
       // Verifica se _auth.currentUser não é null antes de acessar uid
       if (_auth.currentUser != null) {
-        String idDoUsuario = ""; //_auth.currentUser!.uid;
+        String idDoUsuario = _auth.currentUser!.uid;
         Prestador? prestador =
             await prestadoresProvider.loadClienteById(idDoUsuario);
         print(prestador!.name);
