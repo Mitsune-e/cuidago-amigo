@@ -4,7 +4,7 @@ import 'package:cuidadoamigoapp/provider/servicos.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cuidadoamigoapp/models/Servico.dart';
+import 'package:cuidadoamigoapp/models/servico.dart';
 import 'package:uuid/uuid.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';

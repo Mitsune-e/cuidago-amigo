@@ -1,5 +1,5 @@
 import 'package:cuidadoamigoapp/models/Prestador.dart';
-import 'package:cuidadoamigoapp/models/Servico.dart';
+import 'package:cuidadoamigoapp/models/servico.dart';
 import 'package:cuidadoamigoapp/provider/Prestadores.dart';
 import 'package:cuidadoamigoapp/provider/servicos.dart';
 import 'package:flutter/material.dart';
