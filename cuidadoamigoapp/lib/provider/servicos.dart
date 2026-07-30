@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cuidadoamigoapp/models/servico.dart';
+import 'package:cuidadoamigoapp/models/Servico.dart';
 import 'package:flutter/material.dart';
 
 class Servicos with ChangeNotifier {
