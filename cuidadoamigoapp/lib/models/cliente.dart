@@ -35,7 +35,7 @@ class Cliente {
     required this.alimentacao,
     required this.doencaCronica,
     List<String>? servicos,
-  }) : this.servicos = servicos ?? [];
+  }) : servicos = servicos ?? [];
 
   Cliente.fromMap(Map<String, dynamic> map)
       : id = map["id"],

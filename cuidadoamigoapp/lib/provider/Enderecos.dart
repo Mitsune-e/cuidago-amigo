@@ -6,7 +6,7 @@ class Enderecos with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<Endereco> listEndereco = [];
 
-  adiciona(Endereco endereco) {
+  void adiciona(Endereco endereco) {
     _firestore.collection("Enderecos").doc(endereco.id).set(endereco.toMap());
   }
 
@@ -25,7 +25,7 @@ class Enderecos with ChangeNotifier {
     }
   }
 
-  caregar() async {
+  Future<List<Endereco>> caregar() async {
     List<Endereco> temp = [];
     QuerySnapshot<Map<String, dynamic>> snapshot =
         await _firestore.collection('Enderecos').get();

@@ -27,11 +27,10 @@ class _PerfilState extends State<PerfilCuidador> {
   final TextEditingController _numeroController = TextEditingController();
   final TextEditingController _complementoController = TextEditingController();
   String? imageUrl;
-  var cidade = "";
-  var estado = '';
-  var estado_novo = "";
-  var cidade_novo = "";
-  List<String> cliente_enderecos = [];
+  String cidade = "";
+  String estado = '';
+  String estado_novo = "";
+  String cidade_novo = "";
   bool _isLoadingImage = true;
   final TextEditingController _descricaoController = TextEditingController();
   bool _possuiCarro = false;
@@ -40,11 +39,6 @@ class _PerfilState extends State<PerfilCuidador> {
   void initState() {
     super.initState();
     _loadData();
-
-    User? user = _auth.currentUser;
-    if (user != null) {
-      _loadUserData(user.uid);
-    }
   }
 
   Future<void> _loadData() async {
@@ -186,42 +180,36 @@ class _PerfilState extends State<PerfilCuidador> {
             const SizedBox(height: 20),
             // Use um widget de carregamento enquanto a imagem está sendo carregada
             _isLoadingImage
-                ? CircularProgressIndicator()
+                ? const CircularProgressIndicator()
                 : ClipOval(
-                    child: _isLoadingImage
-                        ? CircularProgressIndicator()
-                        : imageUrl != null && imageUrl!.isNotEmpty
-                            ? Image.network(
-                                imageUrl!,
-                                width: 150,
-                                height: 150,
-                                fit: BoxFit.cover,
-                                loadingBuilder: (BuildContext context,
-                                    Widget child,
+                    child: imageUrl != null && imageUrl!.isNotEmpty
+                        ? Image.network(
+                            imageUrl!,
+                            width: 150,
+                            height: 150,
+                            fit: BoxFit.cover,
+                            loadingBuilder:
+                                (BuildContext context, Widget child,
                                     ImageChunkEvent? loadingProgress) {
-                                  if (loadingProgress == null) {
-                                    return child;
-                                  } else {
-                                    return Center(
-                                      child: CircularProgressIndicator(
-                                        value: loadingProgress
-                                                    .expectedTotalBytes !=
-                                                null
-                                            ? loadingProgress
-                                                    .cumulativeBytesLoaded /
-                                                (loadingProgress
-                                                        .expectedTotalBytes ??
-                                                    1)
-                                            : null,
-                                      ),
-                                    );
-                                  }
-                                },
-                              )
-                            : Icon(
-                                Icons.person,
-                                size: 150,
-                              ),
+                              if (loadingProgress == null) {
+                                return child;
+                              }
+                              return Center(
+                                child: CircularProgressIndicator(
+                                  value: loadingProgress.expectedTotalBytes !=
+                                          null
+                                      ? loadingProgress
+                                              .cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
+                                      : null,
+                                ),
+                              );
+                            },
+                          )
+                        : const Icon(
+                            Icons.person,
+                            size: 150,
+                          ),
                   ),
             ElevatedButton(
               onPressed: () {
@@ -286,7 +274,7 @@ class _PerfilState extends State<PerfilCuidador> {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
+            color: Colors.grey.withValues(alpha: 0.5),
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 3),
@@ -440,7 +428,7 @@ class _PerfilState extends State<PerfilCuidador> {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
+            color: Colors.grey.withValues(alpha: 0.5),
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 3),

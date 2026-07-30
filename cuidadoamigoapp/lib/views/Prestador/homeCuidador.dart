@@ -6,7 +6,6 @@ import 'package:cuidadoamigoapp/views/Prestador/detalhamento2.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:timezone/data/latest.dart';
-import 'package:timezone/timezone.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:provider/provider.dart';
 import 'package:cuidadoamigoapp/provider/servicos.dart';
@@ -32,17 +31,14 @@ class HomeCuidadorState extends State<HomeCuidador> {
   void initState() {
     super.initState();
 
-    final User? user = _auth.currentUser;
-
     initializeTimeZones();
 
-    // Obter o fuso horário de Brasília
     final String brt = 'America/Sao_Paulo';
-    final location = getLocation(brt);
-
-    // Obter a data e hora atual no fuso horário de Brasília
+    final location = tz.getLocation(brt);
     var now = DateTime.now().toLocal();
     now = tz.TZDateTime.from(now, location);
+
+    final User? user = _auth.currentUser;
 
     if (user != null) {
       _reloadServicosDoCliente(user.uid, Servico.solicitado);
@@ -107,7 +103,7 @@ class HomeCuidadorState extends State<HomeCuidador> {
 
   @override
   Widget build(BuildContext context) {
-    Color buttonBackgroundColor = const Color(0xFF73C9C9).withOpacity(0.8);
+    Color buttonBackgroundColor = const Color(0xFF73C9C9).withValues(alpha: 0.8);
 
     return Scaffold(
       appBar: AppBar(
@@ -224,8 +220,6 @@ class HomeCuidadorState extends State<HomeCuidador> {
   }
 
   Widget _buildServiceItem(Servico servico) {
-    bool showPlayButton = isShowPlayButton(servico);
-
     return Card(
       elevation: 4,
       margin: const EdgeInsets.only(bottom: 16),
@@ -252,17 +246,16 @@ class HomeCuidadorState extends State<HomeCuidador> {
     );
   }
 
-  _pickButtonToShow(Servico servico) {
+  Widget? _pickButtonToShow(Servico servico) {
     if (servico.status == Servico.solicitado) {
       return IconButton(
-        icon: Icon(
+        icon: const Icon(
           Icons.play_circle_fill,
           color: Colors.green,
           size: 32,
         ),
         onPressed: () {
           servico.status = Servico.emAndamento;
-
           Provider.of<Servicos>(context, listen: false).editar(servico);
           _reloadServicosDoCliente(userId, Servico.emAndamento);
         },
@@ -270,14 +263,13 @@ class HomeCuidadorState extends State<HomeCuidador> {
     }
     if (servico.status == Servico.emAndamento) {
       return IconButton(
-        icon: Icon(
+        icon: const Icon(
           Icons.play_circle_fill,
           color: Colors.blue,
           size: 32,
         ),
         onPressed: () {
           servico.status = Servico.finalizado;
-
           Provider.of<Servicos>(context, listen: false).editar(servico);
           _reloadServicosDoCliente(userId, Servico.finalizado);
         },

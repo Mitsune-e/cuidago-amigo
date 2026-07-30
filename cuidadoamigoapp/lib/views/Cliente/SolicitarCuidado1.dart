@@ -197,12 +197,7 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
-                        setState(() {
-                          _loadUserData(_auth.currentUser!.uid);
-                          stateController.text = estado;
-                          cityController.text = cidade;
-                        });
-                        final cscPickerState = _cscPickerKey.currentState;
+                        await _loadUserData(_auth.currentUser!.uid);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF73C9C9),
@@ -367,10 +362,9 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                         selectedTimeFim!.isAfter(
                             selectedTimeInicio!.add(Duration(minutes: 30))) &&
                         _validateAddress()) {
-                      if (dataController.text.isEmpty ||
-                          dataController.text == null) {
+                      if (dataController.text.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
+                          const SnackBar(
                             content: Text('O campo de Data é obrigatório.'),
                           ),
                         );
@@ -380,41 +374,39 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                           selectedTimeFim == null ||
                           selectedTimeFim!.isBefore(selectedTimeInicio!)) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
+                          const SnackBar(
                             content: Text('O campo de Horário é obrigatório.'),
                           ),
                         );
                         return;
                       }
-                      if (cidade == null || cidade.isEmpty) {
+                      if (cidade.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
+                          const SnackBar(
                             content: Text('O campo de Cidade é obrigatório.'),
                           ),
                         );
                         return;
                       }
-                      if (estado == null || estado.isEmpty) {
+                      if (estado.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
+                          const SnackBar(
                             content: Text('O campo de Estado é obrigatório.'),
                           ),
                         );
                         return;
                       }
-                      if (enderecoController.text.isEmpty ||
-                          enderecoController.text == null) {
+                      if (enderecoController.text.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
+                          const SnackBar(
                             content: Text('O campo de Endereço é obrigatório.'),
                           ),
                         );
                         return;
                       }
-                      if (numeroController.text.isEmpty ||
-                          numeroController.text == null) {
+                      if (numeroController.text.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
+                          const SnackBar(
                             content: Text('O campo de Número é obrigatório.'),
                           ),
                         );
@@ -655,7 +647,7 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                   color: Colors.white,
                   border: Border.all(
-                    color: Colors.grey.withOpacity(0.5),
+                    color: Colors.grey.withValues(alpha: 0.5),
                     style: BorderStyle.solid,
                   ),
                 ),
@@ -663,7 +655,7 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                   color: Colors.grey[200],
                   border: Border.all(
-                    color: Colors.grey.withOpacity(0.5),
+                    color: Colors.grey.withValues(alpha: 0.5),
                     style: BorderStyle.solid,
                   ),
                 ),
@@ -687,12 +679,12 @@ class _SolicitarCuidado1State extends State<SolicitarCuidado1> {
                 },
                 onStateChanged: (value) {
                   setState(() {
-                    estadoController.text = value.toString();
+                    estadoController.text = value ?? '';
                   });
                 },
                 onCityChanged: (value) {
                   setState(() {
-                    cidadeController.text = value.toString();
+                    cidadeController.text = value ?? '';
                   });
                 },
               ),

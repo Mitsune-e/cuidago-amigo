@@ -20,7 +20,7 @@ class Agenda extends StatefulWidget {
 }
 
 class _AgendaState extends State<Agenda> {
-  FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   List<Servico> servicosDoCliente = [];
   List<Servico> servicosEmAberto = [];
   List<Servico> servicosEmAndamento = [];
@@ -60,8 +60,7 @@ class _AgendaState extends State<Agenda> {
         final servicosDoClienteByIds = cliente.servicos;
 
         for (var document in querySnapshot.docs) {
-          final servico =
-              Servico.fromMap(document.data() as Map<String, dynamic>);
+          final servico = Servico.fromMap(document.data());
 
           if (servicosDoClienteByIds!.any((id) => id == servico.id)) {
             final prestador = await loadPrestadorById(servico.prestador);

@@ -15,7 +15,7 @@ class AuthService extends ChangeNotifier {
     _authCheck();
   }
 
-  _authCheck() {
+  void _authCheck() {
     _auth.authStateChanges().listen((User? user) {
       usuario = (user == null) ? null : user;
       isLoading = false;
@@ -23,12 +23,12 @@ class AuthService extends ChangeNotifier {
     });
   }
 
-  _getUser() {
+  void _getUser() {
     usuario = _auth.currentUser;
     notifyListeners();
   }
 
-  registrar(String email, String senha) async {
+  Future<void> registrar(String email, String senha) async {
     try {
       await _auth.createUserWithEmailAndPassword(email: email, password: senha);
       _getUser();
@@ -41,7 +41,7 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  login(String email, String senha) async {
+  Future<void> login(String email, String senha) async {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: senha);
       _getUser();
@@ -54,12 +54,12 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  logout() async {
+  Future<void> logout() async {
     await _auth.signOut();
     _getUser();
   }
 
-  forgetpassword(String email) async {
+  Future<void> forgetpassword(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
     } on FirebaseAuthException catch (e) {

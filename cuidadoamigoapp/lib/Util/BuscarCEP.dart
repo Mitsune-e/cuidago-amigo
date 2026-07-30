@@ -1,6 +1,6 @@
 import 'package:search_cep/search_cep.dart';
 
-buscarCEP(String cep) async {
+Future<ViaCepInfo> buscarCEP(String cep) async {
   final viaCepSearchCep = ViaCepSearchCep();
   final resultJson = await viaCepSearchCep.searchInfoByCep(cep: cep);
 

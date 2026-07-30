@@ -10,10 +10,7 @@ import 'package:cuidadoamigoapp/widgets/TextFieldComponent.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'package:csc_picker/csc_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:search_cep/search_cep.dart';
 
 class Cadastro1 extends StatefulWidget {
   const Cadastro1({super.key});
